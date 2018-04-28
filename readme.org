@@ -1,0 +1,873 @@
+* Jeremy's Emacs
+#+CAPTION: Screenshot of Emacs setup
+#+NAME:   Emacs Dashboard
+[[./assets/screenshot.png]]
+
+** Installation
+This is my personal emacs configuration. I prefer to keep this repo seperate from my =~/.emacs.d/= dir, therefore, the =~/.emacs= file can be generated directly from this readme by tangling the code snippets. This can be done globally with org-babel-tangle (~C-c C-v t~). After tangling the file you should be able to relaunch (or simply evaluate) the resulting =~/.emacs= file and, assuming you have a working [[https://github.com/jwiegley/use-package][use-package]] configuration, emacs should work without issue.
+
+Before tangling the file, please read through the random thoughts throughout and turn on/off the features that you would like by removing the ~:tangle~ flag from the source blocks. Tangling the entire file will overwrite anything in your local =~/.emacs= file.
+
+Credit where credit is due: a lot of the content in my configuration was lifted from fellow emacsers like [[https://github.com/daedreth/UncleDavesEmacs][Uncle Dave]], [[http://sachachua.com/blog/category/emacs/][Sacha Chua]] and [[http://cestlaz.github.io/stories/emacs/][Mike Zamanski]] to name a few; as well as countless reddit, emacs.stackexchange and stackoverflow contributors.
+
+** Configuration
+*** Package archives and use-package
+Setting up basic repositories and such.
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (require 'package)
+  (setq package-enable-at-startup nil)
+
+  (setq package-archives '(("marmalade"  . "http://marmalade-repo.org/packages/")
+            ("melpa-stable" . "http://stable.melpa.org/packages/")
+            ("gnu" . "https://elpa.gnu.org/packages/")
+            ("melpa" . "https://melpa.org/packages/")))
+  (package-initialize)
+
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+  (package-install 'use-package))
+
+#+END_SRC
+*** Personal Information
+For the sake of completeness, configure name and email address
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (setq user-full-name "Jeremy Gooch"
+        user-mail-address "jeremy.gooch@gmail.com")
+#+END_SRC
+
+*** Run emacs as a replacement for desktop/window manager
+Emacs was the original terminal multiplexer so manages split views quite nicely.
+
+First, get some basics out of the way. Switch to fullscreen mode and hide the menus and also adjust the default font size while we're at it.
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (set-frame-parameter nil 'fullscreen 'fullboth)
+  (set-face-attribute 'default nil :height 100)
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+#+END_SRC
+
+The default keybindings for naviating split views can be cumbersome, so remap them to something a bit easier.
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+
+  (global-set-key (kbd "C-c <left>")  'windmove-left)
+  (global-set-key (kbd "C-c <right>") 'windmove-right)
+  (global-set-key (kbd "C-c <up>")    'windmove-up)
+  (global-set-key (kbd "C-c <down>")  'windmove-down)
+#+END_SRC
+
+We'll need to turn off the mouse from time to time
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (use-package disable-mouse
+    :ensure t)
+#+END_SRC
+
+**** EXWM
+With EXWM it can act as a complete desktop environment.
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (use-package exwm
+    :ensure t)
+  (use-package exwm-config
+    :config
+    (exwm-config-default)
+    (exwm-config-ido))
+#+END_SRC
+
+Fortunately EXWM also has support for multiple monitors.
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (use-package exwm-randr
+  )
+  (setq exwm-randr-workspace-output-plist '(1 "VGA-1" 2 "VGA-2"))
+  (add-hook 'exwm-randr-screen-change-hook
+            (lambda ()
+              (start-process-shell-command
+               "xrandr" nil "xrandr --output VGA-1 --left-of VGA-2 --auto")))
+  (exwm-randr-enable)
+#+END_SRC
+
+**** Screenshots
+I took this from Uncle Dave's config. Its a super slick screenshot function for taking both fullscreen as well as region screenshots.
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+    (defun jrm3/take-screenshot ()
+    "Takes a fullscreenshot of the current workspace"
+    (interactive)
+    (when window-system
+      (cl-loop for i downfrom 3 to 1 do
+            (progn
+              (message (concat (number-to-string i) "..."))
+              (sit-for 1)))
+      (message "Cheese!")
+      (sit-for 1)
+      (start-process "screenshot" nil "import" "-window" "root"
+                     (concat (getenv "HOME") "/Pictures/" (current-time-string) ".png"))
+      (message "Screenshot taken!")))
+  (global-set-key (kbd "<C-print>") 'jrm3/take-screenshot)
+
+  (defun jrm3/take-screenshot-region ()
+    "Takes a screenshot of a region selected by the user"
+    (interactive)
+    (when window-system
+      (call-process "import" nil nil nil ".newScreenshot.png")
+      (call-process "convert" nil nil nil ".newScreenshot.png" "-shave" "1x1"
+                    (concat (getenv "HOME") "/Pictures/" (current-time-string) ".png"))
+      (call-process "rm" nil nil nil ".newScreenshot.png")))
+  (global-set-key (kbd "<print>") 'jrm3/take-screenshot-region)
+#+END_SRC
+
+**** Application Launcher with dmenu
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+(use-package dmenu
+  :ensure t
+  :bind
+    ("s-SPC" . 'dmenu))
+#+END_SRC
+
+**** X11
+According to the [[https://www.systutorials.com/docs/linux/man/1-Xorg.wrap/][man page]], edit [[/etc/X11/Xwrapper.config]] to include the line:
+~allowed_users=anybody~ and ~needs_root_rights=yes~.
+
+#+BEGIN_SRC shell :exports code :tangle ~/.xinitrc
+#!/bin/bash
+exec emacs
+#+END_SRC
+
+**** Minibuffer considerations for desktop/fullscreen usage
+Display the current time and battery indicator
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (setq display-time-24hr-format t)
+  (setq display-time-format "%H:%M - %d.%b.%y")
+  (display-time-mode 1)
+
+  (display-battery-mode 1)
+#+END_SRC
+
+*** UI Components
+**** Dashboard
+What can I say, I like a nice big splash screen and I'm partial to the meditating GNU logo.
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (use-package dashboard
+    :ensure t
+    :config
+      (dashboard-setup-startup-hook)
+      (setq dashboard-startup-banner (concat (getenv "HOME") "/emacsdotorg/assets/gnu-meditate-scaled.png"))
+      (setq dashboard-items '((recents  . 5)
+                              (projects . 5)))
+      (setq dashboard-banner-logo-title ""))
+
+#+END_SRC
+
+**** Theme
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (use-package zerodark-theme
+    :ensure t)
+#+END_SRC
+*** Shell
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (add-hook 'shell-mode-hook 'disable-mouse-mode)
+  ;; Make shells interactive (i.e. M-!, or source blocks in org)
+  (setq shell-command-switch "-ic")
+#+END_SRC
+
+By default just use bash for all shells
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (defvar my-term-shell "/bin/bash")
+  (defadvice ansi-term (before force-bash)
+    (interactive (list my-term-shell)))
+  (ad-activate 'ansi-term)
+#+END_SRC
+
+*** Org Mode
+Load some basic minor modes by default
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs 
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (disable-mouse-mode)
+              (no-trailing-whitespace)
+              ))
+  (add-hook 'org-src-mode-hook 'disable-mouse-mode)
+#+END_SRC
+
+Show the asterisks as bullets
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+(use-package org-bullets
+  :ensure t
+  :config
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
+#+END_SRC
+
+**** Literate programming
+One of the coolest features of org mode imo is the ability to evaluate almost any language via org-babel. Lets load in the non-common ones.
+#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
+  (use-package ob-js
+    :ensure t)
+  (use-package ob-python
+    :ensure t)
+  (use-package ob-typescript
+    :ensure t)
+
+  (use-package ob-rust
+    :ensure t)
+  (use-package ob-go
+    :ensure t)
+
+  (use-package ob-java
+    :ensure t)
+
+  (with-temp-buffer
+    (url-insert-file-contents "https://raw.github.com/steckerhalter/ob-php/master/ob-php.el")
+    (eval-buffer))
+  (use-package ob-php
+    :ensure t)
+
+  (add-to-list 'org-babel-load-languages '(php . t) '(emacs-lisp . nil))
+  (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)
+#+END_SRC
+
+Make it easier to tangle the current source block
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+(global-set-key (kbd "C-c v t") (lambda () (interactive) (org-babel-tangle-block)))
+#+END_SRC
+
+Add option to append as part of tangling a file
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (defun org-babel-tangle-append ()
+    "Append source code block at point to its tangle file.
+  The command works like `org-babel-tangle' with prefix arg
+  but `delete-file' is ignored."
+    (interactive)
+    (cl-letf (((symbol-function 'delete-file) #'ignore))
+      (org-babel-tangle '(4))))
+
+  (defun org-babel-tangle-append-setup ()
+    "Add key-binding C-c C-v C-t for `org-babel-tangle-append'."
+    (org-defkey org-mode-map (kbd "C-c C-v +") 'org-babel-tangle-append))
+
+  (add-hook 'org-mode-hook #'org-babel-tangle-append-setup)
+#+END_SRC
+
+**** Org Agenda
+Bind org agenda to shortcut and give it our todo paths. Note that the paths are not recursive for org-agenda-files.
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (define-key global-map "\C-ca" 'org-agenda)
+
+  ;; use find-file for recursion
+  (load-library "find-lisp")
+  (setq org-agenda-files (find-lisp-find-files "~/Dropbox" "\.org$"))
+
+  ;; Exclude the dropbox cache directory
+  (eval-when-compile (require 'cl))
+  (setq org-agenda-files
+        (remove-if '(lambda (x)
+                      (string-match
+                       (concat "^" (regexp-quote (expand-file-name "~/Dropbox/.dropbox.cache/")))
+                       x))
+                   org-agenda-files))
+#+END_SRC
+
+Super simple reordering from Org Agenda -> Todo view
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  ;; The following was lifted from http://pragmaticemacs.com/emacs/reorder-todo-items-in-your-org-mode-agenda/
+  (defun jrm3/org-headline-to-top ()
+    "Move the current org headline to the top of its section"
+    (interactive)
+    ;; check if we are at the top level
+    (let ((lvl (org-current-level)))
+      (cond
+       ;; above all headlines so nothing to do
+       ((not lvl)
+        (message "No headline to move"))
+       ((= lvl 1)
+        ;; if at top level move current tree to go above first headline
+        (org-cut-subtree)
+        (beginning-of-buffer)
+        ;; test if point is now at the first headline and if not then
+        ;; move to the first headline
+        (unless (looking-at-p "*")
+          (org-next-visible-heading 1))
+        (org-paste-subtree))
+       ((> lvl 1)
+        ;; if not at top level then get position of headline level above
+        ;; current section and refile to that position. Inspired by
+        ;; https://gist.github.com/alphapapa/2cd1f1fc6accff01fec06946844ef5a5
+        (let* ((org-reverse-note-order t)
+               (pos (save-excursion
+                      (outline-up-heading 1)
+                      (point)))
+               (filename (buffer-file-name))
+               (rfloc (list nil filename nil pos)))
+          (org-refile nil nil rfloc))))))
+
+  (defun jrm3/org-agenda-item-to-top ()
+    "Move the current agenda item to the top of the subtree in its file"
+    (interactive)
+    ;; save buffers to preserve agenda
+    (org-save-all-org-buffers)
+    ;; switch to buffer for current agenda item
+    (org-agenda-switch-to)
+    ;; move item to top
+    (jrm3/org-headline-to-top)
+    ;; go back to agenda view
+    (switch-to-buffer (other-buffer (current-buffer) 1))
+    ;; refresh agenda
+    (org-agenda-redo)
+    )
+
+  (define-key org-agenda-mode-map (kbd "1") 'jrm3/org-agenda-item-to-top)
+#+END_SRC
+
+**** Org Capture
+Customize org capture to my liking
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (global-set-key (kbd "C-c c") 'org-capture)
+  (setq org-capture-templates
+   '(("w" "Work Todo" entry (file "~/Dropbox/SA.org")
+      "** TODO %?\n  %i\n  %a")
+     ;; ("a" "Aqua Orb Todo" entry (file+headline "~/Dropbox/Projects.org" "Aqua Orb")
+     ;;  "** TODO %?\n  %i\n  %a")
+     ;; ("o" "Reorganize Workflow Todo" entry (file+headline "~/Dropbox/Projects.org" "Reorganize Workflow")
+     ;;  "** TODO %?\n  %i\n  %a")
+     ("m" "Meeting" entry (file "~/Dropbox/Meetings.org")
+      "** MEETING with %? :MEETING:\n  %i\n"  :clock-in t :clock-resume t)
+     ("m" "Next" entry (file "~/Dropbox/Next.org")
+      "** NEXT %?\n  %i\n  %a")
+     ("i" "Idea" entry (file "~/Dropbox/Ideas.org")
+      "** TODO %?\n  %i\n  %a" :clock-in t :clock-resume t)
+     ("M" "Milestone" entry (file "~/Dropbox/SA-milestones.org")
+      "* %u %?\n*Summary*: \n\n*Description*: \n\n" :clock-in t :clock-resume t)))
+
+
+#+END_SRC
+
+**** TODO Update Custom Org workflow
+Lifted from [[http://cachestocaches.com/2016/9/my-workflow-org-agenda/]]. Need to customize to my preferences.
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  ;; (setq org-todo-keywords '((type "TODO" "NEXT" "DONE" "WITING" "INACTIVE" "CANCELLED" "MEETING"))
+
+  ;; == Tags ==
+  (setq org-tag-alist '((:startgroup)
+                ("@errand" . ?e)
+                ("@personal" . ?p)
+                (:endgroup)
+                ("DESIGN" . ?D)
+                ("FRONTEND" . ?f)
+                ("CULTURE" . ?C)
+                ("DEVOPS" . ?v)
+                ))
+
+  ;; Allow setting single tags without the menu
+  (setq org-fast-tag-selection-single-key 'expert)
+
+  ;; Include the todo keywords
+  (setq org-fast-tag-selection-include-todo t)
+
+  ;; == Custom State Keywords ==
+  (setq org-use-fast-todo-selection t)
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+      (sequence "WAITING(w@/!)" "INACTIVE(i@/!)" "|" "CANCELLED(c@/!)" "MEETING")))
+  ;; Custom colors for the keywords
+  (setq org-todo-keyword-faces
+        '(("TODO" :foreground "red" :weight bold)
+      ("NEXT" :foreground "blue" :weight bold)
+      ("DONE" :foreground "forest green" :weight bold)
+      ("WAITING" :foreground "orange" :weight bold)
+      ("INACTIVE" :foreground "magenta" :weight bold)
+      ("CANCELLED" :foregroundhttp://cachestocaches.com/2016/9/my-workflow-org-agenda/ "forest green" :weight bold)
+      ("MEETING" :foreground "forest green" :weight bold)))
+  ;; Auto-update tags whenever the state is changed
+  (setq org-todo-state-tags-triggers
+        '(("CANCELLED" ("CANCELLED" . t))
+      ("WAITING" ("WAITING" . t))
+      ("INACTIVE" ("WAITING") ("INACTIVE" . t))
+      (done ("WAITING") ("INACTIVE"))
+      ("TODO" ("WAITING") ("CANCELLED") ("INACTIVE"))
+      ("NEXT" ("WAITING") ("CANCELLED") ("INACTIVE"))
+      ("DONE" ("WAITING") ("CANCELLED") ("INACTIVE"))))
+  (defun gs/mark-next-done-parent-tasks-todo ()
+    "Visit each parent task and change NEXT (or DONE) states to TODO."
+    ;; Don't change the value if new state is "DONE"
+    (let ((mystate (or (and (fboundp 'org-state)
+                            (member state
+                    (list "NEXT" "TODO")))
+                       (member (nth 2 (org-heading-components))
+                   (list "NEXT" "TODO")))))
+      (when mystate
+        (save-excursion
+          (while (org-up-heading-safe)
+            (when (member (nth 2 (org-heading-components)) (list "NEXT" "DONE"))
+              (org-todo "TODO")))))))
+  (add-hook 'org-after-todo-state-change-hook 'gs/mark-next-done-parent-tasks-todo 'append)
+
+#+END_SRC
+
+**** Custom Jira Integrations for Org Agenda
+Setup account
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (setq org-jira-working-dir "~/Dropbox/org-jira/")
+  (setq jiralib-url "https://softwareadvice.atlassian.net")
+#+END_SRC
+
+Add basic group tagging to buffer
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (defun jrm3/jira-tags ()
+    "Add Jira tags based on common Jira Ids"
+    (interactive)
+
+      (switch-to-buffer "FE.org")
+      (let ((case-fold-search t))
+        (goto-char (point-min))
+        (while (search-forward " :fe_" nil t)
+          (replace-match " :FE:FE_"))
+        )
+      (switch-to-buffer "GN.org")
+      (let ((case-fold-search t))
+        (goto-char (point-min))
+        (while (search-forward " :gn_" nil t)
+          (replace-match " :GN:GN_"))
+        )
+    )
+#+END_SRC
+
+Get issues then tag the buffers
+#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
+  (defun jrm3/jira-get-issues ()
+    "Add Jira tags based on common Jira Ids"
+    (interactive)
+    (org-jira-get-issues ())
+    (switch-to-buffer "FE.org")
+    (let ((case-fold-search t))
+      (goto-char (point-min))
+      (while (search-forward " :fe_" nil t)
+        (replace-match " :FE:FE_"))
+      )
+    (switch-to-buffer "GN.org")
+    (let ((case-fold-search t))
+      (goto-char (point-min))
+      (while (search-forward " :gn_" nil t)
+        (replace-match " :GN:GN_"))
+      )
+    )
+
+    (let ((case-fold-search t))
+      (goto-char (point-min))
+      (while (search-forward " :fe_" nil t)
+        (replace-match " :FE:FE_"))
+
+      (while (search-forward " :gn_" nil t)
+        (replace-match " :GN:GN_"))
+      )
+    )
+#+END_SRC
+
+*** Filesystem Navigation
+Tramp is a must have for my workflows
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (use-package tramp
+    :config
+    (setq tramp-default-method "scp"))
+#+END_SRC
+
+I'm finding I use Tabbar less and less in favor of other utilities (i.e. ibuffer and ido). Leaving it in for now as it's sometimes still helpful in certain situations.
+#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
+  (use-package tabbar
+    :config
+    (tabbar-mode t))
+#+END_SRC
+
+Setup Ibuffer and organize by mode type
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
+
+  (setq ibuffer-saved-filter-groups
+        (quote (("default"
+                 ("dired" (mode . dired-mode))
+                 ("org" (mode . org-mode))
+                 ("shell" (mode . shell-mode))
+                 ("git" (name . "^magit\*"))
+                 ("Slack" (or
+                           (mode . slack-mode)
+                           (name . "^\\*Slack.*$")
+                           ))
+                 ("email" (name . "^\\*mu4e-.*\\*$"))
+                 ("javascript" (or
+                                (mode . javascript-mode)
+                                (name . "^.*.js$")
+                                (name . "^.*.json$")
+                                ))
+                 ("markup" (or
+                            (mode . web-mode)
+                            (name . "^.*.tpl")
+                            (name . "^.*.mst")
+                            (name . "^.*.html")
+                            ))
+                 ("images" (name . "^.*png$"))
+                 ("process" (or
+                             (mode . grep-mode)
+                             (name . "^\\*tramp*$")
+                             ))
+                 ("emacs" (or
+                           (name . "^\\*scratch\\*$")
+                           (name . "^\\*Messages\\*$")
+                           (name . "^\\*eww\\*$")
+                           (name . "^\\*GNU Emacs\\*$")
+                           ))
+                 ))))
+
+  (add-hook 'ibuffer-mode-hook
+            (lambda ()
+              (ibuffer-switch-to-saved-filter-groups "default")))
+#+END_SRC
+
+Dumb jump for jumping around projects
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (dumb-jump-mode)
+  (global-set-key (kbd "C-c C-j") 'dumb-jump-go)
+#+END_SRC
+
+Copy current file path
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+;; Copy the file path of the current buffer
+(defun xah-copy-file-path (&optional *dir-path-only-p)
+  "Copy the current buffer's file path or dired path to `kill-ring'.
+Result is full path.
+If `universal-argument' is called first, copy only the dir path.
+URL `http://ergoemacs.org/emacs/emacs_copy_file_path.html'
+Version 2017-01-27"
+  (interactive "P")
+  (let ((-fpath
+         (if (equal major-mode 'dired-mode)
+             (expand-file-name default-directory)
+           (if (buffer-file-name)
+               (buffer-file-name)
+             (user-error "Current buffer is not associated with a file.")))))
+    (kill-new
+     (if *dir-path-only-p
+         (progn
+           (message "Directory path copied: 「%s」" (file-name-directory -fpath))
+           (file-name-directory -fpath))
+       (progn
+         (message "File path copied: 「%s」" -fpath)
+         -fpath )))))
+
+#+END_SRC
+
+Projectile for project level interaction
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (use-package projectile
+    :ensure t
+    :config
+    (projectile-global-mode))
+#+END_SRC
+
+*** In-file Navigation
+Easier paragraph jumping
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (global-set-key (kbd "M-p") 'backward-paragraph)
+  (global-set-key (kbd "M-n") 'forward-paragraph)
+#+END_SRC
+
+Avy is great for speed-of-thought navigation
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (use-package avy
+    :ensure t)
+  (global-set-key (kbd "M-s") 'avy-goto-char)
+  (global-set-key (kbd "C-c SPC") 'avy-goto-line)
+#+END_SRC
+
+Wrap long lines so I can see everything at a glance
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (global-visual-line-mode t)
+#+END_SRC
+
+*** File Editing utilities
+I find it helpful to be able to backtab (shift+tab) to un-indent
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (global-set-key (kbd "<backtab>") 'un-indent-by-removing-4-spaces)
+  (defun un-indent-by-removing-4-spaces ()
+    "Remove 4 spaces from beginning of of line."
+    (interactive)
+    (save-excursion
+      (save-match-data
+        (beginning-of-line)
+        ;; get rid of tabs at beginning of line
+        (when (looking-at "^\\s-+")
+          (untabify (match-beginning 0) (match-end 0)))
+        (when (looking-at "^    ")
+          (replace-match "")))))
+#+END_SRC
+
+Just some basic settings particular to how I like to work
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  ;; Overwrite mode
+  (delete-selection-mode 1)
+  ;; Backwards delete word
+  (global-set-key [M-delete] 'backward-kill-word)
+  ;; Use spaces instead of tabs
+  (setq-default indent-tabs-mode nil)
+  ;; Set default tab width
+  (setq-default tab-width 4)
+#+END_SRC
+
+Make evaluating lisp buffers even quicker
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (global-set-key (kbd "C-c C-e")  'eval-buffer)
+#+END_SRC
+
+Keep temporary and backup buffers out of current directory like a civilized human being.
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (custom-set-variables
+   '(auto-save-file-name-transforms '((".*" "~/.emacs.d/autosaves/\\1" t)))
+   '(backup-directory-alist '((".*" . "~/.emacs.d/backups/")))
+   '(delete-old-versions t))
+
+  (make-directory "~/.emacs.d/autosaves/" t)
+#+END_SRC
+
+I don't mind using the minibuffer for the current line num, but vertical line numbers is helpful for pair programming situations
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (global-set-key (kbd "C-c l l") 'linum-mode)
+  (global-set-key (kbd "C-c l d") (lambda () (interactive) (linum-mode 0)))
+#+END_SRC
+
+Turn off the mouse/trackpad when editing certain files
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (add-hook 'javascript-mode-hook 'disable-mouse-mode)
+  (add-hook 'text-mode-hook 'disable-mouse-mode)
+  (add-hook 'web-mode-hook 'disable-mouse-mode)
+#+END_SRC
+
+**** Programming & Ops
+Trailing whitespace == smh. However, I don't care about it in every situation, like when I'm reading prose.
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (use-package whitespace
+    :ensure t
+    :config
+    (setq-default show-trailing-whitespace t)
+
+    (defun no-trailing-whitespace ()
+      (setq show-trailing-whitespace nil))
+
+    (add-hook 'minibuffer-setup-hook
+              'no-trailing-whitespace)
+    (add-hook 'eww-mode-hook
+              'no-trailing-whitespace)
+    (add-hook 'shell-mode-hook
+              'no-trailing-whitespace)
+    (add-hook 'help-mode-hook
+              'no-trailing-whitespace)
+    (add-hook 'term-mode-hook
+              'no-trailing-whitespace)
+    (add-hook 'calendar-mode-hook
+              'no-trailing-whitespace))
+
+#+END_SRC
+
+Various modes helpful for development
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (use-package yaml-mode
+    :ensure t
+    :config
+    (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode)))
+
+
+  (use-package restclient
+    :ensure )
+
+
+  ;; PHP Mode Improved (http://www.emacswiki.org/emacs/php-mode-improved.el)
+  ;; (add-to-list 'load-path "~/.emacs.d/lisp/")
+  (use-package php-mode
+    :ensure t
+    :config
+    (autoload 'php-mode "php-mode-improved" "Major mode for editing php code." t)
+    (add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
+    (add-to-list 'auto-mode-alist '("\\.inc$" . php-mode)))
+
+  ;; SCSS Mode
+  (use-package sass-mode
+    :ensure t
+    :config
+    (setq exec-path (cons (expand-file-name "/usr/bin/sass") exec-path)))
+
+  ;; SGML Mode - Indentation
+  (add-hook 'sgml-mode-hook
+            (lambda ()
+              ;; Default indentation to 2, but let SGML mode guess, too.
+              (set (make-local-variable 'sgml-basic-offset) 4)
+              (sgml-guess-indent))
+            )
+
+  ;; Markdown Mode
+  (autoload 'markdown-mode "markdown-mode"
+    "Major mode for editing Markdown files" t)
+  (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
+  (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+  (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+
+  ;; Dired Mode
+  (global-auto-revert-mode 1)
+  (setq global-auto-revert-non-file-buffers t)
+  (setq auto-revert-verbose nil)
+
+  (use-package web-mode
+    :ensure t
+    :config
+    (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.tpl\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.mst\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.hbs\\'" . web-mode)))
+
+  ;; Last but not least
+  (setq c-basic-offset 4)
+  (setq web-mode-css-indent-offset 4)
+  (setq web-mode-markup-indent-offset 4)
+  (setq web-mode-code-indent-offset 4)
+#+END_SRC
+
+Magit for version control
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (use-package magit
+    :ensure t
+    :config
+    (global-set-key (kbd "C-x g") 'magit-status))
+#+END_SRC
+
+Emmet mode for html/css
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacsn
+  (add-hook 'sgml-mode-hook 'emmet-mode)
+  (add-hook 'css-mode-hook  'emmet-mode)
+#+END_SRC
+
+SCSS Compile on Save
+#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
+;; Compile on save
+(setq exec-path (cons (expand-file-name "/usr/bin/sass") exec-path))
+(add-to-list 'load-path (expand-file-name "~/emacs-setup/v24.4/.emacs.d/lisp/scss-mode.el"))
+(autoload 'scss-mode "scss-mode")
+(add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
+(setq-default scss-compile-at-save t)
+
+#+END_SRC
+
+*** Consuming Content
+**** EWW
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (defun eww-new ()
+    (interactive)
+    (let ((url (read-from-minibuffer "Enter URL or keywords: ")))
+      (switch-to-buffer (generate-new-buffer "eww"))
+      (eww-mode)
+      (eww url)))
+#+END_SRC
+
+**** Blogs
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (use-package elfeed
+    :config
+    (global-set-key (kbd "C-x e") 'elfeed)
+    (setq elfeed-feeds
+          '("http://nullprogram.com/feed/"
+            "https://fivethirtyeight.com/all/feed"
+            "http://planet.emacsen.org/atom.xml"
+            "http://www.usrsb.in/rss.xml"
+            "https://hackernoon.com/tagged/rss"
+            "https://www.smashingmagazine.com/category/javascript"
+            "http://planet.emacsen.org/atom.xml")))
+#+END_SRC
+
+*** Misc Emacs Enhancements
+**** Smex for auto complete meta commands
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+(use-package smex
+  :ensure t
+ :init
+  (smex-initialize)
+  :bind
+  ("M-x" . smex)
+  ("M-X" . smex-major-mode-commands))
+#+END_SRC
+
+**** Ido Mode
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (setq ido-enable-flex-matching nil)
+  (setq ido-create-new-buffer 'always) ;; create a buffer with specific name if it doesn't exist already
+  (setq ido-everywhere t)
+  (ido-mode 1)
+
+  (use-package ido-vertical-mode
+    :ensure t)
+  (ido-vertical-mode 1)
+  (setq ido-vertical-define-keys 'C-n-and-C-p-only)
+#+END_SRC
+
+**** Ivy/Counsel/Swiper
+Generic auto-complete with Ivy
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (ivy-mode 1)
+  (use-package ivy :demand
+    :ensure t
+    :config
+    (setq ivy-use-virtual-buffers t
+          ivy-count-format "%d/%d "))
+#+END_SRC
+
+Ivy enhanced search (swiper) and common Emacs meta commands (counsel)
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+(global-set-key (kbd "M-x") 'counsel-M-x)
+(global-set-key (kbd "C-s") 'swiper)
+#+END_SRC
+
+**** Fix emacs' regex
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (setq-default pcre-mode t)
+#+END_SRC
+
+**** Company for auto-complete
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (add-hook 'after-init-hook 'global-company-mode)
+#+END_SRC
+
+**** Change questions to accept single letter answers
+#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
+  (defalias 'yes-or-no-p 'y-or-n-)
+#+END_SRC
+
+**** Beacon
+Helpful for finding the cursor when jumping around
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (use-package beacon
+    :ensure t
+    :config
+      (beacon-mode 1))
+#+END_SRC
+**** Which key
+Some quick help for when I get stuck in the middle of a command
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (use-package which-key
+    :ensure t
+    :config
+      (which-key-mode))
+#+END_SRC
+**** Kill buffer
+When killing a buffer always pick the current buffer
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (defun kill-current-buffer ()
+    "Kills the current buffer."
+    (interactive)
+    (kill-buffer (current-buffer)))
+  (global-set-key (kbd "C-x k") 'kill-current-buffer)
+#+END_SRC
+**** Final pieces
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+(provide '.emacs)
+;;; .emacs ends here
+
+#+END_SRC
+
