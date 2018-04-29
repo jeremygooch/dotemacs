@@ -74,8 +74,7 @@ With EXWM it can act as a complete desktop environment.
 
 Fortunately EXWM also has support for multiple monitors.
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-  (use-package exwm-randr
-  )
+  (use-package exwm-randr)
   (setq exwm-randr-workspace-output-plist '(1 "VGA-1" 2 "VGA-2"))
   (add-hook 'exwm-randr-screen-change-hook
             (lambda ()
@@ -197,29 +196,16 @@ Show the asterisks as bullets
 **** Literate programming
 One of the coolest features of org mode imo is the ability to evaluate almost any language via org-babel. Lets load in the non-common ones.
 #+BEGIN_SRC emacs-lisp :exports code ~/.emacs
-  (use-package ob-js
-    :ensure t)
-  (use-package ob-python
-    :ensure t)
-  (use-package ob-typescript
-    :ensure t)
+  (add-to-list 'org-src-lang-modes '("js" . "javascript")
+               '("php" . "php"))
 
-  (use-package ob-rust
-    :ensure t)
-  (use-package ob-go
-    :ensure t)
-
-  (use-package ob-java
-    :ensure t)
-
-  (with-temp-buffer
-    (url-insert-file-contents "https://raw.github.com/steckerhalter/ob-php/master/ob-php.el")
-    (eval-buffer))
-  (use-package ob-php
-    :ensure t)
-
-  (add-to-list 'org-babel-load-languages '(php . t) '(emacs-lisp . nil))
-  (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((python . t)
+     (go . t)
+     (typescript . t)
+     (rust . t)
+     (java . t)))
 #+END_SRC
 
 Make it easier to tangle the current source block
@@ -670,7 +656,11 @@ Various modes helpful for development
 
 
   (use-package restclient
-    :ensure )
+    :ensure t)
+
+
+  (use-package go-mode
+    :ensure t)
 
 
   ;; PHP Mode Improved (http://www.emacswiki.org/emacs/php-mode-improved.el)
@@ -767,21 +757,6 @@ SCSS Compile on Save
       (eww url)))
 #+END_SRC
 
-**** Blogs
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-  (use-package elfeed
-    :config
-    (global-set-key (kbd "C-x e") 'elfeed)
-    (setq elfeed-feeds
-          '("http://nullprogram.com/feed/"
-            "https://fivethirtyeight.com/all/feed"
-            "http://planet.emacsen.org/atom.xml"
-            "http://www.usrsb.in/rss.xml"
-            "https://hackernoon.com/tagged/rss"
-            "https://www.smashingmagazine.com/category/javascript"
-            "http://planet.emacsen.org/atom.xml")))
-#+END_SRC
-
 *** Misc Emacs Enhancements
 **** Smex for auto complete meta commands
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
@@ -867,7 +842,5 @@ When killing a buffer always pick the current buffer
 **** Final pieces
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
 (provide '.emacs)
-;;; .emacs ends here
-
 #+END_SRC
 
