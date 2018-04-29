@@ -139,6 +139,11 @@ Display the current time and battery indicator
   (display-battery-mode 1)
 #+END_SRC
 
+**** Send keys to EXWM Line Mode buffers
+I find the default way (C-c C-q) of exwm sending keys like ctrl to an async buffer difficult. C-c C-c is much simpler for me.
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (define-key exwm-mode-map [?\C-c ?\C-c] 'exwm-input-send-next-key)
+#+END_SRC
 *** UI Components
 **** Dashboard
 What can I say, I like a nice big splash screen and I'm partial to the meditating GNU logo.
@@ -147,7 +152,7 @@ What can I say, I like a nice big splash screen and I'm partial to the meditatin
     :ensure t
     :config
       (dashboard-setup-startup-hook)
-      (setq dashboard-startup-banner (concat (getenv "HOME") "/emacsdotorg/assets/gnu-meditate-scaled.png"))
+      (setq dashboard-startup-banner (concat (getenv "HOME") "/dotemacs/assets/gnu-meditate-scaled.png"))
       (setq dashboard-items '((recents  . 5)
                               (projects . 5)))
       (setq dashboard-banner-logo-title ""))
@@ -509,15 +514,12 @@ Dumb jump for jumping around projects
   (global-set-key (kbd "C-c C-j") 'dumb-jump-go)
 #+END_SRC
 
-Copy current file path
+Copy current file path. Lifted from (http://ergoemacs.org/emacs/emacs_copy_file_path.html)
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
 ;; Copy the file path of the current buffer
-(defun xah-copy-file-path (&optional *dir-path-only-p)
+(defun jrm3/copy-file-path (&optional *dir-path-only-p)
   "Copy the current buffer's file path or dired path to `kill-ring'.
-Result is full path.
-If `universal-argument' is called first, copy only the dir path.
-URL `http://ergoemacs.org/emacs/emacs_copy_file_path.html'
-Version 2017-01-27"
+Result is full path."
   (interactive "P")
   (let ((-fpath
          (if (equal major-mode 'dired-mode)
