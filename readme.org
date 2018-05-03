@@ -46,6 +46,8 @@ First, get some basics out of the way. Switch to fullscreen mode and hide the me
   (tool-bar-mode -1)
 #+END_SRC
 
+#+RESULTS:
+
 The default keybindings for naviating split views can be cumbersome, so remap them to something a bit easier.
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
 
@@ -463,20 +465,21 @@ Get issues then tag the buffers
 **** Confluence
 Atlassian Confluence's WYSIWYG editor leaves a lot to be desired. It's much better to work in org mode then export to confluence using ox-confluence. At this time there is not a simple way to maintain a page in Confluence via org mode so this will have to suffice. Also, since ox-confluence is not in the repo, fetch it manually and put it in load path
 #+BEGIN_SRC emacs-lisp :export code :tangle ~/.emacs
-(setq lp (concat (getenv "HOME") "/.emacs.d/lisp/"))
-(when (not (file-directory-p lp))
-  (make-directory lp))
+  (setq lp (concat (getenv "HOME") "/.emacs.d/lisp/"))
+  (when (not (file-directory-p lp))
+    (make-directory lp))
 
-(when (not (file-exists-p (concat lp "/ox-confluence.el")))
-  (url-retrieve
-   "https://raw.githubusercontent.com/emacsmirror/org/master/contrib/lisp/ox-confluence.el"
-   (lambda (s)
-     (re-search-forward "\r?\n\r?\n") ;; skip the headers
-     (write-region (point) (point-max) (concat lp "ox-confluence.el")))))
+  (when (not (file-exists-p (concat lp "/ox-confluence.el")))
+    (url-retrieve
+     "https://raw.githubusercontent.com/emacsmirror/org/master/contrib/lisp/ox-confluence.el"
+     (lambda (s)
+       (re-search-forward "\r?\n\r?\n") ;; skip the headers
+       (write-region (point) (point-max) (concat lp "ox-confluence.el")))))
 
-(add-to-list 'load-path lp)
-(load "ox-confluence")
-#+END_SRC
+  (add-to-list 'load-path lp)
+  (load "ox-confluence")
+
+ #+END_SRC
 *** Filesystem Navigation
 Tramp is a must have for my workflows
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
@@ -649,6 +652,11 @@ Turn off the mouse/trackpad when editing certain files
   (add-hook 'javascript-mode-hook 'disable-mouse-mode)
   (add-hook 'text-mode-hook 'disable-mouse-mode)
   (add-hook 'web-mode-hook 'disable-mouse-mode)
+  (add-hook 'dired-mode-hook 'disable-mouse-mode)
+  (add-hook 'org-mode-hook 'disable-mouse-mode)
+  (add-hook 'lisp-interaction-mode-hook 'disable-mouse-mode)
+  (add-hook 'emacs-lisp-mode-hook 'disable-mouse-mode)
+  (add-hook 'special'-mode-hook 'disable-mouse-mode)
 #+END_SRC
 
 **** Programming & Ops
