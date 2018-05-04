@@ -223,6 +223,7 @@ One of the coolest features of org mode imo is the ability to evaluate almost an
      (go . t)
      (typescript . t)
      (rust . t)
+     (sql . t)
      (java . t)))
 #+END_SRC
 
@@ -341,6 +342,63 @@ Customize org capture to my liking
 
 #+END_SRC
 
+**** LaTeX
+LaTeX + Beamer is helpful for creating presentations, so setting up LaTeX boilerplate
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  ;; allow for export=>beamer by placing
+
+  ;; #+LaTeX_CLASS: beamer in org files
+  (unless (boundp 'org-export-latex-classes)
+    (setq org-export-latex-classes nil))
+  (add-to-list 'org-export-latex-classes
+    ;; beamer class, for presentations
+    '("beamer"
+       "\\documentclass[11pt]{beamer}\n
+        \\mode<{{{beamermode}}}>\n
+        \\usetheme{{{{beamertheme}}}}\n
+        \\usecolortheme{{{{beamercolortheme}}}}\n
+        \\beamertemplateballitem\n
+        \\setbeameroption{show notes}
+        \\usepackage[utf8]{inputenc}\n
+        \\usepackage[T1]{fontenc}\n
+        \\usepackage{hyperref}\n
+        \\usepackage{color}
+        \\usepackage{listings}
+        \\lstset{numbers=none,language=[ISO]C++,tabsize=4,
+    frame=single,
+    basicstyle=\\small,
+    showspaces=false,showstringspaces=false,
+    showtabs=false,
+    keywordstyle=\\color{blue}\\bfseries,
+    commentstyle=\\color{red},
+    }\n
+        \\usepackage{verbatim}\n
+        \\institute{{{{beamerinstitute}}}}\n          
+         \\subject{{{{beamersubject}}}}\n"
+
+       ("\\section{%s}" . "\\section*{%s}")
+
+       ("\\begin{frame}[fragile]\\frametitle{%s}"
+         "\\end{frame}"
+         "\\begin{frame}[fragile]\\frametitle{%s}"
+         "\\end{frame}")))
+
+    ;; letter class, for formal letters
+
+    (add-to-list 'org-export-latex-classes
+
+    '("letter"
+       "\\documentclass[11pt]{letter}\n
+        \\usepackage[utf8]{inputenc}\n
+        \\usepackage[T1]{fontenc}\n
+        \\usepackage{color}"
+
+       ("\\section{%s}" . "\\section*{%s}")
+       ("\\subsection{%s}" . "\\subsection*{%s}")
+       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+       ("\\paragraph{%s}" . "\\paragraph*{%s}")
+       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+#+END_SRC
 **** TODO Update Custom Org workflow
 Lifted from [[http://cachestocaches.com/2016/9/my-workflow-org-agenda/]]. Need to customize to my preferences.
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
@@ -653,7 +711,7 @@ Turn off the mouse/trackpad when editing certain files
   (add-hook 'text-mode-hook 'disable-mouse-mode)
   (add-hook 'web-mode-hook 'disable-mouse-mode)
   (add-hook 'dired-mode-hook 'disable-mouse-mode)
-  (add-hook 'org-mode-hook 'disable-mouse-mode)
+  (add-hook 'org-mode-hoook 'disable-mouse-mode)
   (add-hook 'lisp-interaction-mode-hook 'disable-mouse-mode)
   (add-hook 'emacs-lisp-mode-hook 'disable-mouse-mode)
   (add-hook 'special-mode-hook 'disable-mouse-mode)
