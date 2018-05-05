@@ -716,6 +716,7 @@ Turn off the mouse/trackpad when editing certain files
   (add-hook 'emacs-lisp-mode-hook 'disable-mouse-mode)
   (add-hook 'special-mode-hook 'disable-mouse-mode)
   (add-hook 'fundamental-mode-hook 'disable-mouse-mode)
+  (add-hook 'ng2-ts-mode-hook 'disable-mouse-mode)
 #+END_SRC
 
 **** Programming & Ops
@@ -746,6 +747,7 @@ Trailing whitespace == smh. However, I don't care about it in every situation, l
 
 Various modes helpful for development
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+
   (use-package yaml-mode
     :ensure t
     :config
@@ -762,16 +764,18 @@ Various modes helpful for development
   (use-package go-mode
     :ensure t)
 
+#+END_SRC
 
-  ;; PHP Mode Improved (http://www.emacswiki.org/emacs/php-mode-improved.el)
-  ;; (add-to-list 'load-path "~/.emacs.d/lisp/")
-  (use-package php-mode
+Magit for version control
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (use-package magit
     :ensure t
     :config
-    (autoload 'php-mode "php-mode-improved" "Major mode for editing php code." t)
-    (add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
-    (add-to-list 'auto-mode-alist '("\\.inc$" . php-mode)))
+    (global-set-key (kbd "C-x g") 'magit-status))
+#+END_SRC
 
+***** Web development
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   ;; SCSS Mode
   (use-package sass-mode
     :ensure t
@@ -821,29 +825,55 @@ Various modes helpful for development
   (setq web-mode-code-indent-offset 4)
 #+END_SRC
 
-Magit for version control
+PHP Development
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-  (use-package magit
+  ;; PHP Mode Improved (http://www.emacswiki.org/emacs/php-mode-improved.el)
+  ;; (add-to-list 'load-path "~/.emacs.d/lisp/")
+  (use-package php-mode
     :ensure t
     :config
-    (global-set-key (kbd "C-x g") 'magit-status))
+    (autoload 'php-mode "php-mode-improved" "Major mode for editing php code." t)
+    (add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
+    (add-to-list 'auto-mode-alist '("\\.inc$" . php-mode)))
+#+END_SRC
+
+Angular setup
+#+BEGIN_SRC emacs-lisp
+  (use-package ng2-mode
+    :ensure t)
+
+  (use-package tide
+    :ensure t
+    :config
+    (defun setup-tide-mode ()
+      (interactive)
+      (tide-setup)
+      (flycheck-mode +1)
+      (setq flycheck-check-syntax-automatically '(save mode-enabled))
+      (eldoc-mode +1)
+      (tide-hl-identifier-mode +1)
+      ;; company is an optional dependency. You have to
+      ;; install it separately via package-install
+      ;; `M-x package-install [ret] company`
+      (company-mode +1))
+
+    ;; aligns annotation to the right hand side
+    (setq company-tooltip-align-annotations t)
+
+    ;; formats the buffer before saving
+    (add-hook 'before-save-hook 'tide-format-before-save)
+
+    (add-hook 'typescript-mode-hook #'setup-tide-mode)
+    (setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil :IndentStyle 2))
+
+    (define-key tide-mode-map (kbd "C-c C-d") 'tide-documentation-at-point)
+    (define-key tide-mode-map (kbd "C-c C-i") 'tide-organize-imports))
 #+END_SRC
 
 Emmet mode for html/css
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacsn
   (add-hook 'sgml-mode-hook 'emmet-mode)
   (add-hook 'css-mode-hook  'emmet-mode)
-#+END_SRC
-
-SCSS Compile on Save
-#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
-;; Compile on save
-(setq exec-path (cons (expand-file-name "/usr/bin/sass") exec-path))
-(add-to-list 'load-path (expand-file-name "~/emacs-setup/v24.4/.emacs.d/lisp/scss-mode.el"))
-(autoload 'scss-mode "scss-mode")
-(add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
-(setq-default scss-compile-at-save t)
-
 #+END_SRC
 
 *** Consuming Content
