@@ -838,7 +838,7 @@ PHP Development
 #+END_SRC
 
 Angular setup
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/emacs
   (use-package ng2-mode
     :ensure t)
 
@@ -870,8 +870,23 @@ Angular setup
     (define-key tide-mode-map (kbd "C-c C-i") 'tide-organize-imports))
 #+END_SRC
 
+For Tide integration, use the local tsserver and fallback to the default one installed with tide
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/emacs
+  (let* ((package-root (locate-dominating-file default-directory
+                                               "package.json"))
+         (path
+          (and package-root
+               (expand-file-name "node_modules/typescript/bin/tsserver"
+                                 (expand-file-name package-root)))))
+    (when (and path
+               (file-exists-p path))
+      (make-local-variable 'tide-tsserver-executable)
+      (setq tide-tsserver-executable path)
+      ))
+#+END_SRC
+
 Emmet mode for html/css
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacsn
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (add-hook 'sgml-mode-hook 'emmet-mode)
   (add-hook 'css-mode-hook  'emmet-mode)
 #+END_SRC
