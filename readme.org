@@ -223,6 +223,7 @@ One of the coolest features of org mode imo is the ability to evaluate almost an
      (go . t)
      (typescript . t)
      (rust . t)
+     (sql . t)
      (java . t)))
 #+END_SRC
 
@@ -341,6 +342,63 @@ Customize org capture to my liking
 
 #+END_SRC
 
+**** LaTeX
+LaTeX + Beamer is helpful for creating presentations, so setting up LaTeX boilerplate
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  ;; allow for export=>beamer by placing
+
+  ;; #+LaTeX_CLASS: beamer in org files
+  (unless (boundp 'org-export-latex-classes)
+    (setq org-export-latex-classes nil))
+  (add-to-list 'org-export-latex-classes
+    ;; beamer class, for presentations
+    '("beamer"
+       "\\documentclass[11pt]{beamer}\n
+        \\mode<{{{beamermode}}}>\n
+        \\usetheme{{{{beamertheme}}}}\n
+        \\usecolortheme{{{{beamercolortheme}}}}\n
+        \\beamertemplateballitem\n
+        \\setbeameroption{show notes}
+        \\usepackage[utf8]{inputenc}\n
+        \\usepackage[T1]{fontenc}\n
+        \\usepackage{hyperref}\n
+        \\usepackage{color}
+        \\usepackage{listings}
+        \\lstset{numbers=none,language=[ISO]C++,tabsize=4,
+    frame=single,
+    basicstyle=\\small,
+    showspaces=false,showstringspaces=false,
+    showtabs=false,
+    keywordstyle=\\color{blue}\\bfseries,
+    commentstyle=\\color{red},
+    }\n
+        \\usepackage{verbatim}\n
+        \\institute{{{{beamerinstitute}}}}\n          
+         \\subject{{{{beamersubject}}}}\n"
+
+       ("\\section{%s}" . "\\section*{%s}")
+
+       ("\\begin{frame}[fragile]\\frametitle{%s}"
+         "\\end{frame}"
+         "\\begin{frame}[fragile]\\frametitle{%s}"
+         "\\end{frame}")))
+
+    ;; letter class, for formal letters
+
+    (add-to-list 'org-export-latex-classes
+
+    '("letter"
+       "\\documentclass[11pt]{letter}\n
+        \\usepackage[utf8]{inputenc}\n
+        \\usepackage[T1]{fontenc}\n
+        \\usepackage{color}"
+
+       ("\\section{%s}" . "\\section*{%s}")
+       ("\\subsection{%s}" . "\\subsection*{%s}")
+       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+       ("\\paragraph{%s}" . "\\paragraph*{%s}")
+       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+#+END_SRC
 **** TODO Update Custom Org workflow
 Lifted from [[http://cachestocaches.com/2016/9/my-workflow-org-agenda/]]. Need to customize to my preferences.
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
@@ -653,12 +711,13 @@ Turn off the mouse/trackpad when editing certain files
   (add-hook 'text-mode-hook 'disable-mouse-mode)
   (add-hook 'web-mode-hook 'disable-mouse-mode)
   (add-hook 'dired-mode-hook 'disable-mouse-mode)
-  (add-hook 'org-mode-hook 'disable-mouse-mode)
+  (add-hook 'org-mode-hoook 'disable-mouse-mode)
   (add-hook 'lisp-interaction-mode-hook 'disable-mouse-mode)
   (add-hook 'emacs-lisp-mode-hook 'disable-mouse-mode)
   (add-hook 'special-mode-hook 'disable-mouse-mode)
   (add-hook 'fundamental-mode-hook 'disable-mouse-mode)
   (add-hook 'groovy-mode-hook 'disable-mouse-mode)
+  (add-hook 'ng2-ts-mode-hook 'disable-mouse-mode)
 #+END_SRC
 
 **** Programming & Ops
@@ -689,6 +748,7 @@ Trailing whitespace == smh. However, I don't care about it in every situation, l
 
 Various modes helpful for development
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+
   (use-package yaml-mode
     :ensure t
     :config
@@ -705,16 +765,18 @@ Various modes helpful for development
   (use-package go-mode
     :ensure t)
 
+#+END_SRC
 
-  ;; PHP Mode Improved (http://www.emacswiki.org/emacs/php-mode-improved.el)
-  ;; (add-to-list 'load-path "~/.emacs.d/lisp/")
-  (use-package php-mode
+Magit for version control
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (use-package magit
     :ensure t
     :config
-    (autoload 'php-mode "php-mode-improved" "Major mode for editing php code." t)
-    (add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
-    (add-to-list 'auto-mode-alist '("\\.inc$" . php-mode)))
+    (global-set-key (kbd "C-x g") 'magit-status))
+#+END_SRC
 
+***** Web development
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   ;; SCSS Mode
   (use-package sass-mode
     :ensure t
@@ -764,32 +826,79 @@ Various modes helpful for development
   (setq web-mode-code-indent-offset 4)
 #+END_SRC
 
-Magit for version control
+PHP Development
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-  (use-package magit
+  ;; PHP Mode Improved (http://www.emacswiki.org/emacs/php-mode-improved.el)
+  ;; (add-to-list 'load-path "~/.emacs.d/lisp/")
+  (use-package php-mode
     :ensure t
     :config
-    (global-set-key (kbd "C-x g") 'magit-status))
+    (autoload 'php-mode "php-mode-improved" "Major mode for editing php code." t)
+    (add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
+    (add-to-list 'auto-mode-alist '("\\.inc$" . php-mode)))
+#+END_SRC
+
+Angular setup
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/emacs
+  (use-package ng2-mode
+    :ensure t)
+
+  (use-package tide
+    :ensure t
+    :config
+    (defun setup-tide-mode ()
+      (interactive)
+      (tide-setup)
+      (flycheck-mode +1)
+      (setq flycheck-check-syntax-automatically '(save mode-enabled))
+      (eldoc-mode +1)
+      (tide-hl-identifier-mode +1)
+      ;; company is an optional dependency. You have to
+      ;; install it separately via package-install
+      ;; `M-x package-install [ret] company`
+      (company-mode +1))
+
+    ;; aligns annotation to the right hand side
+    (setq company-tooltip-align-annotations t)
+
+    ;; formats the buffer before saving
+    (add-hook 'before-save-hook 'tide-format-before-save)
+
+    (add-hook 'typescript-mode-hook #'setup-tide-mode)
+    (setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil :IndentStyle 2))
+
+    (define-key tide-mode-map (kbd "C-c C-d") 'tide-documentation-at-point)
+    (define-key tide-mode-map (kbd "C-c C-i") 'tide-organize-imports))
+#+END_SRC
+
+For Tide integration, use the local tsserver and fallback to the default one installed with tide
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/emacs
+  (let* ((package-root (locate-dominating-file default-directory
+                                               "package.json"))
+         (path
+          (and package-root
+               (expand-file-name "node_modules/typescript/bin/tsserver"
+                                 (expand-file-name package-root)))))
+    (when (and path
+               (file-exists-p path))
+      (make-local-variable 'tide-tsserver-executable)
+      (setq tide-tsserver-executable path)
+      ))
 #+END_SRC
 
 Emmet mode for html/css
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacsn
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (add-hook 'sgml-mode-hook 'emmet-mode)
   (add-hook 'css-mode-hook  'emmet-mode)
 #+END_SRC
 
-SCSS Compile on Save
-#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
-;; Compile on save
-(setq exec-path (cons (expand-file-name "/usr/bin/sass") exec-path))
-(add-to-list 'load-path (expand-file-name "~/emacs-setup/v24.4/.emacs.d/lisp/scss-mode.el"))
-(autoload 'scss-mode "scss-mode")
-(add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
-(setq-default scss-compile-at-save t)
-
-#+END_SRC
-
 *** Consuming Content
+**** Mail
+Basic setup for mu4e. 
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs 
+  (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e/")
+  (require 'mu4e)
+#+END_SRC
 **** EWW
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (defun eww-new ()
