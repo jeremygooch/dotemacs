@@ -892,6 +892,12 @@ Emmet mode for html/css
 #+END_SRC
 
 *** Consuming Content
+**** Mail
+Basic setup for mu4e. 
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs 
+  (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e/")
+  (require 'mu4e)
+#+END_SRC
 **** EWW
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (defun eww-new ()
