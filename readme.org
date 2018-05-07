@@ -658,6 +658,7 @@ Turn off the mouse/trackpad when editing certain files
   (add-hook 'emacs-lisp-mode-hook 'disable-mouse-mode)
   (add-hook 'special-mode-hook 'disable-mouse-mode)
   (add-hook 'fundamental-mode-hook 'disable-mouse-mode)
+  (add-hook 'groovy-mode-hook 'disable-mouse-mode)
 #+END_SRC
 
 **** Programming & Ops
