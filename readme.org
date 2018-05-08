@@ -729,6 +729,8 @@ Turn off the mouse/trackpad when editing certain files
   (add-hook 'fundamental-mode-hook 'disable-mouse-mode)
   (add-hook 'groovy-mode-hook 'disable-mouse-mode)
   (add-hook 'ng2-ts-mode-hook 'disable-mouse-mode)
+  (add-hook 'org-agenda-mode-hook 'disable-mouse-mode)
+  (add-hook 'slack-message-buffer-mode-hook 'disable-mouse-mode)
 #+END_SRC
 
 **** Programming & Ops
@@ -782,10 +784,19 @@ Various modes helpful for development
 
 Magit for version control
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+
   (use-package magit
     :ensure t
     :config
     (global-set-key (kbd "C-x g") 'magit-status))
+#+END_SRC
+
+Load private/workspecific configs
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (defun jrm3/softwareadvice ()
+    "Loads software advice specific configs"
+    (interactive)
+    (load "~/org-docs/softwareadvice.el"))
 #+END_SRC
 
 ***** Web development
@@ -852,7 +863,8 @@ PHP Development
 #+END_SRC
 
 Angular setup
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/emacs
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (setq exec-path (append exec-path '("/home/jrm3/.nvm/versions/node/v9.11.1/bin")))
   (use-package ng2-mode
     :ensure t)
 
@@ -866,9 +878,7 @@ Angular setup
       (setq flycheck-check-syntax-automatically '(save mode-enabled))
       (eldoc-mode +1)
       (tide-hl-identifier-mode +1)
-      ;; company is an optional dependency. You have to
-      ;; install it separately via package-install
-      ;; `M-x package-install [ret] company`
+      ;; company is an optional dependency. 
       (company-mode +1))
 
     ;; aligns annotation to the right hand side
@@ -885,7 +895,7 @@ Angular setup
 #+END_SRC
 
 For Tide integration, use the local tsserver and fallback to the default one installed with tide
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/emacs
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (let* ((package-root (locate-dominating-file default-directory
                                                "package.json"))
          (path
@@ -918,7 +928,7 @@ Basic setup for mu4e.
         mu4e-drafts-folder "/w/[Gmail].Drafts"
         mu4e-trash-folder "/w/[Gmail].Trash"
         user-mail-address "jeremy@softwareadvice.com"
-        smtpmail-default-smtp-server "smtp.gmail.com"
+        smtpmail-default-smpt-server "smtp.gmail.com"
         smtpmail-local-domain "softwareadvice.com"
         smtpmail-smtp-server "smtp.gmail.com"
         smtpmail-stream-type 'starttls
@@ -938,9 +948,21 @@ Basic setup for mu4e.
        (smtpmail-smtp-service 25))
       ))
 
-
   (setq mu4e-get-mail-command "offlineimap")
 
+  ;; Assumes package gnutls-bin is installed on system
+  (require 'smtpmail)
+  (require 'starttls)
+  (setq message-send-mail-function 'smtpmail-send-it
+        starttls-gnutls-program "/usr/bin/gnutls-cli"
+        starttls-extra-arguments nil
+        starttls-use-gnutls t
+        smtpmail-starttls-credentials '(("smtp.gmail.com" 587 nil nil))
+        smtpmail-auth-credentials
+        '(("smtp.gmail.com" 587 "jeremy@softwareadvice.com" nil))
+        smtpmail-default-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-service 587)
 
   (setq mu4e-reply-to-address "jeremy@softwareadvice.com"
         user-mail-address "jeremy@softwareadvice.com"
@@ -948,6 +970,12 @@ Basic setup for mu4e.
   (setq mu4e-compose-signature
         "Jeremy Gooch\nhttp://www.softwareadvice.com\n")
 
+  ;; don't keep message buffers around
+  (setq message-kill-buffer-on-exit t)
+#+END_SRC
+
+Setup keybinding for mu4e
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (setq mu4e-maildir-shortcuts
         '( ("/w/INBOX"               . ?i)
            ("/w/[Gmail].Sent Mail"   . ?s)
@@ -957,9 +985,8 @@ Basic setup for mu4e.
            ("/w/[Gmail].Drafts"      . ?d)
            ("/w/[Gmail].All Mail"    . ?a)))
 
-
-  ;; don't keep message buffers around
-  (setq message-kill-buffer-on-exit t)
+  (global-set-key (kbd "C-c m") 'mu4e)
+  (global-set-key (kbd "C-c i") 'mu4e-update-index)
 #+END_SRC
 
 Add mail alerts for new messages.
@@ -973,8 +1000,14 @@ Add mail alerts for new messages.
        "flag:unread"
        " maildir:/w/INBOX "
        ))
-    (mu4e-alert-set-default-style 'notifications)
+    ;; (mu4e-alert-set-default-style 'notifications)
     (mu4e-alert-enable-mode-line-display)
+    (defun gjstein-refresh-mu4e-alert-mode-line ()
+      (interactive)
+      (mu4e~proc-kill)
+      (mu4e-alert-enable-mode-line-display)
+      )
+    (run-with-timer 0 60 'gjstein-refresh-mu4e-alert-mode-line)
     )
 
 #+END_SRC
