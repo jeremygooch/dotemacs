@@ -714,18 +714,6 @@ I find it helpful to be able to backtab (shift+tab) to un-indent
           (replace-match "")))))
 #+END_SRC
 
-Just some basic settings particular to how I like to work
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-  ;; Overwrite mode
-  (delete-selection-mode 1)
-  ;; Backwards delete word
-  (global-set-key [M-delete] 'backward-kill-word)
-  ;; Use spaces instead of tabs
-  (setq-default indent-tabs-mode nil)
-  ;; Set default tab width
-  (setq tab-width 2)
-#+END_SRC
-
 Make evaluating lisp buffers even quicker
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (global-set-key (kbd "C-c C-e")  'eval-buffer)
@@ -833,54 +821,58 @@ Load private and workspecific configs
     (load "~/org-docs/private.el"))
 #+END_SRC
 
-
+Defining custom indentation based on project paths and setting them to functions that I can call as needed. This also sets backtab and backwards delete functionality.
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (defun jrm3/setup-indent (n)
-    ;; java/c/c++
-    (setq-local c-basic-offset n)
-    ;; web development
-    (setq-local coffee-tab-width n) ; coffeescript
-    (setq-local javascript-indent-level n) ; javascript-mode
-    (setq-local js-indent-level n) ; js-mode
-    (setq-local typescript-indent-level n) ; js-mode
-    (setq-local js2-basic-offset n) ; js2-mode, in latest js2-mode, it's alias of js-indent-level
-    (setq-local web-mode-markup-indent-offset n) ; web-mode, html tag in html file
-    (setq-local web-mode-css-indent-offset n) ; web-mode, css in html file
-    (setq-local web-mode-code-indent-offset n) ; web-mode, js code in html file
-    (setq-local css-indent-offset n) ; css-mode
-    )
+	(setq indent-tabs-mode nil)
+	;; java/c/c++
+	(setq-local c-basic-offset n)
+	;; web development
+	(setq-local coffee-tab-width n) ; coffeescript
+	(setq-local javascript-indent-level n) ; javascript-mode
+	(setq-local js-indent-level n) ; js-mode
+	(setq-local typescript-indent-level n) ; typescript-mode
+	(setq-local js2-basic-offset n) ; js2-mode, in latest js2-mode, it's alias of js-indent-level
+	(setq-local web-mode-markup-indent-offset 4) ; web-mode, html tag in html file
+	(setq-local web-mode-css-indent-offset 4) ; web-mode, css in html file
+	(setq-local web-mode-code-indent-offset n) ; web-mode, js code in html file
+	(setq-local css-indent-offset 4) ; css-mode
+	)
 
   (defun jrm3/neon-code-style ()
-    (interactive)
-    (message "Office code style")
-    ;; use tab instead of space
-    (setq-local indent-tabs-mode t)
-    ;; indent 4 spaces width
-    (my-setup-indent 2))
+	(interactive)
+	(message "Using Neon coding style")
+	;; indent 2 spaces width
+	(jrm3/setup-indent 2))
 
-  (defun jrm3/legacy-code-style ()
-    (interactive)
-    (message "My personal code style")
-    ;; use space instead of tab
-    (setq indent-tabs-mode nil)
-    ;; indent 2 spaces width
-    (my-setup-indent 4))
+  (defun jrm3/personal-code-style ()
+	(interactive)
+	(message "Using personal coding style")
+	;; indent 4 spaces width
+	(jrm3/setup-indent 4))
 
   (defun jrm3/develop-environment ()
-    (interactive)
-    (let ((proj-dir (file-name-directory (buffer-file-name))))
-      ;; if hobby project path contains string "hobby-proj1"
-      (if (string-match-p "hobby-proj1" proj-dir)
-          (my-personal-code-style))
+	(interactive)
+	(let ((proj-dir (file-name-directory (buffer-file-name))))
+	  ;; ;; if hobby project path contains string "hobby-proj1"
+	  ;; (if (string-match-p "hobby-proj1" proj-dir)
+	  ;;     (my-personal-code-style))
 
-      ;; if commericial project path contains string "commerical-proj"
-      (if (string-match-p "commerical-proj" proj-dir)
-          (my-office-code-style))))
+	  ;; ;; if commericial project path contains string "commerical-proj"
+	  (if (string-match-p "neon/" proj-dir)
+		  (jrm3/neon-code-style))))
+	  ))
 
   (add-hook 'prog-mode-hook 'jrm3/develop-environment)
   ;; a few major-modes does NOT inherited from prog-mode
   (add-hook 'lua-mode-hook 'jrm3/develop-environment)
   (add-hook 'web-mode-hook 'jrm3/develop-environment)
+
+
+
+  (delete-selection-mode 1)
+  ;; Backwards delete word
+  (global-set-key [M-delete] 'backward-kill-word)
 #+END_SRC
 
 ***** Web development
@@ -1086,12 +1078,12 @@ Add mail alerts for new messages.
        ))
     ;; (mu4e-alert-set-default-style 'notifications)
     (mu4e-alert-enable-mode-line-display)
-    (defun gjstein-refresh-mu4e-alert-mode-line ()
+    (defun jrm3/refresh-mu4e-alert-mode-line ()
       (interactive)
       (mu4e~proc-kill)
       (mu4e-alert-enable-mode-line-display)
       )
-    (run-with-timer 0 60 'gjstein-refresh-mu4e-alert-mode-line)
+    (run-with-timer 0 60 jrm3/refresh-mu4e-alert-mode-line)
     )
 
 #+END_SRC
