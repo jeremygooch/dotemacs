@@ -210,6 +210,11 @@ Load some basic minor modes by default
               (no-trailing-whitespace)
               ))
   (add-hook 'org-src-mode-hook 'disable-mouse-mode)
+
+
+
+  (eval-after-load "org"
+    '(require 'ox-md nil t))
 #+END_SRC
 
 Show the asterisks as bullets
@@ -228,13 +233,17 @@ Add some export modes for getting content out of org
 **** Literate programming
 One of the coolest features of org mode imo is the ability to evaluate almost any language via org-babel. Lets load in the non-common ones.
 #+BEGIN_SRC emacs-lisp :exports code ~/.emacs
+  (use-package ob-typescript
+    :ensure t)
+  (use-package ob-rust
+    :ensure t)
   (add-to-list 'org-src-lang-modes '("js" . "javascript")
                '("php" . "php"))
 
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((python . t)
-     (go . t)
+     (js . t)
      (typescript . t)
      (rust . t)
      (sql . t)
@@ -613,6 +622,7 @@ Setup Ibuffer and organize by mode type
                  ("javascript" (or
                                 (mode . javascript-mode)
                                 (name . "^.*.js$")
+                                (name . "^.*.ts")
                                 (name . "^.*.json$")
                                 ))
                  ("markup" (or
@@ -750,6 +760,7 @@ Turn off the mouse/trackpad when editing certain files
   (add-hook 'ng2-ts-mode-hook 'disable-mouse-mode)
   (add-hook 'org-agenda-mode-hook 'disable-mouse-mode)
   (add-hook 'slack-message-buffer-mode-hook 'disable-mouse-mode)
+  (add-hook 'typescript-mode-hook 'disable-mouse-mode)
 #+END_SRC
 
 **** Programming & Ops
