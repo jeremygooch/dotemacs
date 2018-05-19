@@ -70,7 +70,8 @@ With EXWM it can act as a complete desktop environment.
   (use-package exwm-config
     :config
     (exwm-config-default)
-    (exwm-config-ido))
+    (exwm-config-ido)
+    (global-set-key (kbd "C-x O")  'exwm-workspace-switch-to-buffer))
 #+END_SRC
 
 Fortunately EXWM also has support for multiple monitors.
@@ -232,22 +233,32 @@ Add some export modes for getting content out of org
 #+END_SRC
 **** Literate programming
 One of the coolest features of org mode imo is the ability to evaluate almost any language via org-babel. Lets load in the non-common ones.
-#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (use-package ob-typescript
     :ensure t)
   (use-package ob-rust
     :ensure t)
   (add-to-list 'org-src-lang-modes '("js" . "javascript")
-               '("php" . "php"))
+	       '("php" . "php"))
 
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((python . t)
      (js . t)
+     (lisp . t)
+     (clojure . t)
      (typescript . t)
      (rust . t)
      (sql . t)
      (java . t)))
+   (require 'ob-clojure)
+#+END_SRC
+
+When evaluating a source code block in org mode do not prompt for input, just run it.
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (defun jrm3/org-confirm-babel-evaluate (lang body)
+    (not (string= lang "clojure"))) ;; don't ask for clojure
+  (setq org-confirm-babel-evaluate 'jrm3/org-confirm-babel-evaluate)
 #+END_SRC
 
 Make it easier to tangle the current source block
@@ -303,48 +314,48 @@ Super simple reordering from Org Agenda -> Todo view
       (cond
        ;; above all headlines so nothing to do
        ((not lvl)
-        (message "No headline to move"))
+	(message "No headline to move"))
        ((= lvl 1)
-        ;; if at top level move current tree to go above first headline
-        (org-cut-subtree)
-        (beginning-of-buffer)
-        ;; test if point is now at the first headline and if not then
-        ;; move to the first headline
-        (unless (looking-at-p "*")
-          (org-next-visible-heading 1))
-        (org-paste-subtree))
+	;; if at top level move current tree to go above first headline
+	(org-cut-subtree)
+	(beginning-of-buffer)
+	;; test if point is now at the first headline and if not then
+	;; move to the first headline
+	(unless (looking-at-p "*")
+	  (org-next-visible-heading 1))
+	(org-paste-subtree))
        ((> lvl 1)
-        ;; if not at top level then get position of headline level above
-        ;; current section and refile to that position. Inspired by
-        ;; https://gist.github.com/alphapapa/2cd1f1fc6accff01fec06946844ef5a5
-        (let* ((org-reverse-note-order t)
-               (pos (save-excursion
-                      (outline-up-heading 1)
-                      (point)))
-               (filename (buffer-file-name))
-               (rfloc (list nil filename nil pos)))
-          (org-refile nil nil rfloc))))))
+	;; if not at top level then get position of headline level above
+	;; current section and refile to that position. Inspired by
+	;; https://gist.github.com/alphapapa/2cd1f1fc6accff01fec06946844ef5a5
+	(let* ((org-reverse-note-order t)
+	       (pos (save-excursion
+		      (outline-up-heading 1)
+		      (point)))
+	       (filename (buffer-file-name))
+	       (rfloc (list nil filename nil pos)))
+	  (org-refile nil nil rfloc))))))
 
-  (defun jrm3/org-agenda-item-to-top ()
-    "Move the current agenda item to the top of the subtree in its file"
-    (interactive)
-    ;; save buffers to preserve agenda
-    (org-save-all-org-buffers)
-    ;; switch to buffer for current agenda item
-    (org-agenda-switch-to)
-    ;; move item to top
-    (jrm3/org-headline-to-top)
-    ;; go back to agenda view
-    (switch-to-buffer (other-buffer (current-buffer) 1))
-    ;; refresh agenda
-    (org-agenda-redo)
-    )
+  ;; (defun jrm3/org-agenda-item-to-top ()
+  ;;   "Move the current agenda item to the top of the subtree in its file"
+  ;;   (interactive)
+  ;;   ;; save buffers to preserve agenda
+  ;;   (org-save-all-org-buffers)
+  ;;   ;; switch to buffer for current agenda item
+  ;;   (org-agenda-switch-to)
+  ;;   ;; move item to top
+  ;;   (jrm3/org-headline-to-top)
+  ;;   ;; go back to agenda view
+  ;;   (switch-to-buffer (other-buffer (current-buffer) 1))
+  ;;   ;; refresh agenda
+  ;;   (org-agenda-redo)
+  ;;   )
 
-  (define-key org-agenda-mode-map (kbd "1") 'jrm3/org-agenda-item-to-top)
+  ;; (define-key org-agenda-mode-map (kbd "1") 'jrm3/org-agenda-item-to-top)
 #+END_SRC
 
 Setup reminders with [[http://sachachua.com/blog/2007/11/setting-up-appointment-reminders-in-org/][org-agenda-to-appt]].
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
   (defun org-agenda-to-appt ()
     "Activate appointments found in `org-agenda-files'."
     (interactive)
@@ -761,6 +772,8 @@ Turn off the mouse/trackpad when editing certain files
   (add-hook 'org-agenda-mode-hook 'disable-mouse-mode)
   (add-hook 'slack-message-buffer-mode-hook 'disable-mouse-mode)
   (add-hook 'typescript-mode-hook 'disable-mouse-mode)
+  (add-hook 'clojure-mode-hook 'disable-mouse-mode)
+  (add-hook 'repl-mode-hook 'disable-mouse-mode)
 #+END_SRC
 
 **** Programming & Ops
@@ -811,7 +824,49 @@ Various modes helpful for development
 
   (use-package go-mode
     :ensure t)
+#+END_SRC
 
+Clojure with Cider for interactive Clojure development
+#+BEGIN_SRC emacs-lisp :export code :tangle ~/.emacs
+  (use-package clojure-mode
+    :ensure t
+    :config
+    ;; Set mode for specific files
+    (add-to-list 'auto-mode-alist '("\\.edn$" . clojure-mode))
+    (add-to-list 'auto-mode-alist '("\\.boot$" . clojure-mode))
+    (add-to-list 'auto-mode-alist '("\\.cljs.*$" . clojure-mode))
+    (add-to-list 'auto-mode-alist '("lein-env" . enh-ruby-mode)))
+
+
+
+  (use-package cider
+    :ensure t
+    :config
+    (add-hook 'cider-repl-mode-hook #'eldoc-mode)
+    (setq cider-repl-pop-to-buffer-on-connect t) ;; go to the repl when done connecting
+    (setq cider-show-error-buffer t)
+    (setq cider-auto-select-error-buffer t) ;; jump to error message
+    )
+
+    (use-package clojure-cheatsheet
+      :ensure t
+      :config
+      '(progn
+	 (define-key clojure-mode-map (kbd "C-c C-h") #'clojure-cheatsheet))
+      (add-hook 'clojure-mode-hook 'subword-mode)
+      (use-package clojure-mode-extra-font-locking
+	:ensure t))
+
+
+
+  (use-package paredit
+    :ensure t
+    :config (add-hook 'clojure-mode-hook 'enable-paredit-mode))
+#+END_SRC
+
+For org-babel's clojure backend use cider rather than the default slime
+#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
+   (setq org-babel-clojure-backend 'cider)
 #+END_SRC
 
 Magit for version control
@@ -833,7 +888,7 @@ Load private and workspecific configs
 #+END_SRC
 
 Defining custom indentation based on project paths and setting them to functions that I can call as needed. This also sets backtab and backwards delete functionality.
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp :exports code  ~/.emacs
   (defun jrm3/setup-indent (n)
     (setq indent-tabs-mode nil)
     ;; java/c/c++
@@ -871,7 +926,7 @@ Defining custom indentation based on project paths and setting them to functions
 
       ;; ;; if commericial project path contains string "commerical-proj"
       (if (string-match-p "neon/" proj-dir)
-          (jrm3/neon-code-style))))
+	  (jrm3/neon-code-style))))
 
   (add-hook 'prog-mode-hook 'jrm3/develop-environment)
   ;; a few major-modes does NOT inherited from prog-mode
