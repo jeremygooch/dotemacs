@@ -864,8 +864,8 @@ Clojure with Cider for interactive Clojure development
 #+END_SRC
 
 For org-babel's clojure backend use cider rather than the default slime
-#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
-   (setq org-babel-clojure-backend 'cider)
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (setq org-babel-clojure-backend 'cider)
 #+END_SRC
 
 Magit for version control
@@ -884,10 +884,15 @@ Load private and workspecific configs
     "Loads configs"
     (interactive)
     (load "~/org-docs/private.el"))
+
+  (defun jrm3/email ()
+    "Loads email configuration"
+    (interactive)
+    (load "~/org-docs/gmail.el"))
 #+END_SRC
 
-Defining custom indentation based on project paths and setting them to functions that I can call as needed. This also sets backtab and backwards delete functionality.
-#+BEGIN_SRC emacs-lisp :exports code  ~/.emacs
+Defining custom indentation based on project paths and setting them to functions that I can call as needed. This also sets backtab.
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (defun jrm3/setup-indent (n)
     (setq indent-tabs-mode nil)
     ;; java/c/c++
@@ -932,11 +937,13 @@ Defining custom indentation based on project paths and setting them to functions
   (add-hook 'lua-mode-hook 'jrm3/develop-environment)
   (add-hook 'web-mode-hook 'jrm3/develop-environment)
 
-
-
-  (delete-selection-mode 1)
   ;; Backwards delete word
   (global-set-key [M-delete] 'backward-kill-word)
+#+END_SRC
+
+I'm accustomed to being able to highlight a region then replace it with the next keystroke, (i.e. a letter, return, backspace, etc.).
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (delete-selection-mode 1)
 #+END_SRC
 
 ***** Web development
