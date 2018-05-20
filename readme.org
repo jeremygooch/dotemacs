@@ -257,9 +257,7 @@ One of the coolest features of org mode imo is the ability to evaluate almost an
 
 When evaluating a source code block in org mode do not prompt for input, just run it.
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-  (defun jrm3/org-confirm-babel-evaluate (lang body)
-    (not (string= lang "clojure"))) ;; don't ask for clojure
-  (setq org-confirm-babel-evaluate 'jrm3/org-confirm-babel-evaluate)
+  (setq org-confirm-babel-evaluate nil)
 #+END_SRC
 
 Make it easier to tangle the current source block
