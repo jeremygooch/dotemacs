@@ -175,18 +175,13 @@ What can I say, I like a nice big splash screen and I'm partial to the meditatin
 
 **** Clean up modeline with diminish
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-  (use-package diminish
-    :ensure t
-    :init
-    (defun jrm3/diminish-modeline ()
-      "Run the diminish mode line"
-    (interactive)
-    (diminish 'disable-mouse-mode)
-    (diminish 'ivy-mode)
-    (diminish 'eldoc-mode)
-    (diminish 'projectile-mode))
-    (funcall jrm3/diminish-modeline))
-
+  (funcall (lambda ()
+	     (use-package diminish :ensure t)
+	     (diminish 'disable-mouse-mode)
+	     (diminish 'ivy-mode)
+	     (diminish 'eldoc-mode)
+	     (diminish 'company-mode)
+	     (diminish 'projectile-mode)))
 #+END_SRC
 *** Shell
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
