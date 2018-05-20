@@ -185,7 +185,8 @@ What can I say, I like a nice big splash screen and I'm partial to the meditatin
     (diminish 'ivy-mode)
     (diminish 'eldoc-mode)
     (diminish 'projectile-mode))
-    (jrm3/diminish-modeline))
+    (funcall jrm3/diminish-modeline))
+
 #+END_SRC
 *** Shell
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
