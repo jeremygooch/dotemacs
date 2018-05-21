@@ -79,9 +79,10 @@ Fortunately EXWM also has support for multiple monitors.
   (use-package exwm-randr)
   (setq exwm-randr-workspace-output-plist '(1 "VGA-1" 2 "VGA-2"))
   (add-hook 'exwm-randr-screen-change-hook
-            (lambda ()
-              (start-process-shell-command
-               "xrandr" nil "xrandr --output VGA-1 --left-of VGA-2 --auto")))
+	    (lambda ()
+	      (start-process-shell-command
+	       "xrandr" nil "xrandr --output VGA-1 --left-of VGA-2 --auto")))
+	       ;; "xrandr" nil "xrandr --output eDP-1 --mode 1920x1080 --left-of DP-1-2 --auto")))
   (exwm-randr-enable)
 #+END_SRC
 
@@ -284,16 +285,17 @@ Bind org agenda to shortcut and give it our todo paths. Note that the paths are 
 
   ;; use find-file for recursion
   (load-library "find-lisp")
-  (setq org-agenda-files (find-lisp-find-files "~/Dropbox" "\.org$"))
+  ;; (setq org-agenda-files (find-lisp-find-files "~/Dropbox" "\.org$"))
+  (org-agenda-file-to-front (find-lisp-find-files "~/Dropbox/work/softwareadvice/" "|.org$"))
 
   ;; Exclude the dropbox cache directory
   (eval-when-compile (require 'cl))
   (setq org-agenda-files
-        (remove-if '(lambda (x)
-                      (string-match
-                       (concat "^" (regexp-quote (expand-file-name "~/Dropbox/.dropbox.cache/")))
-                       x))
-                   org-agenda-files))
+	(remove-if '(lambda (x)
+		      (string-match
+		       (concat "^" (regexp-quote (expand-file-name "~/Dropbox/.dropbox.cache/")))
+		       x))
+		   org-agenda-files))
 #+END_SRC
 
 Super simple reordering from Org Agenda -> Todo view
@@ -380,19 +382,17 @@ Customize org capture to my liking
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (global-set-key (kbd "C-c c") 'org-capture)
   (setq org-capture-templates
-   '(("w" "Work Todo" entry (file "~/Dropbox/SA.org")
+   '(("w" "Work Todo" entry (file "~/Dropbox/work/softwareadvice/SA.org")
       "** TODO %?\n  %i\n  %a")
      ;; ("a" "Aqua Orb Todo" entry (file+headline "~/Dropbox/Projects.org" "Aqua Orb")
      ;;  "** TODO %?\n  %i\n  %a")
      ;; ("o" "Reorganize Workflow Todo" entry (file+headline "~/Dropbox/Projects.org" "Reorganize Workflow")
      ;;  "** TODO %?\n  %i\n  %a")
-     ("m" "Meeting" entry (file "~/Dropbox/Meetings.org")
+     ("m" "Meeting" entry (file "~/Dropbox/work/softwareadvice/Meetings.org")
       "** MEETING with %? :MEETING:\n  %i\n"  :clock-in t :clock-resume t)
      ("m" "Next" entry (file "~/Dropbox/Next.org")
       "** NEXT %?\n  %i\n  %a")
-     ("i" "Idea" entry (file "~/Dropbox/Ideas.org")
-      "** TODO %?\n  %i\n  %a" :clock-in t :clock-resume t)
-     ("M" "Milestone" entry (file "~/Dropbox/SA-milestones.org")
+     ("M" "Milestone" entry (file "~/Dropbox/work/softwareadvice/SA-milestones.org")
       "* %u %?\n*Summary*: \n\n*Description*: \n\n" :clock-in t :clock-resume t)))
 
 
@@ -520,7 +520,7 @@ Lifted from [[http://cachestocaches.com/2016/9/my-workflow-org-agenda/]]. Need t
 **** Custom Jira Integrations for Org Agenda
 Setup account
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-  (setq org-jira-working-dir "~/Dropbox/org-jira/")
+  (setq org-jira-working-dir "~/Dropbox/work/softwareadvice/org-jira/")
   (setq jiralib-url "https://softwareadvice.atlassian.net")
 #+END_SRC
 
@@ -782,21 +782,23 @@ Trailing whitespace == smh. However, I don't care about it in every situation, l
       (setq show-trailing-whitespace nil))
 
     (add-hook 'minibuffer-setup-hook
-              'no-trailing-whitespace)
+	      'no-trailing-whitespace)
     (add-hook 'eww-mode-hook
-              'no-trailing-whitespace)
+	      'no-trailing-whitespace)
     (add-hook 'shell-mode-hook
-              'no-trailing-whitespace)
+	      'no-trailing-whitespace)
     (add-hook 'mu4e:view-mode-hook
-              'no-trailing-whitespace)
+	      'no-trailing-whitespace)
     (add-hook 'help-mode-hook
-              'no-trailing-whitespace)
+	      'no-trailing-whitespace)
     (add-hook 'term-mode-hook
-              'no-trailing-whitespace)
+	      'no-trailing-whitespace)
     (add-hook 'slack-message-buffer-mode-hook
-              'no-trailing-whitespace)
+	      'no-trailing-whitespace)
+    (add-hook 'mu4e:view-mode-hook
+	      'no-trailing-whitespace)
     (add-hook 'calendar-mode-hook
-              'no-trailing-whitespace))
+	      'no-trailing-whitespace))
 
 #+END_SRC
 
@@ -1071,13 +1073,13 @@ Add mail alerts for new messages.
        " maildir:/w/INBOX "
        ))
     ;; (mu4e-alert-set-default-style 'notifications)
-    (mu4e-alert-enable-mode-line-display)
-    (defun jrm3/refresh-mu4e-alert-mode-line ()
-      (interactive)
-      (mu4e~proc-kill)
-      (mu4e-alert-enable-mode-line-display)
-      )
-    (run-with-timer 0 60 jrm3/refresh-mu4e-alert-mode-line)
+    ;; (mu4e-alert-enable-mode-line-display)
+    ;; (defun jrm3/refresh-mu4e-alert-mode-line ()
+    ;;   (interactive)
+    ;;   (mu4e~proc-kill)
+    ;;   (mu4e-alert-enable-mode-line-display)
+    ;;   )
+    ;; (run-with-timer 0 60 jrm3/refresh-mu4e-alert-mode-line)
     )
 
 #+END_SRC
