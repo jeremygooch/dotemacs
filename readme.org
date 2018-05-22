@@ -764,7 +764,7 @@ Various modes helpful for development
 #+END_SRC
 
 Clojure with Cider for interactive Clojure development
-#+BEGIN_SRC emacs-lisp :export code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp :export code ~/.emacs
   (use-package clojure-mode
     :ensure t
     :config
@@ -802,7 +802,7 @@ Clojure with Cider for interactive Clojure development
 #+END_SRC
 
 For org-babel's clojure backend use cider rather than the default slime
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
   (setq org-babel-clojure-backend 'cider)
 #+END_SRC
 
