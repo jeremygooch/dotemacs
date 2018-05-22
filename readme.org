@@ -517,64 +517,6 @@ Lifted from [[http://cachestocaches.com/2016/9/my-workflow-org-agenda/]]. Need t
 
 #+END_SRC
 
-**** Custom Jira Integrations for Org Agenda
-Setup account
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-  (setq org-jira-working-dir "~/Dropbox/work/softwareadvice/org-jira/")
-  (setq jiralib-url "https://softwareadvice.atlassian.net")
-#+END_SRC
-
-Add basic group tagging to buffer
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-  (defun jrm3/jira-tags ()
-    "Add Jira tags based on common Jira Ids"
-    (interactive)
-
-      (switch-to-buffer "FE.org")
-      (let ((case-fold-search t))
-        (goto-char (point-min))
-        (while (search-forward " :fe_" nil t)
-          (replace-match " :FE:FE_"))
-        )
-      (switch-to-buffer "GN.org")
-      (let ((case-fold-search t))
-        (goto-char (point-min))
-        (while (search-forward " :gn_" nil t)
-          (replace-match " :GN:GN_"))
-        )
-    )
-#+END_SRC
-
-Get issues then tag the buffers
-#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
-  (defun jrm3/jira-get-issues ()
-    "Add Jira tags based on common Jira Ids"
-    (interactive)
-    (org-jira-get-issues ())
-    (switch-to-buffer "FE.org")
-    (let ((case-fold-search t))
-      (goto-char (point-min))
-      (while (search-forward " :fe_" nil t)
-        (replace-match " :FE:FE_"))
-      )
-    (switch-to-buffer "GN.org")
-    (let ((case-fold-search t))
-      (goto-char (point-min))
-      (while (search-forward " :gn_" nil t)
-        (replace-match " :GN:GN_"))
-      )
-    )
-
-    (let ((case-fold-search t))
-      (goto-char (point-min))
-      (while (search-forward " :fe_" nil t)
-        (replace-match " :FE:FE_"))
-
-      (while (search-forward " :gn_" nil t)
-        (replace-match " :GN:GN_"))
-      )
-    )
-#+END_SRC
 
 **** Confluence
 Atlassian Confluence's WYSIWYG editor leaves a lot to be desired. It's much better to work in org mode then export to confluence using ox-confluence. At this time there is not a simple way to maintain a page in Confluence via org mode so this will have to suffice. Also, since ox-confluence is not in the repo, fetch it manually and put it in load path
@@ -1178,6 +1120,11 @@ When killing a buffer always pick the current buffer
 #+END_SRC
 **** Final pieces
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-(provide '.emacs)
+  (defun load-x ()
+    ""
+    (interactive)
+    (load "~/Dropbox/load-x.el"))
+
+  (provide '.emacs)
 #+END_SRC
 
