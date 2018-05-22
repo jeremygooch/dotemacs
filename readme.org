@@ -286,7 +286,7 @@ Bind org agenda to shortcut and give it our todo paths. Note that the paths are 
   ;; use find-file for recursion
   (load-library "find-lisp")
   ;; (setq org-agenda-files (find-lisp-find-files "~/Dropbox" "\.org$"))
-  (org-agenda-file-to-front (find-lisp-find-files "~/Dropbox/work/softwareadvice/" "|.org$"))
+  (org-agenda-file-to-front (find-lisp-find-files "~/Dropbox/work/softwareadvice" "|.org$"))
 
   ;; Exclude the dropbox cache directory
   (eval-when-compile (require 'cl))
