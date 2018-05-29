@@ -180,6 +180,8 @@ What can I say, I like a nice big splash screen and I'm partial to the meditatin
 	     (use-package diminish :ensure t)
 	     (diminish 'disable-mouse-mode)
 	     (diminish 'ivy-mode)
+	     (diminish 'typescript-mode)
+	     (diminish 'flycheck-mode)
 	     (diminish 'eldoc-mode)
 	     (diminish 'company-mode)
 	     (diminish 'projectile-mode)))
