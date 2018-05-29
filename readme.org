@@ -331,22 +331,22 @@ Super simple reordering from Org Agenda -> Todo view
 	       (rfloc (list nil filename nil pos)))
 	  (org-refile nil nil rfloc))))))
 
-  ;; (defun jrm3/org-agenda-item-to-top ()
-  ;;   "Move the current agenda item to the top of the subtree in its file"
-  ;;   (interactive)
-  ;;   ;; save buffers to preserve agenda
-  ;;   (org-save-all-org-buffers)
-  ;;   ;; switch to buffer for current agenda item
-  ;;   (org-agenda-switch-to)
-  ;;   ;; move item to top
-  ;;   (jrm3/org-headline-to-top)
-  ;;   ;; go back to agenda view
-  ;;   (switch-to-buffer (other-buffer (current-buffer) 1))
-  ;;   ;; refresh agenda
-  ;;   (org-agenda-redo)
-  ;;   )
+  (defun jrm3/org-agenda-item-to-top ()
+    "Move the current agenda item to the top of the subtree in its file"
+    (interactive)
+    ;; save buffers to preserve agenda
+    (org-save-all-org-buffers)
+    ;; switch to buffer for current agenda item
+    (org-agenda-switch-to)
+    ;; move item to top
+    (jrm3/org-headline-to-top)
+    ;; go back to agenda view
+    (switch-to-buffer (other-buffer (current-buffer) 1))
+    ;; refresh agenda
+    (org-agenda-redo)
+    )
 
-  ;; (define-key org-agenda-mode-map (kbd "1") 'jrm3/org-agenda-item-to-top)
+  (define-key org-agenda-mode-map (kbd "1") 'jrm3/org-agenda-item-to-top)
 #+END_SRC
 
 Setup reminders with [[http://sachachua.com/blog/2007/11/setting-up-appointment-reminders-in-org/][org-agenda-to-appt]].
@@ -847,6 +847,7 @@ Defining custom indentation based on project paths and setting them to functions
     (setq-local css-indent-offset 4) ; css-mode
     )
 
+  ;; Allow manual changing of coding styles
   (defun jrm3/neon-code-style ()
     (interactive)
     (message "Using Neon coding style")
@@ -859,16 +860,16 @@ Defining custom indentation based on project paths and setting them to functions
     ;; indent 4 spaces width
     (jrm3/setup-indent 4))
 
+
   (defun jrm3/develop-environment ()
-    (interactive)
     (let ((proj-dir (file-name-directory (buffer-file-name))))
-      ;; ;; if hobby project path contains string "hobby-proj1"
       ;; (if (string-match-p "hobby-proj1" proj-dir)
       ;;     (my-personal-code-style))
 
-      ;; ;; if commericial project path contains string "commerical-proj"
       (if (string-match-p "neon/" proj-dir)
 	  (jrm3/neon-code-style))))
+
+  (funcall (lambda () (jrm3/develop-environment)))
 
   (add-hook 'prog-mode-hook 'jrm3/develop-environment)
   ;; a few major-modes does NOT inherited from prog-mode
