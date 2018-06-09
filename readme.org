@@ -20,7 +20,6 @@ Setting up basic repositories and such.
             ("melpa-stable" . "http://stable.melpa.org/packages/")
             ("gnu" . "https://elpa.gnu.org/packages/")
             ("melpa" . "https://melpa.org/packages/")))
-  (package-initialize)
 
   (unless (package-installed-p 'use-package)
     (package-refresh-contents)
@@ -58,8 +57,9 @@ The default keybindings for naviating split views can be cumbersome, so remap th
 
 We'll need to turn off the mouse from time to time
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-  (use-package disable-mouse
-    :ensure t)
+    (use-package disable-mouse
+      :ensure t
+      :diminish disable-mouse-mode)
 #+END_SRC
 
 **** EXWM
@@ -176,15 +176,8 @@ What can I say, I like a nice big splash screen and I'm partial to the meditatin
 
 **** Clean up modeline with diminish
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-  (funcall (lambda ()
-	     (use-package diminish :ensure t)
-	     (diminish 'disable-mouse-mode)
-	     (diminish 'ivy-mode)
-	     (diminish 'typescript-mode)
-	     (diminish 'flycheck-mode)
-	     (diminish 'eldoc-mode)
-	     (diminish 'company-mode)
-	     (diminish 'projectile-mode)))
+  (use-package diminish
+    :ensure t)
 #+END_SRC
 *** Shell
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
@@ -234,7 +227,8 @@ Add some export modes for getting content out of org
 One of the coolest features of org mode imo is the ability to evaluate almost any language via org-babel. Lets load in the non-common ones.
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (use-package ob-typescript
-    :ensure t)
+    :ensure t
+    :diminish typescript-mode)
   (use-package ob-rust
     :ensure t)
   (add-to-list 'org-src-lang-modes '("js" . "javascript")
@@ -538,18 +532,11 @@ Atlassian Confluence's WYSIWYG editor leaves a lot to be desired. It's much bett
 
  #+END_SRC
 *** Filesystem Navigation
-Tramp is a must have for my workflows
+Tramp is a must have.
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (use-package tramp
     :config
     (setq tramp-default-method "scp"))
-#+END_SRC
-
-I'm finding I use Tabbar less and less in favor of other utilities (i.e. ibuffer and ido). Leaving it in for now as it's sometimes still helpful in certain situations.
-#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
-  (use-package tabbar
-    :config
-    (tabbar-mode t))
 #+END_SRC
 
 Setup Ibuffer and organize by mode type
@@ -635,8 +622,7 @@ Projectile for project level interaction
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (use-package projectile
     :ensure t
-    :config
-    (projectile-global-mode))
+    :diminish projectile-mode)
 #+END_SRC
 
 *** In-file Navigation
@@ -780,6 +766,9 @@ Clojure with Cider for interactive Clojure development
     (add-to-list 'auto-mode-alist '("\\.cljs.*$" . clojure-mode))
     (add-to-list 'auto-mode-alist '("lein-env" . enh-ruby-mode)))
 
+  (use-package eldoc
+    :ensure t
+    :diminish eldoc-mode)
 
 
   (use-package cider
@@ -957,6 +946,14 @@ Angular setup
   (use-package ng2-mode
     :ensure t)
 
+  (use-package flycheck
+    :ensure t
+    :diminish flycheck-mode)
+
+  (use-package company
+    :ensure t
+    :diminish company-mode)
+
   (use-package tide
     :ensure t
     :config
@@ -1067,12 +1064,13 @@ Add mail alerts for new messages.
 **** Ivy/Counsel/Swiper
 Generic auto-complete with Ivy
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-  (use-package ivy :demand
-    :ensure t
-    :config
-    (setq ivy-use-virtual-buffers t
-          ivy-count-format "%d/%d "))
-  (ivy-mode 1)
+    (use-package ivy :demand
+      :ensure t
+      :diminish ivy-mode
+      :config
+      (setq ivy-use-virtual-buffers t
+	    ivy-count-format "%d/%d "))
+    (ivy-mode 1)
 #+END_SRC
 
 Ivy enhanced search (swiper) and common Emacs meta commands (counsel)
