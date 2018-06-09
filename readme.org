@@ -1120,12 +1120,12 @@ Function for quickly swapping around meta and super keys which is necessary from
     (interactive)
     (if (get 'jrm3/toggle-super-meta 'state)
 	(progn
-	  (setq x-super-keysym 'meta)
-	  (setq x-meta-keysym 'super)
+	  (setq x-super-keysym 'super)
+	  (setq x-meta-keysym 'meta)
 	  (put 'jrm3/toggle-super-meta 'state nil))
       (progn
-	(setq x-super-keysym 'super)
-	(setq x-meta-keysym 'meta)
+	(setq x-super-keysym 'meta)
+	(setq x-meta-keysym 'super)
 	(put 'jrm3/toggle-super-meta 'state t))))
 #+END_SRC
 **** Kill buffer
