@@ -869,16 +869,13 @@ Defining custom indentation based on project paths and setting them to functions
 
   (defun jrm3/develop-environment ()
     (let ((proj-dir (file-name-directory (buffer-file-name))))
-      ;; (if (string-match-p "hobby-proj1" proj-dir)
-      ;;     (my-personal-code-style))
-
       (if (string-match-p "neon/" proj-dir)
 	  (jrm3/neon-code-style))))
 
-  (funcall (lambda () (jrm3/develop-environment)))
 
-  (add-hook 'prog-mode-hook 'jrm3/develop-environment)
-  ;; a few major-modes does NOT inherited from prog-mode
+
+  (add-hook 'typescript-mode-hook 'jrm3/develop-environment)
+  ;; (add-hook 'prog-mode-hook 'jrm3/develop-environment)
   (add-hook 'lua-mode-hook 'jrm3/develop-environment)
   (add-hook 'web-mode-hook 'jrm3/develop-environment)
 
