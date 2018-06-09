@@ -76,16 +76,14 @@ With EXWM it can act as a complete desktop environment.
 
 Fortunately EXWM also has support for multiple monitors.
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-  (use-package exwm-randr
-    :ensure t
-    :config
-    (setq exwm-randr-workspace-output-plist '(1 "VGA-1" 2 "VGA-2"))
-    (add-hook 'exwm-randr-screen-change-hook
-	      (lambda ()
-		(start-process-shell-command
-		 "xrandr" nil "xrandr --output VGA-1 --left-of VGA-2 --auto")))
-    ;; "xrandr" nil "xrandr --output eDP-1 --mode 1920x1080 --left-of DP-1-2 --auto")))
-    (exwm-randr-enable))
+  (require 'exwm-randr)
+  (setq exwm-randr-workspace-output-plist '(1 "VGA-1" 2 "VGA-2"))
+  (add-hook 'exwm-randr-screen-change-hook
+	    (lambda ()
+	      (start-process-shell-command
+	       "xrandr" nil "xrandr --output VGA-1 --left-of VGA-2 --auto")))
+  ;; "xrandr" nil "xrandr --output eDP-1 --mode 1920x1080 --left-of DP-1-2 --auto")))
+  (exwm-randr-enable)
 #+END_SRC
 
 **** Screenshots
