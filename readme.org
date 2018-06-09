@@ -76,14 +76,16 @@ With EXWM it can act as a complete desktop environment.
 
 Fortunately EXWM also has support for multiple monitors.
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-  (use-package exwm-randr)
-  (setq exwm-randr-workspace-output-plist '(1 "VGA-1" 2 "VGA-2"))
-  (add-hook 'exwm-randr-screen-change-hook
-	    (lambda ()
-	      (start-process-shell-command
-	       "xrandr" nil "xrandr --output VGA-1 --left-of VGA-2 --auto")))
-	       ;; "xrandr" nil "xrandr --output eDP-1 --mode 1920x1080 --left-of DP-1-2 --auto")))
-  (exwm-randr-enable)
+  (use-package exwm-randr
+    :ensure t
+    :config
+    (setq exwm-randr-workspace-output-plist '(1 "VGA-1" 2 "VGA-2"))
+    (add-hook 'exwm-randr-screen-change-hook
+	      (lambda ()
+		(start-process-shell-command
+		 "xrandr" nil "xrandr --output VGA-1 --left-of VGA-2 --auto")))
+    ;; "xrandr" nil "xrandr --output eDP-1 --mode 1920x1080 --left-of DP-1-2 --auto")))
+    (exwm-randr-enable))
 #+END_SRC
 
 **** Screenshots
@@ -599,8 +601,12 @@ Setup Ibuffer and organize by mode type
 
 Dumb jump for jumping around projects
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-  (dumb-jump-mode)
-  (global-set-key (kbd "C-c C-j") 'dumb-jump-go)
+  (use-package dumb-jump
+    :ensure t
+    :config
+    (dumb-jump-mode)
+    (global-set-key (kbd "C-c C-j") 'dumb-jump-go)
+    )
 #+END_SRC
 
 Copy current file path. Lifted from (http://ergoemacs.org/emacs/emacs_copy_file_path.html)
@@ -1066,12 +1072,12 @@ Add mail alerts for new messages.
 **** Ivy/Counsel/Swiper
 Generic auto-complete with Ivy
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-  (ivy-mode 1)
   (use-package ivy :demand
     :ensure t
     :config
     (setq ivy-use-virtual-buffers t
           ivy-count-format "%d/%d "))
+  (ivy-mode 1)
 #+END_SRC
 
 Ivy enhanced search (swiper) and common Emacs meta commands (counsel)
