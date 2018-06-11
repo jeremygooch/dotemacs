@@ -722,6 +722,8 @@ Trailing whitespace == smh. However, I don't care about it in every situation, l
 	      'no-trailing-whitespace)
     (add-hook 'mu4e:view-mode-hook
 	      'no-trailing-whitespace)
+    (add-hook 'eshell-mode-hook
+	      'no-trailing-whitespace)
     (add-hook 'help-mode-hook
 	      'no-trailing-whitespace)
     (add-hook 'term-mode-hook
