@@ -279,27 +279,20 @@ Bind org agenda to shortcut and give it our todo paths. Note that the paths are 
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (define-key global-map "\C-ca" 'org-agenda)
 
-  ;; use find-file for recursion
-  (load-library "find-lisp")
   (setq org-agenda-files (list "~/Dropbox/work/softwareadvice"
 			       "~/Dropbox/personal"))
 
-  ;; (setq org-agenda-files (find-lisp-find-files "~/Dropbox/work/softwareadvice" "\.org$"))
-
   ;; ;; Exclude certain directories/files
-  ;; (eval-when-compile (require 'cl))
-  ;; (setq org-agenda-files
-  ;;       (remove-if '(lambda (x)
-  ;; 		    (string-match
-  ;; 		     (concat "^" (regexp-quote (expand-file-name "~/Dropbox/.dropbox.cache/")))
-  ;; 		     x)
-  ;; 		    (string-match
-  ;; 		     (concat "^" (regexp-quote (expand-file-name "~/Dropbox/work/softwareadvice/calendar.org")))
-  ;; 		     x)
-  ;; 		    (string-match
-  ;; 		     (concat "^" (regexp-quote (expand-file-name "~/Dropbox/work/softwareadvice/org-jira/")))
-  ;; 		     x))
-  ;; 		 org-agenda-files))
+  (eval-when-compile (require 'cl))
+  (setq org-agenda-files
+	(remove-if '(lambda (x)
+		      (string-match
+		       (concat "^" (regexp-quote (expand-file-name "~/Dropbox/.dropbox.cache/")))
+		       x)
+		      (string-match
+		       (concat "^" (regexp-quote (expand-file-name "~/Dropbox/work/softwareadvice/org-jira/")))
+		       x))
+		   org-agenda-files))
 #+END_SRC
 
 Super simple reordering from Org Agenda -> Todo view
