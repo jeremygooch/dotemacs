@@ -281,16 +281,25 @@ Bind org agenda to shortcut and give it our todo paths. Note that the paths are 
 
   ;; use find-file for recursion
   (load-library "find-lisp")
-  (setq org-agenda-files (find-lisp-find-files "~/Dropbox/work/softwareadvice" "\.org$"))
+  (setq org-agenda-files (list "~/Dropbox/work/softwareadvice"
+			       "~/Dropbox/personal"))
 
-  ;; Exclude the dropbox cache directory
-  (eval-when-compile (require 'cl))
-  (setq org-agenda-files
-	(remove-if '(lambda (x)
-		      (string-match
-		       (concat "^" (regexp-quote (expand-file-name "~/Dropbox/.dropbox.cache/")))
-		       x))
-		   org-agenda-files))
+  ;; (setq org-agenda-files (find-lisp-find-files "~/Dropbox/work/softwareadvice" "\.org$"))
+
+  ;; ;; Exclude certain directories/files
+  ;; (eval-when-compile (require 'cl))
+  ;; (setq org-agenda-files
+  ;;       (remove-if '(lambda (x)
+  ;; 		    (string-match
+  ;; 		     (concat "^" (regexp-quote (expand-file-name "~/Dropbox/.dropbox.cache/")))
+  ;; 		     x)
+  ;; 		    (string-match
+  ;; 		     (concat "^" (regexp-quote (expand-file-name "~/Dropbox/work/softwareadvice/calendar.org")))
+  ;; 		     x)
+  ;; 		    (string-match
+  ;; 		     (concat "^" (regexp-quote (expand-file-name "~/Dropbox/work/softwareadvice/org-jira/")))
+  ;; 		     x))
+  ;; 		 org-agenda-files))
 #+END_SRC
 
 Super simple reordering from Org Agenda -> Todo view
@@ -378,14 +387,12 @@ Customize org capture to my liking
   (global-set-key (kbd "C-c c") 'org-capture)
   (setq org-capture-templates
    '(("w" "Work Todo" entry (file "~/Dropbox/work/softwareadvice/SA.org")
-      "** TODO %?\n  %i\n  %a")
-     ;; ("a" "Aqua Orb Todo" entry (file+headline "~/Dropbox/Projects.org" "Aqua Orb")
-     ;;  "** TODO %?\n  %i\n  %a")
-     ;; ("o" "Reorganize Workflow Todo" entry (file+headline "~/Dropbox/Projects.org" "Reorganize Workflow")
-     ;;  "** TODO %?\n  %i\n  %a")
+      "** TODO %? :sa:\n  %i\n  %a")
+     ("l" "Personal Todo" entry (file "~/Dropbox/personal/personal.org")
+      "*** TODO %? :personal:\n  %i\n  %a")
      ("m" "Meeting" entry (file "~/Dropbox/work/softwareadvice/Meetings.org")
       "** MEETING with %? :MEETING:\n  %i\n"  :clock-in t :clock-resume t)
-     ("m" "Next" entry (file "~/Dropbox/Next.org")
+     ("n" "Next" entry (file "~/Dropbox/Next.org")
       "** NEXT %?\n  %i\n  %a")
      ("M" "Milestone" entry (file "~/Dropbox/work/softwareadvice/SA-milestones.org")
       "* %u %?\n*Summary*: \n\n*Description*: \n\n" :clock-in t :clock-resume t)))
@@ -457,14 +464,17 @@ Lifted from [[http://cachestocaches.com/2016/9/my-workflow-org-agenda/]]. Need t
 
   ;; == Tags ==
   (setq org-tag-alist '((:startgroup)
-                ("@errand" . ?e)
-                ("@personal" . ?p)
-                (:endgroup)
-                ("DESIGN" . ?D)
-                ("FRONTEND" . ?f)
-                ("CULTURE" . ?C)
-                ("DEVOPS" . ?v)
-                ))
+		("@errand" . ?r)
+		("personal" . ?L)
+		(:endgroup)
+		("admin" . ?a)
+		("sa" . ?s)
+		("productivity" . ?p)
+		("engineering" . ?e)
+		("extra" . ?x)
+		("culture" . ?c)
+		("devops" . ?v)
+		))
 
   ;; Allow setting single tags without the menu
   (setq org-fast-tag-selection-single-key 'expert)
@@ -475,11 +485,11 @@ Lifted from [[http://cachestocaches.com/2016/9/my-workflow-org-agenda/]]. Need t
   ;; == Custom State Keywords ==
   (setq org-use-fast-todo-selection t)
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-      (sequence "WAITING(w@/!)" "INACTIVE(i@/!)" "|" "CANCELLED(c@/!)" "MEETING")))
+	'((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+      (sequence "WAITING(w@/!)" "INACTIVE(i@/!)" "|" "CANCELLED(C@/!)" "MEETING")))
   ;; Custom colors for the keywords
   (setq org-todo-keyword-faces
-        '(("TODO" :foreground "red" :weight bold)
+	'(("TODO" :foreground "red" :weight bold)
       ("NEXT" :foreground "blue" :weight bold)
       ("DONE" :foreground "forest green" :weight bold)
       ("WAITING" :foreground "orange" :weight bold)
@@ -488,7 +498,7 @@ Lifted from [[http://cachestocaches.com/2016/9/my-workflow-org-agenda/]]. Need t
       ("MEETING" :foreground "forest green" :weight bold)))
   ;; Auto-update tags whenever the state is changed
   (setq org-todo-state-tags-triggers
-        '(("CANCELLED" ("CANCELLED" . t))
+	'(("CANCELLED" ("CANCELLED" . t))
       ("WAITING" ("WAITING" . t))
       ("INACTIVE" ("WAITING") ("INACTIVE" . t))
       (done ("WAITING") ("INACTIVE"))
@@ -499,15 +509,15 @@ Lifted from [[http://cachestocaches.com/2016/9/my-workflow-org-agenda/]]. Need t
     "Visit each parent task and change NEXT (or DONE) states to TODO."
     ;; Don't change the value if new state is "DONE"
     (let ((mystate (or (and (fboundp 'org-state)
-                            (member state
-                    (list "NEXT" "TODO")))
-                       (member (nth 2 (org-heading-components))
-                   (list "NEXT" "TODO")))))
+			    (member state
+		    (list "NEXT" "TODO")))
+		       (member (nth 2 (org-heading-components))
+		   (list "NEXT" "TODO")))))
       (when mystate
-        (save-excursion
-          (while (org-up-heading-safe)
-            (when (member (nth 2 (org-heading-components)) (list "NEXT" "DONE"))
-              (org-todo "TODO")))))))
+	(save-excursion
+	  (while (org-up-heading-safe)
+	    (when (member (nth 2 (org-heading-components)) (list "NEXT" "DONE"))
+	      (org-todo "TODO")))))))
   (add-hook 'org-after-todo-state-change-hook 'gs/mark-next-done-parent-tasks-todo 'append)
 
 #+END_SRC
