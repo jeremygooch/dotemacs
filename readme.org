@@ -1056,19 +1056,28 @@ Add mail alerts for new messages.
 **** Ivy/Counsel/Swiper
 Generic auto-complete with Ivy
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-    (use-package ivy :demand
-      :ensure t
-      :diminish ivy-mode
-      :config
-      (setq ivy-use-virtual-buffers t
-	    ivy-count-format "%d/%d "))
-    (ivy-mode 1)
+  (use-package ivy :demand
+    :ensure t
+    :diminish ivy-mode
+    :config
+    (setq ivy-use-virtual-buffers t
+	  ivy-count-format "%d/%d "))
+  (ivy-mode 1)
+
 #+END_SRC
 
 Ivy enhanced search (swiper) and common Emacs meta commands (counsel)
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-(global-set-key (kbd "M-x") 'counsel-M-x)
-(global-set-key (kbd "C-s") 'swiper)
+  (use-package counsel
+    :ensure t
+    :config
+    (global-set-key (kbd "M-x") 'counsel-M-x))
+
+  (use-package swiper
+    :ensure t
+    :config
+    (global-set-key (kbd "C-s") 'swiper))
+
 #+END_SRC
 
 **** Fix emacs' regex
