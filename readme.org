@@ -153,6 +153,13 @@ There are a few miscellaneous modes where the mouse should be disabled by defaul
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (add-hook 'lisp-interaction-mode 'disable-mouse-mode)
 #+END_SRC
+
+**** Lock screen with slock
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (exwm-input-set-key (kbd "s-l") (lambda ()
+	      (interactive)
+	      (start-process "" nil "/usr/bin/slock")))
+#+END_SRC
 *** UI Components
 **** Dashboard
 What can I say, I like a nice big splash screen and I'm partial to the meditating GNU logo.
