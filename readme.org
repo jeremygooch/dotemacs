@@ -903,11 +903,11 @@ I'm accustomed to being able to highlight a region then replace it with the next
 
   ;; SGML Mode - Indentation
   (add-hook 'sgml-mode-hook
-            (lambda ()
-              ;; Default indentation to 2, but let SGML mode guess, too.
-              (set (make-local-variable 'sgml-basic-offset) 4)
-              (sgml-guess-indent))
-            )
+	    (lambda ()
+	      ;; Default indentation to 2, but let SGML mode guess, too.
+	      (set (make-local-variable 'sgml-basic-offset) 4)
+	      (sgml-guess-indent))
+	    )
 
   ;; Markdown Mode
   (autoload 'markdown-mode "markdown-mode"
@@ -920,6 +920,8 @@ I'm accustomed to being able to highlight a region then replace it with the next
   (global-auto-revert-mode 1)
   (setq global-auto-revert-non-file-buffers t)
   (setq auto-revert-verbose nil)
+  (setq dired-listing-switches "-alh")
+
 
   (use-package web-mode
     :ensure t
@@ -1122,7 +1124,7 @@ Ivy enhanced search (swiper) and common Emacs meta commands (counsel)
 **** Highlight line
 Helpful for finding the cursor when jumping around
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-(global-hl-line-mode +1)
+  (global-hl-line-mode +1)
 #+END_SRC
 **** Which key
 Some quick help for when I get stuck in the middle of a command
