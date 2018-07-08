@@ -417,7 +417,7 @@ Customize org capture to my liking
 
 #+END_SRC
 
-**** LaTeX
+**** Presentations
 LaTeX + Beamer is helpful for creating presentations, so setting up LaTeX boilerplate
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   ;; allow for export=>beamer by placing
@@ -473,6 +473,15 @@ LaTeX + Beamer is helpful for creating presentations, so setting up LaTeX boiler
        ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
        ("\\paragraph{%s}" . "\\paragraph*{%s}")
        ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+#+END_SRC
+***** Reveal JS
+#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
+  (use-package htmlize
+    :ensure t)
+
+
+  (add-to-list 'load-path "~/.emacs.d/lisp/org-reveal")
+  (require 'ox-reveal)
 #+END_SRC
 **** TODO Update Custom Org workflow
 Lifted from [[http://cachestocaches.com/2016/9/my-workflow-org-agenda/]]. Need to customize to my preferences.
@@ -1015,8 +1024,11 @@ For Tide integration, use the local tsserver and fallback to the default one ins
 
 Emmet mode for html/css
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-  (add-hook 'sgml-mode-hook 'emmet-mode)
-  (add-hook 'css-mode-hook  'emmet-mode)
+  (use-package emmet-mode
+    :ensure t
+    :config
+    (add-hook 'sgml-mode-hook 'emmet-mode)
+    (add-hook 'css-mode-hook  'emmet-mode))
 #+END_SRC
 
 *** Consuming Content
