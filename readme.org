@@ -40,7 +40,7 @@ Emacs was the original terminal multiplexer so manages split views quite nicely.
 First, get some basics out of the way. Switch to fullscreen mode and hide the menus and also adjust the default font size while we're at it.
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (set-frame-parameter nil 'fullscreen 'fullboth)
-  (set-face-attribute 'default nil :height 100)
+  (set-face-attribute 'default nil :height 110)
   (menu-bar-mode -1)
   (tool-bar-mode -1)
 #+END_SRC
@@ -78,12 +78,14 @@ With EXWM it can act as a complete desktop environment.
 Fortunately EXWM also has support for multiple monitors.
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (require 'exwm-randr)
-  (setq exwm-randr-workspace-output-plist '(1 "VGA-1" 2 "VGA-2"))
+  ;; (setq exwm-randr-workspace-output-plist '(1 "VGA-1" 2 "VGA-2"))
+  (setq exwm-randr-workspace-output-plist '(1 "eDP-1" 2 "DP-1-2"))
   (add-hook 'exwm-randr-screen-change-hook
 	    (lambda ()
 	      (start-process-shell-command
-	       "xrandr" nil "xrandr --output VGA-1 --left-of VGA-2 --auto")))
-  ;; "xrandr" nil "xrandr --output eDP-1 --mode 1920x1080 --left-of DP-1-2 --auto")))
+	       ;; "xrandr" nil "xrandr --output VGA-1 --left-of VGA-2 --auto")))
+  ;; "xrandr" nil "xrandr --output eDP-1 --mode 1920x1080")))
+  "xrandr" nil "xrandr --output eDP-1 --mode 2048x1152")))
   (exwm-randr-enable)
 #+END_SRC
 
@@ -160,6 +162,28 @@ There are a few miscellaneous modes where the mouse should be disabled by defaul
   (exwm-input-set-key (kbd "s-l") (lambda ()
 	      (interactive)
 	      (start-process "" nil "/usr/bin/slock")))
+#+END_SRC
+**** Helpful Function Keys
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+(defun jrm3/volume-increase ()
+  "Bump up the volume by 5%"
+  (interactive)
+     (with-temp-buffer (shell-command "/usr/bin/amixer set Master 5%+" t)))
+(global-set-key (kbd "<XF86AudioRaiseVolume>") 'jrm3/volume-increase)
+
+
+(defun jrm3/volume-decrease ()
+  "Bump down the volume by 5%"
+  (interactive)
+     (with-temp-buffer (shell-command "/usr/bin/amixer set Master 5%-" t)))
+(global-set-key (kbd "<XF86AudioLowerVolume>") 'jrm3/volume-decrease)
+
+(defun jrm3/volume-mute-toggle ()
+  "Toggle volume mute on/off"
+  (interactive)
+     (with-temp-buffer (shell-command "/usr/bin/amixer set Master toggle" t)))
+(global-set-key (kbd "<XF86AudioMute>") 'jrm3/volume-mute-toggle)
+
 #+END_SRC
 *** UI Components
 **** Dashboard
