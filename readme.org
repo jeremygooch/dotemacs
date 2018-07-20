@@ -1022,6 +1022,20 @@ For Tide integration, use the local tsserver and fallback to the default one ins
       ))
 #+END_SRC
 
+Using Node JS Repl which is helpful for node development as well as just tinkering around with JS
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (use-package nodejs-repl
+    :ensure t)
+  (add-hook 'js-mode-hook
+	    (lambda ()
+	      (define-key js-mode-map (kbd "C-c C-e") 'nodejs-repl-send-last-expression)
+	      (define-key js-mode-map (kbd "C-c C-c") 'nodejs-repl-send-buffer)
+	      (define-key js-mode-map (kbd "C-c C-j") 'nodejs-repl-send-line)
+	      (define-key js-mode-map (kbd "C-c C-r") 'nodejs-repl-send-region)
+	      (define-key js-mode-map (kbd "C-c C-l") 'nodejs-repl-load-file)
+	      (define-key js-mode-map (kbd "C-c C-z") 'nodejs-repl-switch-to-repl)))
+#+END_SRC
+
 Emmet mode for html/css
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (use-package emmet-mode
