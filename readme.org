@@ -161,6 +161,7 @@ There are a few miscellaneous modes where the mouse should be disabled by defaul
 	      (interactive)
 	      (start-process "" nil "/usr/bin/slock")))
 #+END_SRC
+
 *** UI Components
 **** Dashboard
 What can I say, I like a nice big splash screen and I'm partial to the meditating GNU logo.
@@ -1132,6 +1133,11 @@ Ivy enhanced search (swiper) and common Emacs meta commands (counsel)
 
 #+END_SRC
 
+**** GPG Pinentry
+Instead of using the display's popup, prompt for gpg creds in the minibuffer
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+(setq epa-pinentry-mode 'loopback)
+#+END_SRC
 **** Fix emacs' regex
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (setq-default pcre-mode t)
