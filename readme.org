@@ -165,6 +165,7 @@ There are a few miscellaneous modes where the mouse should be disabled by defaul
 	      (interactive)
 	      (start-process "" nil "/usr/bin/slock")))
 #+END_SRC
+
 **** Helpful Function Keys
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (defun jrm3/volume-increase ()
@@ -1049,6 +1050,20 @@ For Tide integration, use the local tsserver and fallback to the default one ins
       ))
 #+END_SRC
 
+Using Node JS Repl which is helpful for node development as well as just tinkering around with JS
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (use-package nodejs-repl
+    :ensure t)
+  (add-hook 'js-mode-hook
+	    (lambda ()
+	      (define-key js-mode-map (kbd "C-c C-e") 'nodejs-repl-send-last-expression)
+	      (define-key js-mode-map (kbd "C-c C-c") 'nodejs-repl-send-buffer)
+	      (define-key js-mode-map (kbd "C-c C-j") 'nodejs-repl-send-line)
+	      (define-key js-mode-map (kbd "C-c C-r") 'nodejs-repl-send-region)
+	      (define-key js-mode-map (kbd "C-c C-l") 'nodejs-repl-load-file)
+	      (define-key js-mode-map (kbd "C-c C-z") 'nodejs-repl-switch-to-repl)))
+#+END_SRC
+
 Emmet mode for html/css
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (use-package emmet-mode
@@ -1145,6 +1160,11 @@ Ivy enhanced search (swiper) and common Emacs meta commands (counsel)
 
 #+END_SRC
 
+**** GPG Pinentry
+Instead of using the display's popup, prompt for gpg creds in the minibuffer
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+(setq epa-pinentry-mode 'loopback)
+#+END_SRC
 **** Fix emacs' regex
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (setq-default pcre-mode t)
