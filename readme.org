@@ -216,21 +216,6 @@ What can I say, I like a nice big splash screen and I'm partial to the meditatin
     :ensure t)
 #+END_SRC
 
-**** Modeline
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-  (use-package smart-mode-line
-    :ensure t
-    :config
-    (setq sml/no-confirm-load-theme t))
-
-  (use-package smart-mode-line-powerline-theme
-    :ensure t
-    :config
-    (smart-mode-line-enable)
-    (set-face-attribute 'mode-line nil
-		      :foreground "#a6b6d7"
-		      :box nil))
-#+END_SRC
 *** Shell
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (add-hook 'shell-mode-hook 'disable-mouse-mode)
@@ -326,6 +311,49 @@ Add option to append as part of tangling a file
   (add-hook 'org-mode-hook #'org-babel-tangle-append-setup)
 #+END_SRC
 
+Add custom easy-templates for inserting structural elements with as few keystrokes as possible
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (custom-set-variables
+   '(org-structure-template-alist
+     (quote
+      (("s" "#+BEGIN_SRC ?
+
+  \#+END_SRC")
+       ("e" "#+BEGIN_EXAMPLE
+  ?
+  ,#+END_EXAMPLE")
+       ("q" "#+BEGIN_QUOTE
+  ?
+  ,#+END_QUOTE")
+       ("v" "#+BEGIN_VERSE
+  ?
+  ,#+END_VERSE")
+       ("V" "#+BEGIN_VERBATIM
+  ?
+  ,#+END_VERBATIM")
+       ("c" "#+BEGIN_CENTER
+  ?
+  ,#+END_CENTER")
+       ("C" "#+BEGIN_COMMENT
+  ?
+  ,#+END_COMMENT")
+       ("l" "#+BEGIN_EXPORT latex
+  ?
+  ,#+END_EXPORT")
+       ("L" "#+LaTeX: ")
+       ("h" "#+BEGIN_EXPORT html
+  ?
+  ,#+END_EXPORT")
+       ("H" "#+HTML: ")
+       ("a" "#+BEGIN_EXPORT ascii
+  ?
+  ,#+END_EXPORT")
+       ("A" "#+ASCII: ")
+       ("i" "#+INDEX: ?")
+       ("I" "#+INCLUDE: %file ?")
+       ("n" "#+NAME: "))))
+   )
+#+END_SRC
 **** Org Agenda
 Bind org agenda to shortcut and give it our todo paths. Note that the paths are not recursive for org-agenda-files.
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
@@ -769,7 +797,7 @@ Turn off the mouse/trackpad when editing certain files
 #+END_SRC
 
 **** Programming & Ops
-Trailing whitespace == smh. However, I don't care about it in every situation, like when I'm reading prose.
+I prefer to see trailing whitespace; however, I don't care about it in every situation, like when I'm reading prose.
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (use-package whitespace
     :ensure t
@@ -1067,10 +1095,9 @@ Using Node JS Repl which is helpful for node development as well as just tinkeri
 Emmet mode for html/css
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
   (use-package emmet-mode
-    :ensure t
-    :config
-    (add-hook 'sgml-mode-hook 'emmet-mode)
-    (add-hook 'css-mode-hook  'emmet-mode))
+    :ensure t)
+  (add-hook 'sgml-mode-hook 'emmet-mode)
+  (add-hook 'css-mode-hook  'emmet-mode)
 #+END_SRC
 
 *** Consuming Content
@@ -1163,7 +1190,7 @@ Ivy enhanced search (swiper) and common Emacs meta commands (counsel)
 **** GPG Pinentry
 Instead of using the display's popup, prompt for gpg creds in the minibuffer
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
-(setq epa-pinentry-mode 'loopback)
+  (setq epa-pinentry-mode 'loopback)
 #+END_SRC
 **** Fix emacs' regex
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
