@@ -284,6 +284,49 @@ Add option to append as part of tangling a file
   (add-hook 'org-mode-hook #'org-babel-tangle-append-setup)
 #+END_SRC
 
+Add custom easy-templates for inserting structural elements with as few keystrokes as possible
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (custom-set-variables
+   '(org-structure-template-alist
+     (quote
+      (("s" "#+BEGIN_SRC ?
+
+  \#+END_SRC")
+       ("e" "#+BEGIN_EXAMPLE
+  ?
+  ,#+END_EXAMPLE")
+       ("q" "#+BEGIN_QUOTE
+  ?
+  ,#+END_QUOTE")
+       ("v" "#+BEGIN_VERSE
+  ?
+  ,#+END_VERSE")
+       ("V" "#+BEGIN_VERBATIM
+  ?
+  ,#+END_VERBATIM")
+       ("c" "#+BEGIN_CENTER
+  ?
+  ,#+END_CENTER")
+       ("C" "#+BEGIN_COMMENT
+  ?
+  ,#+END_COMMENT")
+       ("l" "#+BEGIN_EXPORT latex
+  ?
+  ,#+END_EXPORT")
+       ("L" "#+LaTeX: ")
+       ("h" "#+BEGIN_EXPORT html
+  ?
+  ,#+END_EXPORT")
+       ("H" "#+HTML: ")
+       ("a" "#+BEGIN_EXPORT ascii
+  ?
+  ,#+END_EXPORT")
+       ("A" "#+ASCII: ")
+       ("i" "#+INDEX: ?")
+       ("I" "#+INCLUDE: %file ?")
+       ("n" "#+NAME: "))))
+   )
+#+END_SRC
 **** Org Agenda
 Bind org agenda to shortcut and give it our todo paths. Note that the paths are not recursive for org-agenda-files.
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
