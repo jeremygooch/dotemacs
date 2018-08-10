@@ -375,6 +375,19 @@ Bind org agenda to shortcut and give it our todo paths. Note that the paths are 
 		   org-agenda-files))
 #+END_SRC
 
+Setup the default view for org agenda
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (custom-set-variables
+   '(org-agenda-custom-commands
+     (quote
+      (("n" "Agenda and all TODOs"
+	((agenda ""
+		 ((org-agenda-span
+		   (quote day))))
+	 (alltodo "" nil))
+	nil)))))
+#+END_SRC
+
 Super simple reordering from Org Agenda -> Todo view
 #+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
 
