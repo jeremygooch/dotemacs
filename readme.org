@@ -1019,6 +1019,10 @@ Angular setup
     :ensure t
     :diminish flycheck-mode)
 
+  (custom-set-variables
+   '(flycheck-typescript-tslint-executable "/home/jrm3/.nvm/versions/node/v9.11.1/bin/tslint"))
+
+
   (use-package company
     :ensure t
     :diminish company-mode)
@@ -1047,6 +1051,12 @@ Angular setup
 
     (define-key tide-mode-map (kbd "C-c C-d") 'tide-documentation-at-point)
     (define-key tide-mode-map (kbd "C-c C-i") 'tide-organize-imports))
+#+END_SRC
+
+Check for ts lint errors
+#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
+  (flycheck-add-mode 'typescript-tslint 'ng2-ts-mode)
+  (flycheck-add-mode 'typescript-tide 'ng2-ts-mode)
 #+END_SRC
 
 For Tide integration, use the local tsserver and fallback to the default one installed with tide
