@@ -183,6 +183,10 @@ What can I say, I like a nice big splash screen and I'm partial to the meditatin
     :ensure t)
 #+END_SRC
 
+Remove default scrollbars
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+(scroll-bar-mode -1)
+#+END_SRC
 **** Clean up modeline with diminish
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package diminish
