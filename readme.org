@@ -12,7 +12,7 @@ Credit where credit is due: a lot of the content in my configuration was lifted 
 ** Configuration
 *** Package archives and use-package
 Setting up basic repositories and such.
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (package-initialize)
   (require 'package)
   (setq package-enable-at-startup nil)
@@ -29,7 +29,7 @@ Setting up basic repositories and such.
 #+END_SRC
 *** Personal Information
 For the sake of completeness, configure name and email address
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (setq user-full-name "Jeremy Gooch"
         user-mail-address "jeremy.gooch@gmail.com")
 #+END_SRC
@@ -38,7 +38,7 @@ For the sake of completeness, configure name and email address
 Emacs was the original terminal multiplexer so manages split views quite nicely.
 
 First, get some basics out of the way. Switch to fullscreen mode and hide the menus and also adjust the default font size while we're at it.
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (set-frame-parameter nil 'fullscreen 'fullboth)
   (set-face-attribute 'default nil :height 110)
   (menu-bar-mode -1)
@@ -48,7 +48,7 @@ First, get some basics out of the way. Switch to fullscreen mode and hide the me
 #+RESULTS:
 
 The default keybindings for naviating split views can be cumbersome, so remap them to something a bit easier.
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
 
   (global-set-key (kbd "C-c <left>")  'windmove-left)
   (global-set-key (kbd "C-c <right>") 'windmove-right)
@@ -57,7 +57,7 @@ The default keybindings for naviating split views can be cumbersome, so remap th
 #+END_SRC
 
 We'll need to turn off the mouse from time to time
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
     (use-package disable-mouse
       :ensure t
       :diminish disable-mouse-mode)
@@ -65,7 +65,7 @@ We'll need to turn off the mouse from time to time
 
 **** EXWM
 With EXWM it can act as a complete desktop environment.
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package exwm
     :ensure t)
   (use-package exwm-config
@@ -78,7 +78,7 @@ With EXWM it can act as a complete desktop environment.
 
 
 Fortunately EXWM also has support for multiple monitors.
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (require 'exwm-randr)
   ;; (setq exwm-randr-workspace-output-plist '(1 "VGA-1" 2 "VGA-2"))
   (setq exwm-randr-workspace-output-plist '(1 "eDP-1" 2 "DP-1-2"))
@@ -93,7 +93,7 @@ Fortunately EXWM also has support for multiple monitors.
 
 **** Screenshots
 I took this from Uncle Dave's config. Its a super slick screenshot function for taking both fullscreen as well as region screenshots.
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
     (defun jrm3/take-screenshot ()
     "Takes a fullscreenshot of the current workspace"
     (interactive)
@@ -121,7 +121,7 @@ I took this from Uncle Dave's config. Its a super slick screenshot function for 
 #+END_SRC
 
 **** Application Launcher with dmenu
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
 (use-package dmenu
   :ensure t
   :bind
@@ -132,14 +132,14 @@ I took this from Uncle Dave's config. Its a super slick screenshot function for 
 According to the [[https://www.systutorials.com/docs/linux/man/1-Xorg.wrap/][man page]], edit [[/etc/X11/Xwrapper.config]] to include the line:
 ~allowed_users=anybody~ and ~needs_root_rights=yes~.
 
-#+BEGIN_SRC shell :exports code :tangle ~/.xinitrc
+#+BEGIN_SRC shell  :tangle ~/.xinitrc
 #!/bin/bash
 exec emacs
 #+END_SRC
 
 **** Minibuffer considerations for desktop/fullscreen usage
 Display the current time and battery indicator
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (setq display-time-24hr-format t)
   (setq display-time-format "%H:%M - %d.%b.%y")
   (display-time-mode 1)
@@ -149,18 +149,18 @@ Display the current time and battery indicator
 
 **** Send keys to EXWM Line Mode buffers
 I find the default way (C-c C-q) of exwm sending keys like ctrl to an async buffer difficult. C-c C-c is much simpler for me.
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (define-key exwm-mode-map [?\C-c ?\C-c] 'exwm-input-send-next-key)
 #+END_SRC
 
 **** Mouse/Trackpad
 There are a few miscellaneous modes where the mouse should be disabled by default.
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (add-hook 'lisp-interaction-mode 'disable-mouse-mode)
 #+END_SRC
 
 **** Lock screen with slock
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (exwm-input-set-key (kbd "s-l") (lambda ()
 	      (interactive)
 	      (start-process "" nil "/usr/bin/slock")))
@@ -192,7 +192,7 @@ There are a few miscellaneous modes where the mouse should be disabled by defaul
 *** UI Components
 **** Dashboard
 What can I say, I like a nice big splash screen and I'm partial to the meditating GNU logo.
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package dashboard
     :ensure t
     :config
@@ -205,26 +205,26 @@ What can I say, I like a nice big splash screen and I'm partial to the meditatin
 #+END_SRC
 
 **** Theme
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package zerodark-theme
     :ensure t)
 #+END_SRC
 
 **** Clean up modeline with diminish
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package diminish
     :ensure t)
 #+END_SRC
 
 *** Shell
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (add-hook 'shell-mode-hook 'disable-mouse-mode)
   ;; Make shells interactive (i.e. M-!, or source blocks in org)
   (setq shell-command-switch "-ic")
 #+END_SRC
 
 By default just use bash for all shells
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (defvar my-term-shell "/bin/bash")
   (defadvice ansi-term (before force-bash)
     (interactive (list my-term-shell)))
@@ -233,7 +233,7 @@ By default just use bash for all shells
 
 *** Org Mode
 Load some basic minor modes by default
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs 
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs 
   (add-hook 'org-mode-hook
             (lambda ()
               (disable-mouse-mode)
@@ -248,7 +248,7 @@ Load some basic minor modes by default
 #+END_SRC
 
 Show the asterisks as bullets
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
 (use-package org-bullets
   :ensure t
   :config
@@ -256,13 +256,13 @@ Show the asterisks as bullets
 #+END_SRC
 
 Add some export modes for getting content out of org
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package ox-twbs
     :ensure t)
 #+END_SRC
 **** Literate programming
 One of the coolest features of org mode imo is the ability to evaluate almost any language via org-babel. Lets load in the non-common ones.
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package ob-typescript
     :ensure t
     :diminish typescript-mode)
@@ -285,17 +285,17 @@ One of the coolest features of org mode imo is the ability to evaluate almost an
 #+END_SRC
 
 When evaluating a source code block in org mode do not prompt for input, just run it.
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (setq org-confirm-babel-evaluate nil)
 #+END_SRC
 
 Make it easier to tangle the current source block
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
 (global-set-key (kbd "C-c v t") (lambda () (interactive) (org-babel-tangle-block)))
 #+END_SRC
 
 Add option to append as part of tangling a file
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (defun org-babel-tangle-append ()
     "Append source code block at point to its tangle file.
   The command works like `org-babel-tangle' with prefix arg
@@ -312,7 +312,7 @@ Add option to append as part of tangling a file
 #+END_SRC
 
 Add custom easy-templates for inserting structural elements with as few keystrokes as possible
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (custom-set-variables
    '(org-structure-template-alist
      (quote
@@ -356,7 +356,7 @@ Add custom easy-templates for inserting structural elements with as few keystrok
 #+END_SRC
 **** Org Agenda
 Bind org agenda to shortcut and give it our todo paths. Note that the paths are not recursive for org-agenda-files.
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (define-key global-map "\C-ca" 'org-agenda)
 
   (setq org-agenda-files (list "~/Dropbox/work/softwareadvice"
@@ -389,7 +389,7 @@ Setup the default view for org agenda
 #+END_SRC
 
 Super simple reordering from Org Agenda -> Todo view
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
 
   ;; The following was lifted from http://pragmaticemacs.com/emacs/reorder-todo-items-in-your-org-mode-agenda/
   (defun jrm3/org-headline-to-top ()
@@ -441,7 +441,7 @@ Super simple reordering from Org Agenda -> Todo view
 #+END_SRC
 
 Setup reminders with [[http://sachachua.com/blog/2007/11/setting-up-appointment-reminders-in-org/][org-agenda-to-appt]].
-#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
+#+BEGIN_SRC emacs-lisp  ~/.emacs
   (defun org-agenda-to-appt ()
     "Activate appointments found in `org-agenda-files'."
     (interactive)
@@ -469,7 +469,7 @@ Setup reminders with [[http://sachachua.com/blog/2007/11/setting-up-appointment-
 
 **** Org Capture
 Customize org capture to my liking
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (global-set-key (kbd "C-c c") 'org-capture)
   (setq org-capture-templates
    '(("w" "Work Todo" entry (file "~/Dropbox/work/softwareadvice/SA.org")
@@ -488,7 +488,7 @@ Customize org capture to my liking
 
 **** Presentations
 LaTeX + Beamer is helpful for creating presentations, so setting up LaTeX boilerplate
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   ;; allow for export=>beamer by placing
 
   ;; #+LaTeX_CLASS: beamer in org files
@@ -544,7 +544,7 @@ LaTeX + Beamer is helpful for creating presentations, so setting up LaTeX boiler
        ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 #+END_SRC
 ***** Reveal JS
-#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
+#+BEGIN_SRC emacs-lisp  ~/.emacs
   (use-package htmlize
     :ensure t)
 
@@ -554,7 +554,7 @@ LaTeX + Beamer is helpful for creating presentations, so setting up LaTeX boiler
 #+END_SRC
 **** TODO Update Custom Org workflow
 Lifted from [[http://cachestocaches.com/2016/9/my-workflow-org-agenda/]]. Need to customize to my preferences.
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   ;; (setq org-todo-keywords '((type "TODO" "NEXT" "DONE" "WITING" "INACTIVE" "CANCELLED" "MEETING"))
 
   ;; == Tags ==
@@ -638,14 +638,14 @@ Atlassian Confluence's WYSIWYG editor leaves a lot to be desired. It's much bett
  #+END_SRC
 *** Filesystem Navigation
 Tramp is a must have.
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package tramp
     :config
     (setq tramp-default-method "scp"))
 #+END_SRC
 
 Setup Ibuffer and organize by mode type
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (global-set-key (kbd "C-x C-b") 'ibuffer)
 
   (setq ibuffer-saved-filter-groups
@@ -690,7 +690,7 @@ Setup Ibuffer and organize by mode type
 #+END_SRC
 
 Dumb jump for jumping around projects
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package dumb-jump
     :ensure t
     :config
@@ -700,7 +700,7 @@ Dumb jump for jumping around projects
 #+END_SRC
 
 Copy current file path. Lifted from (http://ergoemacs.org/emacs/emacs_copy_file_path.html)
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
 ;; Copy the file path of the current buffer
 (defun jrm3/copy-file-path (&optional *dir-path-only-p)
   "Copy the current buffer's file path or dired path to `kill-ring'.
@@ -724,7 +724,7 @@ Result is full path."
 #+END_SRC
 
 Projectile for project level interaction
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package projectile
     :ensure t
     :diminish projectile-mode)
@@ -732,13 +732,13 @@ Projectile for project level interaction
 
 *** In-file Navigation
 Easier paragraph jumping
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (global-set-key (kbd "M-p") 'backward-paragraph)
   (global-set-key (kbd "M-n") 'forward-paragraph)
 #+END_SRC
 
 Avy is great for speed-of-thought navigation
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package avy
     :ensure t)
   (global-set-key (kbd "M-s") 'avy-goto-char)
@@ -746,13 +746,13 @@ Avy is great for speed-of-thought navigation
 #+END_SRC
 
 Wrap long lines so I can see everything at a glance
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (global-visual-line-mode t)
 #+END_SRC
 
 *** File Editing utilities
 I find it helpful to be able to backtab (shift+tab) to un-indent
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (global-set-key (kbd "<backtab>") 'un-indent-by-removing-4-spaces)
   (defun un-indent-by-removing-4-spaces ()
     "Remove 4 spaces from beginning of of line."
@@ -768,12 +768,12 @@ I find it helpful to be able to backtab (shift+tab) to un-indent
 #+END_SRC
 
 Make evaluating lisp buffers even quicker
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (global-set-key (kbd "C-c C-e")  'eval-buffer)
 #+END_SRC
 
 Keep temporary and backup buffers out of current directory like a civilized human being.
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (custom-set-variables
    '(auto-save-file-name-transforms '((".*" "~/.emacs.d/autosaves/\\1" t)))
    '(backup-directory-alist '((".*" . "~/.emacs.d/backups/")))
@@ -789,7 +789,7 @@ I don't mind using the minibuffer for the current line num, but vertical line nu
 #+END_SRC
 
 Turn off the mouse/trackpad when editing certain files
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (add-hook 'javascript-mode-hook 'disable-mouse-mode)
   (add-hook 'text-mode-hook 'disable-mouse-mode)
   (add-hook 'web-mode-hook 'disable-mouse-mode)
@@ -811,7 +811,7 @@ Turn off the mouse/trackpad when editing certain files
 
 **** Programming & Ops
 I prefer to see trailing whitespace; however, I don't care about it in every situation, like when I'm reading prose.
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package whitespace
     :ensure t
     :config
@@ -844,7 +844,7 @@ I prefer to see trailing whitespace; however, I don't care about it in every sit
 #+END_SRC
 
 Various modes helpful for development
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
 
   (use-package yaml-mode
     :ensure t
@@ -905,12 +905,12 @@ Clojure with Cider for interactive Clojure development
 #+END_SRC
 
 For org-babel's clojure backend use cider rather than the default slime
-#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
+#+BEGIN_SRC emacs-lisp  ~/.emacs
   (setq org-babel-clojure-backend 'cider)
 #+END_SRC
 
 Magit for version control
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
 
   (use-package magit
     :ensure t
@@ -919,7 +919,7 @@ Magit for version control
 #+END_SRC
 
 Defining custom indentation based on project paths and setting them to functions that I can call as needed. This also sets backtab.
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (defun jrm3/setup-indent (n)
     (setq indent-tabs-mode nil)
     ;; java/c/c++
@@ -967,12 +967,12 @@ Defining custom indentation based on project paths and setting them to functions
 #+END_SRC
 
 I'm accustomed to being able to highlight a region then replace it with the next keystroke, (i.e. a letter, return, backspace, etc.).
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (delete-selection-mode 1)
 #+END_SRC
 
 ***** Web development
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   ;; SCSS Mode
   (use-package sass-mode
     :ensure t
@@ -1025,7 +1025,7 @@ I'm accustomed to being able to highlight a region then replace it with the next
 #+END_SRC
 
 PHP Development
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   ;; PHP Mode Improved (http://www.emacswiki.org/emacs/php-mode-improved.el)
   ;; (add-to-list 'load-path "~/.emacs.d/lisp/")
   (use-package php-mode
@@ -1037,7 +1037,7 @@ PHP Development
 #+END_SRC
 
 Angular setup
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (setq exec-path (append exec-path '("/home/jrm3/.nvm/versions/node/v9.11.1/bin")))
   (use-package ng2-mode
     :ensure t)
@@ -1081,13 +1081,13 @@ Angular setup
 #+END_SRC
 
 Check for ts lint errors
-#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
+#+BEGIN_SRC emacs-lisp  ~/.emacs
   (flycheck-add-mode 'typescript-tslint 'ng2-ts-mode)
   (flycheck-add-mode 'typescript-tide 'ng2-ts-mode)
 #+END_SRC
 
 For Tide integration, use the local tsserver and fallback to the default one installed with tide
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (let* ((package-root (locate-dominating-file default-directory
                                                "package.json"))
          (path
@@ -1102,7 +1102,7 @@ For Tide integration, use the local tsserver and fallback to the default one ins
 #+END_SRC
 
 Using Node JS Repl which is helpful for node development as well as just tinkering around with JS
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package nodejs-repl
     :ensure t)
   (add-hook 'js-mode-hook
@@ -1116,7 +1116,7 @@ Using Node JS Repl which is helpful for node development as well as just tinkeri
 #+END_SRC
 
 Emmet mode for html/css
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package emmet-mode
     :ensure t)
   (add-hook 'sgml-mode-hook 'emmet-mode)
@@ -1126,7 +1126,7 @@ Emmet mode for html/css
 *** Consuming Content
 **** Mail
 Add mail alerts for new messages.
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package mu4e-alert
     :ensure t
     :after mu4e
@@ -1147,7 +1147,7 @@ Add mail alerts for new messages.
 #+END_SRC
 
 **** EWW
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (defun eww-new ()
     (interactive)
     (let ((url (read-from-minibuffer "Enter URL or keywords: ")))
@@ -1158,7 +1158,7 @@ Add mail alerts for new messages.
 
 *** Misc Emacs Enhancements
 **** Smex for auto complete meta commands
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
 (use-package smex
   :ensure t
  :init
@@ -1169,7 +1169,7 @@ Add mail alerts for new messages.
 #+END_SRC
 
 **** Ido Mode
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (setq ido-enable-flex-matching nil)
   (setq ido-create-new-buffer 'always) ;; create a buffer with specific name if it doesn't exist already
   (setq ido-everywhere t)
@@ -1183,7 +1183,7 @@ Add mail alerts for new messages.
 
 **** Ivy/Counsel/Swiper
 Generic auto-complete with Ivy
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package ivy :demand
     :ensure t
     :diminish ivy-mode
@@ -1195,7 +1195,7 @@ Generic auto-complete with Ivy
 #+END_SRC
 
 Ivy enhanced search (swiper) and common Emacs meta commands (counsel)
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package counsel
     :ensure t
     :config
@@ -1210,32 +1210,32 @@ Ivy enhanced search (swiper) and common Emacs meta commands (counsel)
 
 **** GPG Pinentry
 Instead of using the display's popup, prompt for gpg creds in the minibuffer
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (setq epa-pinentry-mode 'loopback)
 #+END_SRC
 **** Fix emacs' regex
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (setq-default pcre-mode t)
 #+END_SRC
 
 **** Company for auto-complete
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (add-hook 'after-init-hook 'global-company-mode)
 #+END_SRC
 
 **** Change questions to accept single letter answers
-#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
+#+BEGIN_SRC emacs-lisp  ~/.emacs
   (defalias 'yes-or-no-p 'y-or-n-)
 #+END_SRC
 
 **** Highlight line
 Helpful for finding the cursor when jumping around
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (global-hl-line-mode +1)
 #+END_SRC
 **** Which key
 Some quick help for when I get stuck in the middle of a command
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package which-key
     :ensure t
     :config
@@ -1243,7 +1243,7 @@ Some quick help for when I get stuck in the middle of a command
 #+END_SRC
 **** Keyboard layout
 Function for quickly swapping around meta and super keys which is necessary from time to time on certain keyboards.
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (defun jrm3/toggle-super-meta ()
     "Toggles the super and meta keys on current keyboard"
     (interactive)
@@ -1259,7 +1259,7 @@ Function for quickly swapping around meta and super keys which is necessary from
 #+END_SRC
 **** Kill buffer
 When killing a buffer always pick the current buffer
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (defun kill-current-buffer ()
     "Kills the current buffer."
     (interactive)
@@ -1268,7 +1268,7 @@ When killing a buffer always pick the current buffer
 #+END_SRC
 **** Final pieces
 Load up some slightly more private info from a seperate file so I can keep the main settings public.
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (defun load-x ()
     "Load the secrets from [undisclosed] (a la JDATE)"
     (interactive)
@@ -1276,6 +1276,6 @@ Load up some slightly more private info from a seperate file so I can keep the m
 
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (provide '.emacs)
 #+END_SRC
