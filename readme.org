@@ -1025,7 +1025,7 @@ Angular setup
     :diminish flycheck-mode)
 
   (custom-set-variables
-   '(flycheck-typescript-tslint-executable "/Users/jgooch/node_modules/.bin/tslint"))
+   '(flycheck-typescript-tslint-executable "/Users/jgooch/.nvm/versions/node/v9.6.1/bin/tslint"))
 
 
   (use-package company
