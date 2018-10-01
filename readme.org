@@ -1015,7 +1015,8 @@ PHP Development
 
 Angular setup
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (setq exec-path (append exec-path '("/home/jrm3/.nvm/versions/node/v9.11.1/bin")))
+  (setenv "PATH" (concat (getenv "PATH") ":/Users/jgooch/.nvm/versions/node/v9.6.1/bin"))
+  (setq exec-path (append exec-path '("/Users/jgooch/.nvm/versions/node/v9.6.1/bin")))
   (use-package ng2-mode
     :ensure t)
 
@@ -1024,7 +1025,7 @@ Angular setup
     :diminish flycheck-mode)
 
   (custom-set-variables
-   '(flycheck-typescript-tslint-executable "/home/jrm3/.nvm/versions/node/v9.11.1/bin/tslint"))
+   '(flycheck-typescript-tslint-executable "/Users/jgooch/node_modules/.bin/tslint"))
 
 
   (use-package company
