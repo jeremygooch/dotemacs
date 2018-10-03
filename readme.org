@@ -707,6 +707,14 @@ Projectile for project level interaction
     :diminish projectile-mode)
 #+END_SRC
 
+Ignore certain directories by default for grep
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (custom-set-variables
+   '(grep-find-ignored-directories
+     (quote
+      ("SCCS" "RCS" "CVS" "MCVS" ".src" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "node_modules" "vendor"))))
+#+END_SRC
+
 *** In-file Navigation
 Easier paragraph jumping
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
