@@ -65,7 +65,7 @@ We'll need to turn off the mouse from time to time
 
 **** EXWM
 With EXWM it can act as a complete desktop environment.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  ~/.emacs
   (use-package exwm
     :ensure t)
   (use-package exwm-config
@@ -78,7 +78,7 @@ With EXWM it can act as a complete desktop environment.
 
 
 Fortunately EXWM also has support for multiple monitors.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  ~/.emacs
   (require 'exwm-randr)
   ;; (setq exwm-randr-workspace-output-plist '(1 "VGA-1" 2 "VGA-2"))
   (setq exwm-randr-workspace-output-plist '(1 "eDP-1" 2 "DP-1-2"))
@@ -93,7 +93,7 @@ Fortunately EXWM also has support for multiple monitors.
 
 **** Screenshots
 I took this from Uncle Dave's config. Its a super slick screenshot function for taking both fullscreen as well as region screenshots.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  ~/.emacs
     (defun jrm3/take-screenshot ()
     "Takes a fullscreenshot of the current workspace"
     (interactive)
@@ -121,7 +121,7 @@ I took this from Uncle Dave's config. Its a super slick screenshot function for 
 #+END_SRC
 
 **** Application Launcher with dmenu
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp ~/.emacs
 (use-package dmenu
   :ensure t
   :bind
@@ -132,7 +132,7 @@ I took this from Uncle Dave's config. Its a super slick screenshot function for 
 According to the [[https://www.systutorials.com/docs/linux/man/1-Xorg.wrap/][man page]], edit [[/etc/X11/Xwrapper.config]] to include the line:
 ~allowed_users=anybody~ and ~needs_root_rights=yes~.
 
-#+BEGIN_SRC shell  :tangle ~/.xinitrc
+#+BEGIN_SRC shell ~/.xinitrc
 #!/bin/bash
 exec emacs
 #+END_SRC
@@ -149,7 +149,7 @@ Display the current time and battery indicator
 
 **** Send keys to EXWM Line Mode buffers
 I find the default way (C-c C-q) of exwm sending keys like ctrl to an async buffer difficult. C-c C-c is much simpler for me.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp ~/.emacs
   (define-key exwm-mode-map [?\C-c ?\C-c] 'exwm-input-send-next-key)
 #+END_SRC
 
@@ -160,7 +160,7 @@ There are a few miscellaneous modes where the mouse should be disabled by defaul
 #+END_SRC
 
 **** Lock screen with slock
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp ~/.emacs
   (exwm-input-set-key (kbd "s-l") (lambda ()
 	      (interactive)
 	      (start-process "" nil "/usr/bin/slock")))
@@ -983,6 +983,21 @@ I'm accustomed to being able to highlight a region then replace it with the next
   (delete-selection-mode 1)
 #+END_SRC
 
+A bit of helpful typsecript debugging
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+(fset 'log-variable
+      (lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote ("\355console.log('', );\370kmac" 0 "%d")) arg)))
+
+(when (fboundp 'typescript-mode)
+  (defun my-ecmascript-config ()
+    "For use in js/ts mode-hooks"
+    (local-set-key (kbd "C-c C-c") 'log-variable)
+    ;;
+    )
+  (add-hook 'typescript-mode-hook 'my-ecmascript-config))
+
+#+END_SRC
+
 ***** Web development
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   ;; SCSS Mode
@@ -1050,7 +1065,8 @@ PHP Development
 
 Angular setup
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (setq exec-path (append exec-path '("/home/jrm3/.nvm/versions/node/v9.11.1/bin")))
+  (setenv "PATH" (concat (getenv "PATH") ":/Users/jgooch/.nvm/versions/node/v9.6.1/bin"))
+  (setq exec-path (append exec-path '("/Users/jgooch/.nvm/versions/node/v9.6.1/bin")))
   (use-package ng2-mode
     :ensure t)
 
@@ -1059,7 +1075,7 @@ Angular setup
     :diminish flycheck-mode)
 
   (custom-set-variables
-   '(flycheck-typescript-tslint-executable "/home/jrm3/.nvm/versions/node/v9.11.1/bin/tslint"))
+   '(flycheck-typescript-tslint-executable "/Users/jgooch/.nvm/versions/node/v9.6.1/bin/tslint"))
 
 
   (use-package company
