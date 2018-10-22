@@ -956,6 +956,21 @@ I'm accustomed to being able to highlight a region then replace it with the next
   (delete-selection-mode 1)
 #+END_SRC
 
+A bit of helpful typsecript debugging
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+(fset 'log-variable
+      (lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote ("\355console.log('', );\370kmac" 0 "%d")) arg)))
+
+(when (fboundp 'typescript-mode)
+  (defun my-ecmascript-config ()
+    "For use in js/ts mode-hooks"
+    (local-set-key (kbd "C-c C-c") 'log-variable)
+    ;;
+    )
+  (add-hook 'typescript-mode-hook 'my-ecmascript-config))
+
+#+END_SRC
+
 ***** Web development
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   ;; SCSS Mode
