@@ -336,18 +336,15 @@ Bind org agenda to shortcut and give it our todo paths. Note that the paths are 
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (define-key global-map "\C-ca" 'org-agenda)
 
-  (setq org-agenda-files (list "~/Dropbox/work/softwareadvice"
-			       "~/Dropbox/personal"))
+  (setq org-agenda-files (list "~/org/work/softwareadvice"
+			       "~/org/personal"))
 
   ;; ;; Exclude certain directories/files
   (eval-when-compile (require 'cl))
   (setq org-agenda-files
 	(remove-if '(lambda (x)
 		      (string-match
-		       (concat "^" (regexp-quote (expand-file-name "~/Dropbox/.dropbox.cache/")))
-		       x)
-		      (string-match
-		       (concat "^" (regexp-quote (expand-file-name "~/Dropbox/work/softwareadvice/org-jira/")))
+		       (concat "^" (regexp-quote (expand-file-name "~/org/work/softwareadvice/org-jira/")))
 		       x))
 		   org-agenda-files))
 #+END_SRC
@@ -449,15 +446,15 @@ Customize org capture to my liking
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (global-set-key (kbd "C-c c") 'org-capture)
   (setq org-capture-templates
-   '(("w" "Work Todo" entry (file "~/Dropbox/work/softwareadvice/SA.org")
+   '(("w" "Work Todo" entry (file "~/org/work/softwareadvice/SA.org")
       "** TODO %? :sa:\n  %i\n  %a")
-     ("l" "Personal Todo" entry (file "~/Dropbox/personal/personal.org")
+     ("l" "Personal Todo" entry (file "~/org/personal/personal.org")
       "*** TODO %? :personal:\n  %i\n  %a")
-     ("m" "Meeting" entry (file "~/Dropbox/work/softwareadvice/Meetings.org")
+     ("m" "Meeting" entry (file "~/org/work/softwareadvice/Meetings.org")
       "** MEETING with %? :MEETING:\n  %i\n"  :clock-in t :clock-resume t)
-     ("n" "Next" entry (file "~/Dropbox/Next.org")
+     ("n" "Next" entry (file "~/org/Next.org")
       "** NEXT %?\n  %i\n  %a")
-     ("M" "Milestone" entry (file "~/Dropbox/work/softwareadvice/SA-milestones.org")
+     ("M" "Milestone" entry (file "~/org/work/softwareadvice/SA-milestones.org")
       "* %u %?\n*Summary*: \n\n*Description*: \n\n" :clock-in t :clock-resume t)))
 
 
