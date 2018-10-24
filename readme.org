@@ -40,7 +40,7 @@ Emacs was the original terminal multiplexer so manages split views quite nicely.
 First, get some basics out of the way. Switch to fullscreen mode and hide the menus and also adjust the default font size while we're at it.
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (set-frame-parameter nil 'fullscreen 'fullboth)
-  (set-face-attribute 'default nil :height 110)
+  (set-face-attribute 'default nil :height 120)
   (menu-bar-mode -1)
   (tool-bar-mode -1)
 #+END_SRC
