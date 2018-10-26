@@ -526,7 +526,7 @@ LaTeX + Beamer is helpful for creating presentations, so setting up LaTeX boiler
   (add-to-list 'load-path "~/.emacs.d/lisp/org-reveal")
   (require 'ox-reveal)
 #+END_SRC
-**** TODO Update Custom Org workflow
+**** Update Custom Org workflow
 Lifted from [[http://cachestocaches.com/2016/9/my-workflow-org-agenda/]]. Need to customize to my preferences.
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   ;; (setq org-todo-keywords '((type "TODO" "NEXT" "DONE" "WITING" "INACTIVE" "CANCELLED" "MEETING"))
@@ -591,6 +591,25 @@ Lifted from [[http://cachestocaches.com/2016/9/my-workflow-org-agenda/]]. Need t
 
 #+END_SRC
 
+***** Poor mans dropbox/text-file-syncing
+This attempts to sync an org file on save if it detects the file is in an ~/org/~ directory. Also added option to sync manually
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+(defun jrm3/sync-org ()
+  "Pulls latest changes to org repo locally"
+  (interactive)
+
+  (shell-command "cd ~/org && git add -A; git commit -m \"$(date)\" && git pull origin master && git push origin master &"))
+(global-set-key (kbd "C-c 1")  'jrm3/sync-org)
+
+(defun jrm3/sync-org-on-save ()
+  "Detects if is an org file and is in org directory and if so, syncs changes"
+  (if (equal major-mode 'org-mode)
+      (if (string-match-p (regexp-quote "/org/") (file-name-directory buffer-file-name))
+	  (jrm3/sync-org))))
+
+(add-hook 'after-save-hook 'jrm3/sync-org-on-save)
+
+#+END_SRC
 
 **** Confluence
 Atlassian Confluence's WYSIWYG editor leaves a lot to be desired. It's much better to work in org mode then export to confluence using ox-confluence. At this time there is not a simple way to maintain a page in Confluence via org mode so this will have to suffice. Also, since ox-confluence is not in the repo, fetch it manually and put it in load path
