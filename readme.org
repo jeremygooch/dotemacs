@@ -65,7 +65,7 @@ We'll need to turn off the mouse from time to time
 
 **** EXWM
 With EXWM it can act as a complete desktop environment.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  ~/.emacs
   (use-package exwm
     :ensure t)
   (use-package exwm-config
@@ -75,13 +75,10 @@ With EXWM it can act as a complete desktop environment.
     (global-set-key (kbd "C-x O")  'exwm-workspace-switch-to-buffer))
 #+END_SRC
 
-
-
 Fortunately EXWM also has support for multiple monitors.
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (require 'exwm-randr)
-  ;; (setq exwm-randr-workspace-output-plist '(1 "VGA-1" 2 "VGA-2"))
-  (setq exwm-randr-workspace-output-plist '(1 "eDP-1" 2 "DP-1-2"))
+  (setq exwm-randr-workspace-output-plist '(1 "VGA-1" 2 "VGA-2"))
   (add-hook 'exwm-randr-screen-change-hook
 	    (lambda ()
 	      (start-process-shell-command
@@ -93,7 +90,7 @@ Fortunately EXWM also has support for multiple monitors.
 
 **** Screenshots
 I took this from Uncle Dave's config. Its a super slick screenshot function for taking both fullscreen as well as region screenshots.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp  ~/.emacs
     (defun jrm3/take-screenshot ()
     "Takes a fullscreenshot of the current workspace"
     (interactive)
@@ -121,7 +118,7 @@ I took this from Uncle Dave's config. Its a super slick screenshot function for 
 #+END_SRC
 
 **** Application Launcher with dmenu
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp ~/.emacs
 (use-package dmenu
   :ensure t
   :bind
@@ -132,7 +129,7 @@ I took this from Uncle Dave's config. Its a super slick screenshot function for 
 According to the [[https://www.systutorials.com/docs/linux/man/1-Xorg.wrap/][man page]], edit [[/etc/X11/Xwrapper.config]] to include the line:
 ~allowed_users=anybody~ and ~needs_root_rights=yes~.
 
-#+BEGIN_SRC shell  :tangle ~/.xinitrc
+#+BEGIN_SRC shell ~/.xinitrc
 #!/bin/bash
 exec emacs
 #+END_SRC
@@ -149,7 +146,7 @@ Display the current time and battery indicator
 
 **** Send keys to EXWM Line Mode buffers
 I find the default way (C-c C-q) of exwm sending keys like ctrl to an async buffer difficult. C-c C-c is much simpler for me.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp ~/.emacs
   (define-key exwm-mode-map [?\C-c ?\C-c] 'exwm-input-send-next-key)
 #+END_SRC
 
@@ -160,7 +157,7 @@ There are a few miscellaneous modes where the mouse should be disabled by defaul
 #+END_SRC
 
 **** Lock screen with slock
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp ~/.emacs
   (exwm-input-set-key (kbd "s-l") (lambda ()
 	      (interactive)
 	      (start-process "" nil "/usr/bin/slock")))
@@ -363,18 +360,15 @@ Bind org agenda to shortcut and give it our todo paths. Note that the paths are 
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (define-key global-map "\C-ca" 'org-agenda)
 
-  (setq org-agenda-files (list "~/Dropbox/work/softwareadvice"
-			       "~/Dropbox/personal"))
+  (setq org-agenda-files (list "~/org/work/softwareadvice"
+			       "~/org/personal"))
 
   ;; ;; Exclude certain directories/files
   (eval-when-compile (require 'cl))
   (setq org-agenda-files
 	(remove-if '(lambda (x)
 		      (string-match
-		       (concat "^" (regexp-quote (expand-file-name "~/Dropbox/.dropbox.cache/")))
-		       x)
-		      (string-match
-		       (concat "^" (regexp-quote (expand-file-name "~/Dropbox/work/softwareadvice/org-jira/")))
+		       (concat "^" (regexp-quote (expand-file-name "~/org/work/softwareadvice/org-jira/")))
 		       x))
 		   org-agenda-files))
 #+END_SRC
@@ -476,15 +470,15 @@ Customize org capture to my liking
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (global-set-key (kbd "C-c c") 'org-capture)
   (setq org-capture-templates
-   '(("w" "Work Todo" entry (file "~/Dropbox/work/softwareadvice/SA.org")
+   '(("w" "Work Todo" entry (file "~/org/work/softwareadvice/SA.org")
       "** TODO %? :sa:\n  %i\n  %a")
-     ("l" "Personal Todo" entry (file "~/Dropbox/personal/personal.org")
+     ("l" "Personal Todo" entry (file "~/org/personal/personal.org")
       "*** TODO %? :personal:\n  %i\n  %a")
-     ("m" "Meeting" entry (file "~/Dropbox/work/softwareadvice/Meetings.org")
+     ("m" "Meeting" entry (file "~/org/work/softwareadvice/Meetings.org")
       "** MEETING with %? :MEETING:\n  %i\n"  :clock-in t :clock-resume t)
-     ("n" "Next" entry (file "~/Dropbox/Next.org")
+     ("n" "Next" entry (file "~/org/Next.org")
       "** NEXT %?\n  %i\n  %a")
-     ("M" "Milestone" entry (file "~/Dropbox/work/softwareadvice/SA-milestones.org")
+     ("M" "Milestone" entry (file "~/org/work/softwareadvice/SA-milestones.org")
       "* %u %?\n*Summary*: \n\n*Description*: \n\n" :clock-in t :clock-resume t)))
 
 
@@ -556,7 +550,7 @@ LaTeX + Beamer is helpful for creating presentations, so setting up LaTeX boiler
   (add-to-list 'load-path "~/.emacs.d/lisp/org-reveal")
   (require 'ox-reveal)
 #+END_SRC
-**** TODO Update Custom Org workflow
+**** Update Custom Org workflow
 Lifted from [[http://cachestocaches.com/2016/9/my-workflow-org-agenda/]]. Need to customize to my preferences.
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   ;; (setq org-todo-keywords '((type "TODO" "NEXT" "DONE" "WITING" "INACTIVE" "CANCELLED" "MEETING"))
@@ -621,6 +615,25 @@ Lifted from [[http://cachestocaches.com/2016/9/my-workflow-org-agenda/]]. Need t
 
 #+END_SRC
 
+***** Poor mans dropbox/text-file-syncing
+This attempts to sync an org file on save if it detects the file is in an ~/org/~ directory. Also added option to sync manually
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+(defun jrm3/sync-org ()
+  "Pulls latest changes to org repo locally"
+  (interactive)
+
+  (shell-command "cd ~/org && git add -A; git commit -m \"$(date)\" && git pull origin master && git push origin master &"))
+(global-set-key (kbd "C-c 1")  'jrm3/sync-org)
+
+(defun jrm3/sync-org-on-save ()
+  "Detects if is an org file and is in org directory and if so, syncs changes"
+  (if (equal major-mode 'org-mode)
+      (if (string-match-p (regexp-quote "/org/") (file-name-directory buffer-file-name))
+	  (jrm3/sync-org))))
+
+(add-hook 'after-save-hook 'jrm3/sync-org-on-save)
+
+#+END_SRC
 
 **** Confluence
 Atlassian Confluence's WYSIWYG editor leaves a lot to be desired. It's much better to work in org mode then export to confluence using ox-confluence. At this time there is not a simple way to maintain a page in Confluence via org mode so this will have to suffice. Also, since ox-confluence is not in the repo, fetch it manually and put it in load path
@@ -983,6 +996,21 @@ I'm accustomed to being able to highlight a region then replace it with the next
   (delete-selection-mode 1)
 #+END_SRC
 
+A bit of helpful typsecript debugging
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+(fset 'log-variable
+      (lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote ("\355console.log('', );\370kmac" 0 "%d")) arg)))
+
+(when (fboundp 'typescript-mode)
+  (defun my-ecmascript-config ()
+    "For use in js/ts mode-hooks"
+    (local-set-key (kbd "C-c C-c") 'log-variable)
+    ;;
+    )
+  (add-hook 'typescript-mode-hook 'my-ecmascript-config))
+
+#+END_SRC
+
 ***** Web development
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   ;; SCSS Mode
@@ -1050,7 +1078,8 @@ PHP Development
 
 Angular setup
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (setq exec-path (append exec-path '("/home/jrm3/.nvm/versions/node/v9.11.1/bin")))
+  (setenv "PATH" (concat (getenv "PATH") ":/Users/jgooch/.nvm/versions/node/v9.6.1/bin"))
+  (setq exec-path (append exec-path '("/Users/jgooch/.nvm/versions/node/v9.6.1/bin")))
   (use-package ng2-mode
     :ensure t)
 
@@ -1059,7 +1088,7 @@ Angular setup
     :diminish flycheck-mode)
 
   (custom-set-variables
-   '(flycheck-typescript-tslint-executable "/home/jrm3/.nvm/versions/node/v9.11.1/bin/tslint"))
+   '(flycheck-typescript-tslint-executable "/Users/jgooch/.nvm/versions/node/v9.6.1/bin/tslint"))
 
 
   (use-package company
