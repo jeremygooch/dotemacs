@@ -325,12 +325,19 @@ Add custom easy-templates for inserting structural elements with as few keystrok
        ("a" "#+BEGIN_EXPORT ascii
   ?
   ,#+END_EXPORT")
+       ("el" "#+BEGIN_SRC emacs-lisp ?
+
+  \#+END_SRC")
+       ("j" "#+BEGIN_SRC js ?
+
+  \#+END_SRC")
        ("A" "#+ASCII: ")
        ("i" "#+INDEX: ?")
        ("I" "#+INCLUDE: %file ?")
        ("n" "#+NAME: "))))
    )
 #+END_SRC
+
 **** Org Agenda
 Bind org agenda to shortcut and give it our todo paths. Note that the paths are not recursive for org-agenda-files.
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
@@ -1273,8 +1280,8 @@ Function for quickly swapping around meta and super keys which is necessary from
 	(setq x-meta-keysym 'super)
 	(put 'jrm3/toggle-super-meta 'state t))))
 #+END_SRC
-**** Kill buffer
-When killing a buffer always pick the current buffer
+**** Buffer Misc
+When killing a buffer always pick the current buffer by default
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (defun kill-current-buffer ()
     "Kills the current buffer."
@@ -1282,6 +1289,13 @@ When killing a buffer always pick the current buffer
     (kill-buffer (current-buffer)))
   (global-set-key (kbd "C-x k") 'kill-current-buffer)
 #+END_SRC
+
+Prevent async shell command buffers from popping-up:
+#+BEGIN_SRC emacs-lisp 
+  (add-to-list 'display-buffer-alist
+    '("\\*Async Shell Command\\*.*" display-buffer-no-window))
+#+END_SRC
+
 **** Final pieces
 Load up some slightly more private info from a seperate file so I can keep the main settings public.
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
