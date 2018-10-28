@@ -841,6 +841,11 @@ Turn off the mouse/trackpad when editing certain files
   (add-hook 'repl-mode-hook 'disable-mouse-mode)
 #+END_SRC
 
+Disable the narrow-to-region message
+#+BEGIN_SRC emacs-lisp 
+  (put 'narrow-to-region 'disabled nil)
+#+END_SRC
+
 **** Programming & Ops
 I prefer to see trailing whitespace; however, I don't care about it in every situation, like when I'm reading prose.
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
