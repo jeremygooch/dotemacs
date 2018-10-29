@@ -842,7 +842,7 @@ Turn off the mouse/trackpad when editing certain files
 #+END_SRC
 
 Disable the narrow-to-region message
-#+BEGIN_SRC emacs-lisp 
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (put 'narrow-to-region 'disabled nil)
 #+END_SRC
 
