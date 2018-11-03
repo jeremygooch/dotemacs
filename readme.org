@@ -34,6 +34,14 @@ For the sake of completeness, configure name and email address
         user-mail-address "jeremy.gooch@gmail.com")
 #+END_SRC
 
+Setup a prefix for custom commands.
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (progn
+    (define-prefix-command 'jrm-key-map))
+
+  (global-set-key (kbd "C-x C-j") jrm-key-map)
+#+END_SRC
+
 *** Run emacs as a replacement for desktop/window manager
 Emacs was the original terminal multiplexer so manages split views quite nicely.
 
@@ -45,7 +53,24 @@ First, get some basics out of the way. Switch to fullscreen mode and hide the me
   (tool-bar-mode -1)
 #+END_SRC
 
-#+RESULTS:
+I find myself need specific font sizes for different scenarios, i.e. projecting, screen-sharing on conference calls, etc. So, binding these to a quick way to toggle through them.
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (defvar jrm/screens-alist '((?1 "X11" (lambda () (set-face-attribute 'default nil :height 110) 'default))
+			      (?2 "MacOS" (lambda () (set-face-attribute 'default nil :height 120) 'proj))
+			      (?3 "Projector" (lambda () (set-face-attribute 'default nil :height 140) 'proj))
+			      (?4 "Projector - Large" (lambda () (set-face-attribute 'default nil :height 160) 'projLg)))
+    "List that associates number letters to descriptions and actions.")
+
+  (defun jrm/adjust-font-size ()
+    "Lets the user choose the the font size and takes the corresponding action.
+  Returns whatever the action returns."
+    (interactive)
+    (let ((choice (read-char-choice (mapconcat (lambda (item) (format "%c: %s" (car item) (cadr item))) jrm3/screens-alist "; ")
+				    (mapcar #'car valeriy-alist))))
+      (funcall (nth 2 (assoc choice jrm3/screens-alist)))))
+
+  (global-set-key (kbd "C-x C-j p")  'jrm/adjust-font-size)
+#+END_SRC
 
 The default keybindings for naviating split views can be cumbersome, so remap them to something a bit easier.
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
@@ -90,30 +115,30 @@ Fortunately EXWM also has support for multiple monitors.
 **** Screenshots
 I took this from Uncle Dave's config. Its a super slick screenshot function for taking both fullscreen as well as region screenshots.
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-    (defun jrm3/take-screenshot ()
+    (defun jrm/take-screenshot ()
     "Takes a fullscreenshot of the current workspace"
     (interactive)
     (when window-system
       (cl-loop for i downfrom 3 to 1 do
-            (progn
-              (message (concat (number-to-string i) "..."))
-              (sit-for 1)))
+	    (progn
+	      (message (concat (number-to-string i) "..."))
+	      (sit-for 1)))
       (message "Cheese!")
       (sit-for 1)
       (start-process "screenshot" nil "import" "-window" "root"
-                     (concat (getenv "HOME") "/Pictures/" (current-time-string) ".png"))
+		     (concat (getenv "HOME") "/Pictures/" (current-time-string) ".png"))
       (message "Screenshot taken!")))
-  (global-set-key (kbd "<C-print>") 'jrm3/take-screenshot)
+  (global-set-key (kbd "C-x C-j <C-print>") 'jrm/take-screenshot)
 
-  (defun jrm3/take-screenshot-region ()
+  (defun jrm/take-screenshot-region ()
     "Takes a screenshot of a region selected by the user"
     (interactive)
     (when window-system
       (call-process "import" nil nil nil ".newScreenshot.png")
       (call-process "convert" nil nil nil ".newScreenshot.png" "-shave" "1x1"
-                    (concat (getenv "HOME") "/Pictures/" (current-time-string) ".png"))
+		    (concat (getenv "HOME") "/Pictures/" (current-time-string) ".png"))
       (call-process "rm" nil nil nil ".newScreenshot.png")))
-  (global-set-key (kbd "<print>") 'jrm3/take-screenshot-region)
+  (global-set-key (kbd "C-x C-j <print>") 'jrm/take-screenshot-region)
 #+END_SRC
 
 **** Application Launcher with dmenu
@@ -373,7 +398,7 @@ Super simple reordering from Org Agenda -> Todo view
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
 
   ;; The following was lifted from http://pragmaticemacs.com/emacs/reorder-todo-items-in-your-org-mode-agenda/
-  (defun jrm3/org-headline-to-top ()
+  (defun jrm/org-headline-to-top ()
     "Move the current org headline to the top of its section"
     (interactive)
     ;; check if we are at the top level
@@ -403,7 +428,7 @@ Super simple reordering from Org Agenda -> Todo view
 	       (rfloc (list nil filename nil pos)))
 	  (org-refile nil nil rfloc))))))
 
-  (defun jrm3/org-agenda-item-to-top ()
+  (defun jrm/org-agenda-item-to-top ()
     "Move the current agenda item to the top of the subtree in its file"
     (interactive)
     ;; save buffers to preserve agenda
@@ -411,14 +436,14 @@ Super simple reordering from Org Agenda -> Todo view
     ;; switch to buffer for current agenda item
     (org-agenda-switch-to)
     ;; move item to top
-    (jrm3/org-headline-to-top)
+    (jrm/org-headline-to-top)
     ;; go back to agenda view
     (switch-to-buffer (other-buffer (current-buffer) 1))
     ;; refresh agenda
     (org-agenda-redo)
     )
 
-  (define-key org-agenda-mode-map (kbd "1") 'jrm3/org-agenda-item-to-top)
+  (define-key org-agenda-mode-map (kbd "1") 'jrm/org-agenda-item-to-top)
 #+END_SRC
 
 Setup reminders with [[http://sachachua.com/blog/2007/11/setting-up-appointment-reminders-in-org/][org-agenda-to-appt]].
@@ -601,20 +626,20 @@ Lifted from [[http://cachestocaches.com/2016/9/my-workflow-org-agenda/]]. Need t
 ***** Poor mans dropbox/text-file-syncing
 This attempts to sync an org file on save if it detects the file is in an ~/org/~ directory. Also added option to sync manually
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-(defun jrm3/sync-org ()
-  "Pulls latest changes to org repo locally"
-  (interactive)
+  (defun jrm/sync-org ()
+    "Pulls latest changes to org repo locally"
+    (interactive)
 
-  (shell-command "cd ~/org && git add -A; git commit -m \"$(date)\" && git pull origin master && git push origin master &"))
-(global-set-key (kbd "C-c 1")  'jrm3/sync-org)
+    (shell-command "cd ~/org && git add -A; git commit -m \"$(date)\" && git pull origin master && git push origin master &"))
+  (global-set-key (kbd "C-x C-j 1")  'jrm/sync-org)
 
-(defun jrm3/sync-org-on-save ()
-  "Detects if is an org file and is in org directory and if so, syncs changes"
-  (if (equal major-mode 'org-mode)
-      (if (string-match-p (regexp-quote "/org/") (file-name-directory buffer-file-name))
-	  (jrm3/sync-org))))
+  (defun jrm/sync-org-on-save ()
+    "Detects if is an org file and is in org directory and if so, syncs changes"
+    (if (equal major-mode 'org-mode)
+	(if (string-match-p (regexp-quote "/org/") (file-name-directory buffer-file-name))
+	    (jrm/sync-org))))
 
-(add-hook 'after-save-hook 'jrm3/sync-org-on-save)
+  (add-hook 'after-save-hook 'jrm/sync-org-on-save)
 
 #+END_SRC
 
@@ -702,7 +727,7 @@ Dumb jump for jumping around projects
 Copy current file path. Lifted from (http://ergoemacs.org/emacs/emacs_copy_file_path.html)
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
 ;; Copy the file path of the current buffer
-(defun jrm3/copy-file-path (&optional *dir-path-only-p)
+(defun jrm/copy-file-path (&optional *dir-path-only-p)
   "Copy the current buffer's file path or dired path to `kill-ring'.
 Result is full path."
   (interactive "P")
@@ -933,7 +958,7 @@ Magit for version control
 
 Defining custom indentation based on project paths and setting them to functions that I can call as needed. This also sets backtab.
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (defun jrm3/setup-indent (n)
+  (defun jrm/setup-indent (n)
     (setq indent-tabs-mode nil)
     ;; java/c/c++
     (setq-local c-basic-offset n)
@@ -950,30 +975,30 @@ Defining custom indentation based on project paths and setting them to functions
     )
 
   ;; Allow manual changing of coding styles
-  (defun jrm3/neon-code-style ()
+  (defun jrm/neon-code-style ()
     (interactive)
     (message "Using Neon coding style")
     ;; indent 2 spaces width
-    (jrm3/setup-indent 2))
+    (jrm/setup-indent 2))
 
-  (defun jrm3/personal-code-style ()
+  (defun jrm/personal-code-style ()
     (interactive)
     (message "Using personal coding style")
     ;; indent 4 spaces width
-    (jrm3/setup-indent 4))
+    (jrm/setup-indent 4))
 
 
-  (defun jrm3/develop-environment ()
+  (defun jrm/develop-environment ()
     (let ((proj-dir (file-name-directory (buffer-file-name))))
       (if (string-match-p "neon/" proj-dir)
-	  (jrm3/neon-code-style))))
+	  (jrm/neon-code-style))))
 
 
 
-  (add-hook 'typescript-mode-hook 'jrm3/develop-environment)
-  ;; (add-hook 'prog-mode-hook 'jrm3/develop-environment)
-  (add-hook 'lua-mode-hook 'jrm3/develop-environment)
-  (add-hook 'web-mode-hook 'jrm3/develop-environment)
+  (add-hook 'typescript-mode-hook 'jrm/develop-environment)
+  ;; (add-hook 'prog-mode-hook 'jrm/develop-environment)
+  (add-hook 'lua-mode-hook 'jrm/develop-environment)
+  (add-hook 'web-mode-hook 'jrm/develop-environment)
 
   ;; Backwards delete word
   (global-set-key [M-delete] 'backward-kill-word)
@@ -1066,7 +1091,7 @@ PHP Development
 
 Angular setup
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (setq exec-path (append exec-path '("/home/jrm3/.nvm/versions/node/v9.11.1/bin")))
+  (setq exec-path (append exec-path '("/home/jrm/.nvm/versions/node/v9.11.1/bin")))
   (use-package ng2-mode
     :ensure t)
 
@@ -1075,7 +1100,7 @@ Angular setup
     :diminish flycheck-mode)
 
   (custom-set-variables
-   '(flycheck-typescript-tslint-executable "/home/jrm3/.nvm/versions/node/v9.11.1/bin/tslint"))
+   '(flycheck-typescript-tslint-executable "/home/jrm/.nvm/versions/node/v9.11.1/bin/tslint"))
 
 
   (use-package company
@@ -1166,11 +1191,11 @@ Add mail alerts for new messages.
        ))
     (mu4e-alert-set-default-style 'notifications)
     (mu4e-alert-enable-mode-line-display)
-    (defun jrm3/refresh-mu4e-alert-mode-line ()
+    (defun jrm/refresh-mu4e-alert-mode-line ()
       (interactive)
       (mu4e~proc-kill)
       (mu4e-alert-enable-mode-line-display))
-    (run-with-timer 0 60 'jrm3/refresh-mu4e-alert-mode-line))
+    (run-with-timer 0 60 'jrm/refresh-mu4e-alert-mode-line))
 
 #+END_SRC
 
@@ -1272,18 +1297,18 @@ Some quick help for when I get stuck in the middle of a command
 **** Keyboard layout
 Function for quickly swapping around meta and super keys which is necessary from time to time on certain keyboards.
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (defun jrm3/toggle-super-meta ()
+  (defun jrm/toggle-super-meta ()
     "Toggles the super and meta keys on current keyboard"
     (interactive)
-    (if (get 'jrm3/toggle-super-meta 'state)
+    (if (get 'jrm/toggle-super-meta 'state)
 	(progn
 	  (setq x-super-keysym 'super)
 	  (setq x-meta-keysym 'meta)
-	  (put 'jrm3/toggle-super-meta 'state nil))
+	  (put 'jrm/toggle-super-meta 'state nil))
       (progn
 	(setq x-super-keysym 'meta)
 	(setq x-meta-keysym 'super)
-	(put 'jrm3/toggle-super-meta 'state t))))
+	(put 'jrm/toggle-super-meta 'state t))))
 #+END_SRC
 **** Buffer Misc
 When killing a buffer always pick the current buffer by default
