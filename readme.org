@@ -233,6 +233,12 @@ By default just use bash for all shells
   (ad-activate 'ansi-term)
 #+END_SRC
 
+Suppress async shell command buffers by default.
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+(add-to-list 'display-buffer-alist
+  '("\\*Async Shell Command\\*.*" display-buffer-no-window))
+#+END_SRC
+
 *** Org Mode
 Load some basic minor modes by default
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs 
