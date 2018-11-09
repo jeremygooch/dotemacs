@@ -1031,6 +1031,44 @@ A bit of helpful typsecript debugging
 #+END_SRC
 
 ***** Web development
+ Emmet mode for html/css
+ #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+   (use-package emmet-mode
+     :ensure t)
+   (add-hook 'sgml-mode-hook 'emmet-mode)
+   (add-hook 'css-mode-hook  'emmet-mode)
+ #+END_SRC
+
+ Using Node JS Repl which is helpful for node development as well as just tinkering around with JS
+ #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+   (use-package nodejs-repl
+     :ensure t)
+   (add-hook 'js-mode-hook
+	     (lambda ()
+	       (define-key js-mode-map (kbd "C-c C-e") 'nodejs-repl-send-last-expression)
+	       (define-key js-mode-map (kbd "C-c C-c") 'nodejs-repl-send-buffer)
+	       (define-key js-mode-map (kbd "C-c C-j") 'nodejs-repl-send-line)
+	       (define-key js-mode-map (kbd "C-c C-r") 'nodejs-repl-send-region)
+	       (define-key js-mode-map (kbd "C-c C-l") 'nodejs-repl-load-file)
+	       (define-key js-mode-map (kbd "C-c C-z") 'nodejs-repl-switch-to-repl)))
+ #+END_SRC
+
+I also like to use org mode's code evaluation capabilities for tinkering around with different languages. Here's a bit of elisp to automate the manual part of that process:
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+(defun jrm/js-playground()
+  "Creates an org buffer for fiddling around with JS code. Uses org so that results can be evaluated."
+  (interactive)
+  (get-buffer-create "js-playground")
+  (switch-to-buffer "js-playground")
+  (org-mode)
+  (goto-char 1)
+  (insert "#+BEGIN_SRC js\n\n#+END_SRC\n")
+  (goto-char 16))
+(global-set-key (kbd "C-x C-j C-j") 'jrm/js-playground)
+
+#+END_SRC
+
+
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   ;; SCSS Mode
   (use-package sass-mode
@@ -1082,105 +1120,84 @@ A bit of helpful typsecript debugging
   (setq web-mode-markup-indent-offset 4)
   (setq web-mode-code-indent-offset 4)
 #+END_SRC
+****** PHP Development
+ PHP Development
+ #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+   ;; PHP Mode Improved (http://www.emacswiki.org/emacs/php-mode-improved.el)
+   ;; (add-to-list 'load-path "~/.emacs.d/lisp/")
+   (use-package php-mode
+     :ensure t
+     :config
+     (autoload 'php-mode "php-mode-improved" "Major mode for editing php code." t)
+     (add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
+     (add-to-list 'auto-mode-alist '("\\.inc$" . php-mode)))
+ #+END_SRC
 
-PHP Development
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  ;; PHP Mode Improved (http://www.emacswiki.org/emacs/php-mode-improved.el)
-  ;; (add-to-list 'load-path "~/.emacs.d/lisp/")
-  (use-package php-mode
-    :ensure t
-    :config
-    (autoload 'php-mode "php-mode-improved" "Major mode for editing php code." t)
-    (add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
-    (add-to-list 'auto-mode-alist '("\\.inc$" . php-mode)))
-#+END_SRC
+****** Angular/TS Development
+ Angular setup
+ #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+   (setq exec-path (append exec-path '("/home/jrm/.nvm/versions/node/v9.11.1/bin")))
+   (use-package ng2-mode
+     :ensure t)
 
-Angular setup
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (setq exec-path (append exec-path '("/home/jrm/.nvm/versions/node/v9.11.1/bin")))
-  (use-package ng2-mode
-    :ensure t)
+   (use-package flycheck
+     :ensure t
+     :diminish flycheck-mode)
 
-  (use-package flycheck
-    :ensure t
-    :diminish flycheck-mode)
-
-  (custom-set-variables
-   '(flycheck-typescript-tslint-executable "/home/jrm/.nvm/versions/node/v9.11.1/bin/tslint"))
+   (custom-set-variables
+    '(flycheck-typescript-tslint-executable "/home/jrm/.nvm/versions/node/v9.11.1/bin/tslint"))
 
 
-  (use-package company
-    :ensure t
-    :diminish company-mode)
+   (use-package company
+     :ensure t
+     :diminish company-mode)
 
-  (use-package tide
-    :ensure t
-    :config
-    (defun setup-tide-mode ()
-      (interactive)
-      (tide-setup)
-      (flycheck-mode +1)
-      (setq flycheck-check-syntax-automatically '(save mode-enabled))
-      (eldoc-mode +1)
-      (tide-hl-identifier-mode +1)
-      ;; company is an optional dependency. 
-      (company-mode +1))
+   (use-package tide
+     :ensure t
+     :config
+     (defun setup-tide-mode ()
+       (interactive)
+       (tide-setup)
+       (flycheck-mode +1)
+       (setq flycheck-check-syntax-automatically '(save mode-enabled))
+       (eldoc-mode +1)
+       (tide-hl-identifier-mode +1)
+       ;; company is an optional dependency. 
+       (company-mode +1))
 
-    ;; aligns annotation to the right hand side
-    (setq company-tooltip-align-annotations t)
+     ;; aligns annotation to the right hand side
+     (setq company-tooltip-align-annotations t)
 
-    ;; formats the buffer before saving
-    (add-hook 'before-save-hook 'tide-format-before-save)
+     ;; formats the buffer before saving
+     (add-hook 'before-save-hook 'tide-format-before-save)
 
-    (add-hook 'typescript-mode-hook #'setup-tide-mode)
-    (setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil :IndentStyle 2))
+     (add-hook 'typescript-mode-hook #'setup-tide-mode)
+     (setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil :IndentStyle 2))
 
-    (define-key tide-mode-map (kbd "C-c C-d") 'tide-documentation-at-point)
-    (define-key tide-mode-map (kbd "C-c C-i") 'tide-organize-imports))
-#+END_SRC
+     (define-key tide-mode-map (kbd "C-c C-d") 'tide-documentation-at-point)
+     (define-key tide-mode-map (kbd "C-c C-i") 'tide-organize-imports))
+ #+END_SRC
 
-Check for ts lint errors
-#+BEGIN_SRC emacs-lisp  ~/.emacs
-  (flycheck-add-mode 'typescript-tslint 'ng2-ts-mode)
-  (flycheck-add-mode 'typescript-tide 'ng2-ts-mode)
-#+END_SRC
+ Check for ts lint errors
+ #+BEGIN_SRC emacs-lisp  ~/.emacs
+   (flycheck-add-mode 'typescript-tslint 'ng2-ts-mode)
+   (flycheck-add-mode 'typescript-tide 'ng2-ts-mode)
+ #+END_SRC
 
-For Tide integration, use the local tsserver and fallback to the default one installed with tide
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (let* ((package-root (locate-dominating-file default-directory
-                                               "package.json"))
-         (path
-          (and package-root
-               (expand-file-name "node_modules/typescript/bin/tsserver"
-                                 (expand-file-name package-root)))))
-    (when (and path
-               (file-exists-p path))
-      (make-local-variable 'tide-tsserver-executable)
-      (setq tide-tsserver-executable path)
-      ))
-#+END_SRC
-
-Using Node JS Repl which is helpful for node development as well as just tinkering around with JS
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package nodejs-repl
-    :ensure t)
-  (add-hook 'js-mode-hook
-	    (lambda ()
-	      (define-key js-mode-map (kbd "C-c C-e") 'nodejs-repl-send-last-expression)
-	      (define-key js-mode-map (kbd "C-c C-c") 'nodejs-repl-send-buffer)
-	      (define-key js-mode-map (kbd "C-c C-j") 'nodejs-repl-send-line)
-	      (define-key js-mode-map (kbd "C-c C-r") 'nodejs-repl-send-region)
-	      (define-key js-mode-map (kbd "C-c C-l") 'nodejs-repl-load-file)
-	      (define-key js-mode-map (kbd "C-c C-z") 'nodejs-repl-switch-to-repl)))
-#+END_SRC
-
-Emmet mode for html/css
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package emmet-mode
-    :ensure t)
-  (add-hook 'sgml-mode-hook 'emmet-mode)
-  (add-hook 'css-mode-hook  'emmet-mode)
-#+END_SRC
+ For Tide integration, use the local tsserver and fallback to the default one installed with tide
+ #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+   (let* ((package-root (locate-dominating-file default-directory
+						"package.json"))
+          (path
+           (and package-root
+		(expand-file-name "node_modules/typescript/bin/tsserver"
+                                  (expand-file-name package-root)))))
+     (when (and path
+		(file-exists-p path))
+       (make-local-variable 'tide-tsserver-executable)
+       (setq tide-tsserver-executable path)
+       ))
+ #+END_SRC
 
 *** Consuming Content
 **** Mail
