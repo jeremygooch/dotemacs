@@ -112,7 +112,7 @@ Fortunately EXWM also has support for multiple monitors.
 #+END_SRC
 
 Simple script for waking up second monitor after reattaching
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp ~/.emacs
   (defun jrm/wake-second-monitor ()
       "Turns second monitor off and back on to wake it up. Helpful for exwm + X11 + multiple monitors."
     (interactive)
