@@ -55,19 +55,19 @@ First, get some basics out of the way. Switch to fullscreen mode and hide the me
 
 I find myself need specific font sizes for different scenarios, i.e. projecting, screen-sharing on conference calls, etc. So, binding these to a quick way to toggle through them.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (defvar jrm/screens-alist '((?1 "X11" (lambda () (set-face-attribute 'default nil :height 110) 'default))
-			      (?2 "MacOS" (lambda () (set-face-attribute 'default nil :height 120) 'proj))
-			      (?3 "Projector" (lambda () (set-face-attribute 'default nil :height 140) 'proj))
-			      (?4 "Projector - Large" (lambda () (set-face-attribute 'default nil :height 160) 'projLg)))
+  (defvar jrm/screens-alist '((?1 "small" (lambda () (set-face-attribute 'default nil :height 110) 'default))
+			      (?2 "medium" (lambda () (set-face-attribute 'default nil :height 120) 'proj))
+			      (?3 "large" (lambda () (set-face-attribute 'default nil :height 140) 'proj))
+			      (?4 "xtra-large" (lambda () (set-face-attribute 'default nil :height 160) 'projLg)))
     "List that associates number letters to descriptions and actions.")
 
   (defun jrm/adjust-font-size ()
     "Lets the user choose the the font size and takes the corresponding action.
   Returns whatever the action returns."
     (interactive)
-    (let ((choice (read-char-choice (mapconcat (lambda (item) (format "%c: %s" (car item) (cadr item))) jrm3/screens-alist "; ")
-				    (mapcar #'car valeriy-alist))))
-      (funcall (nth 2 (assoc choice jrm3/screens-alist)))))
+    (let ((choice (read-char-choice (mapconcat (lambda (item) (format "%c: %s" (car item) (cadr item))) jrm/screens-alist "; ")
+				    (mapcar #'car jrm/screens-alist))))
+      (funcall (nth 2 (assoc choice jrm/screens-alist)))))
 
   (global-set-key (kbd "C-x C-j p")  'jrm/adjust-font-size)
 #+END_SRC
