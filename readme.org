@@ -194,7 +194,7 @@ There are a few miscellaneous modes where the mouse should be disabled by defaul
 #+END_SRC
 
 **** Lock screen with slock
-#+BEGIN_SRC emacs-lisp ~/.emacs
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (exwm-input-set-key (kbd "s-l") (lambda ()
 	      (interactive)
 	      (start-process "" nil "/usr/bin/slock")))
