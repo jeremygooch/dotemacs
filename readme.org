@@ -107,7 +107,7 @@ Fortunately EXWM also has support for multiple monitors.
   (add-hook 'exwm-randr-screen-change-hook
 	    (lambda ()
 	      (start-process-shell-command
-	       "xrandr" nil "xrandr --output eDP-1 --mode 2048x1152 --right-of DP-2-2 --auto")))
+	       "xrandr" nil "xrandr --output eDP-1 --mode 2048x1152; xrandr --output eDP-1 --mode 2048x1152 --right-of DP-2-2 --auto")))
   (exwm-randr-enable)
 #+END_SRC
 
