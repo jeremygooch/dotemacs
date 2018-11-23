@@ -943,52 +943,6 @@ Various modes helpful for development
     :ensure t)
 #+END_SRC
 
-Clojure with Cider for interactive Clojure development
-#+BEGIN_SRC emacs-lisp :export code ~/.emacs
-  (use-package clojure-mode
-    :ensure t
-    :config
-    ;; Set mode for specific files
-    (add-to-list 'auto-mode-alist '("\\.edn$" . clojure-mode))
-    (add-to-list 'auto-mode-alist '("\\.boot$" . clojure-mode))
-    (add-to-list 'auto-mode-alist '("\\.cljs.*$" . clojure-mode))
-    (add-to-list 'auto-mode-alist '("lein-env" . enh-ruby-mode)))
-
-  (use-package eldoc
-    :ensure t
-    :diminish eldoc-mode)
-
-
-  (use-package cider
-    :ensure t
-    :config
-    (add-hook 'cider-repl-mode-hook #'eldoc-mode)
-    (setq cider-repl-pop-to-buffer-on-connect t) ;; go to the repl when done connecting
-    (setq cider-show-error-buffer t)
-    (setq cider-auto-select-error-buffer t) ;; jump to error message
-    )
-
-    (use-package clojure-cheatsheet
-      :ensure t
-      :config
-      '(progn
-	 (define-key clojure-mode-map (kbd "C-c C-h") #'clojure-cheatsheet))
-      (add-hook 'clojure-mode-hook 'subword-mode)
-      (use-package clojure-mode-extra-font-locking
-	:ensure t))
-
-
-
-  (use-package paredit
-    :ensure t
-    :config (add-hook 'clojure-mode-hook 'enable-paredit-mode))
-#+END_SRC
-
-For org-babel's clojure backend use cider rather than the default slime
-#+BEGIN_SRC emacs-lisp  ~/.emacs
-  (setq org-babel-clojure-backend 'cider)
-#+END_SRC
-
 Magit for version control
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
 
@@ -1234,6 +1188,118 @@ I also like to use org mode's code evaluation capabilities for tinkering around 
        (setq tide-tsserver-executable path)
        ))
  #+END_SRC
+
+***** Clojure Development
+Clojure with Cider for interactive Clojure development
+#+BEGIN_SRC emacs-lisp :export code ~/.emacs
+  (use-package clojure-mode
+    :ensure t
+    :config
+    ;; Set mode for specific files
+    (add-to-list 'auto-mode-alist '("\\.edn$" . clojure-mode))
+    (add-to-list 'auto-mode-alist '("\\.boot$" . clojure-mode))
+    (add-to-list 'auto-mode-alist '("\\.cljs.*$" . clojure-mode))
+    (add-to-list 'auto-mode-alist '("lein-env" . enh-ruby-mode)))
+
+  (use-package eldoc
+    :ensure t
+    :diminish eldoc-mode)
+
+
+  (use-package cider
+    :ensure t
+    :config
+    (add-hook 'cider-repl-mode-hook #'eldoc-mode)
+    (setq cider-repl-pop-to-buffer-on-connect t) ;; go to the repl when done connecting
+    (setq cider-show-error-buffer t)
+    (setq cider-auto-select-error-buffer t) ;; jump to error message
+    )
+
+    (use-package clojure-cheatsheet
+      :ensure t
+      :config
+      '(progn
+	 (define-key clojure-mode-map (kbd "C-c C-h") #'clojure-cheatsheet))
+      (add-hook 'clojure-mode-hook 'subword-mode)
+      (use-package clojure-mode-extra-font-locking
+	:ensure t))
+
+
+
+  (use-package paredit
+    :ensure t
+    :config (add-hook 'clojure-mode-hook 'enable-paredit-mode))
+#+END_SRC
+
+For org-babel's clojure backend use cider rather than the default slime
+#+BEGIN_SRC emacs-lisp  ~/.emacs
+  (setq org-babel-clojure-backend 'cider)
+#+END_SRC
+
+****** Clojure/Quil Workflow Customization
+A popup HSV color picker is helpful for quick prototyping/sketching
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (defun convert-range-360 (val)
+    "Converts a value from a 0-1 range to 0-360 range. Used for calculating hue."
+    (* (/ (- val 0) (- 1 0))
+       (+ (- 360 0) 0)))
+
+
+  (defun jrm/insert-color-hsb ()
+    "Select a color and insert its hue/saturation/brightness[lumenosity] format."
+    (interactive "*")
+    (let ((buf (current-buffer)))
+      (custom-set-variables '(list-colors-sort (quote hsv)))
+      (list-colors-display
+       nil nil `(lambda (name)
+		  (interactive)
+		  (quit-window)
+		  (with-current-buffer ,buf
+
+		    (setq hsb (apply 'color-rgb-to-hsl (color-name-to-rgb name)))
+		    (setq hue (convert-range-360 (nth 0 hsb)))
+		    (setq sat (* 100 (nth 1 hsb)))
+
+		    (insert (format "%s" hue 100) " " (format "%s" sat) " " (format "%s" 100.0))
+		    )))))
+  (global-set-key (kbd "C-x C-j H")  'jrm/insert-color-hsb)
+#+END_SRC
+
+AFAIK the default cider repl commands don't provide an easy way to refresh quil windows, so below are some hacked together commands to do so via a temporary shell buffer.
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (defun jrm/start-quil-repl ()
+    "Start Quil repl from current buffer. Current buffer must be part of a Clojure/Quil project."
+    (interactive)
+    (let ((previousBuffer (current-buffer)))
+      (get-buffer-create "quil-repl")
+      (switch-to-buffer "quil-repl")
+      (shell (current-buffer))
+      (switch-to-buffer previousBuffer)
+      (process-send-string "quil-repl" "lein repl\n")
+      (process-send-string "quil-repl" "(use 'sketch.core)\n")))
+  (global-set-key (kbd "C-x C-j Q")  'jrm/start-quil-repl)
+
+  (defun jrm/reload-quil-repl ()
+    "Easy reloading of Quil frames without destroying them. Assumes repl is running in a buffer named quil-repl."
+    (interactive)
+    (let ((previousBuffer (current-buffer)))
+      (switch-to-buffer "quil-repl")
+      (process-send-string "quil-repl" "(refresh)\n")
+      (switch-to-buffer previousBuffer)))
+  (global-set-key (kbd "C-x C-j q")  'jrm/reload-quil-repl)
+
+  (defun jrm/exit-quil-repl ()
+    "Exit running quil-repl buffer"
+    (interactive)
+    (let ((previousBuffer (current-buffer)))
+      (switch-to-buffer "quil-repl")
+      (process-send-string "quil-repl" "exit\n")
+      (process-send-string "quil-repl" "exit\n")
+      (kill-buffer "quil-repl")
+      (switch-to-buffer previousBuffer)))
+  (global-set-key (kbd "C-x C-j x")  'jrm/exit-quil-repl)
+
+#+END_SRC
 
 *** Consuming Content
 **** Mail
