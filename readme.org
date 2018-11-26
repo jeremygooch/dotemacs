@@ -65,9 +65,9 @@ I find myself need specific font sizes for different scenarios, i.e. projecting,
     "Lets the user choose the the font size and takes the corresponding action.
   Returns whatever the action returns."
     (interactive)
-    (let ((choice (read-char-choice (mapconcat (lambda (item) (format "%c: %s" (car item) (cadr item))) jrm3/screens-alist "; ")
-				    (mapcar #'car valeriy-alist))))
-      (funcall (nth 2 (assoc choice jrm3/screens-alist)))))
+    (let ((choice (read-char-choice (mapconcat (lambda (item) (format "%c: %s" (car item) (cadr item))) jrm/screens-alist "; ")
+				    (mapcar #'car jrm/screens-alist))))
+      (funcall (nth 2 (assoc choice jrm/screens-alist)))))
 
   (global-set-key (kbd "C-x C-j p")  'jrm/adjust-font-size)
 #+END_SRC
