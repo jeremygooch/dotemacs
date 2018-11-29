@@ -46,7 +46,7 @@ Setup a prefix for custom commands.
 Emacs was the original terminal multiplexer so manages split views quite nicely.
 
 First, get some basics out of the way. Switch to fullscreen mode and hide the menus and also adjust the default font size while we're at it.
-#+BEGIN_SRC emacs-lisp   
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (set-frame-parameter nil 'fullscreen 'fullboth)
   (set-face-attribute 'default nil :height 100)
   (menu-bar-mode -1)
@@ -778,7 +778,7 @@ Ignore certain directories by default for grep
 
 *** In-file Navigation
 Easier paragraph jumping
-#+BEGIN_SRC emacs-lisp   
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (global-set-key (kbd "M-p") 'backward-paragraph)
   (global-set-key (kbd "M-n") 'forward-paragraph)
 #+END_SRC
@@ -792,7 +792,7 @@ Avy is great for speed-of-thought navigation
 #+END_SRC
 
 Wrap long lines so I can see everything at a glance
-#+BEGIN_SRC emacs-lisp   
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (global-visual-line-mode t)
 #+END_SRC
 
@@ -814,7 +814,7 @@ I find it helpful to be able to backtab (shift+tab) to un-indent
 #+END_SRC
 
 Make evaluating lisp buffers even quicker
-#+BEGIN_SRC emacs-lisp   
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (global-set-key (kbd "C-c C-e")  'eval-buffer)
 #+END_SRC
 
@@ -972,7 +972,7 @@ Defining custom indentation based on project paths and setting them to functions
 #+END_SRC
 
 I'm accustomed to being able to highlight a region then replace it with the next keystroke, (i.e. a letter, return, backspace, etc.).
-#+BEGIN_SRC emacs-lisp   
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (delete-selection-mode 1)
 #+END_SRC
 
@@ -1408,7 +1408,7 @@ Function for quickly swapping around meta and super keys which is necessary from
 #+END_SRC
 **** Buffer Misc
 When killing a buffer always pick the current buffer by default
-#+BEGIN_SRC emacs-lisp   
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (defun kill-current-buffer ()
     "Kills the current buffer."
     (interactive)
