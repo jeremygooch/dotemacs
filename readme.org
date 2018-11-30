@@ -936,7 +936,7 @@ Defining custom indentation based on project paths and setting them to functions
     (setq-local javascript-indent-level n) ; javascript-mode
     (setq-local js-indent-level n) ; js-mode
     (setq-local typescript-indent-level n) ; typescript-mode
-    (setq-local js2-basic-offset n) ; js2-mode, in latest js2-mode, it's alias of js-indent-level
+    ;; (setq-local js2-basic-offset n) ; js2-mode, in latest js2-mode, it's alias of js-indent-level
     (setq-local web-mode-markup-indent-offset 4) ; web-mode, html tag in html file
     (setq-local web-mode-css-indent-offset 4) ; web-mode, css in html file
     (setq-local web-mode-code-indent-offset n) ; web-mode, js code in html file
@@ -1151,6 +1151,9 @@ I also like to use org mode's code evaluation capabilities for tinkering around 
 
      (define-key tide-mode-map (kbd "C-c C-d") 'tide-documentation-at-point)
      (define-key tide-mode-map (kbd "C-c C-i") 'tide-organize-imports))
+
+   (when (memq window-system '(mac ns x))
+     (exec-path-from-shell-initialize))
  #+END_SRC
 
  Check for ts lint errors
