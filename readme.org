@@ -1005,7 +1005,7 @@ I'm accustomed to being able to highlight a region then replace it with the next
   (delete-selection-mode 1)
 #+END_SRC
 
-A bit of helpful typsecript debugging
+A bit of helpful javascript/typsecript debugging
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (fset 'log-variable
 	(lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote ("\355console.log('', );\370kmac" 0 "%d")) arg)))
@@ -1013,7 +1013,19 @@ A bit of helpful typsecript debugging
   (when (or (fboundp 'js-mode) (fboundp 'typescript-mode))
     (defun my-ecmascript-config ()
       "For use in js/ts mode-hooks"
-      (local-set-key (kbd "C-x C-j l") 'log-variable)
+      (local-set-key (kbd "C-x C-j C-l") 'log-variable)
+      ;;
+      )
+    (add-hook 'js-mode-hook 'my-ecmascript-config)
+    (add-hook 'typescript-mode-hook 'my-ecmascript-config))
+
+  (fset 'console-log
+	(lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote ("console.log('');" 0 "%d")) arg)))
+
+  (when (or (fboundp 'js-mode) (fboundp 'typescript-mode))
+    (defun my-ecmascript-config ()
+      "For use in js/ts mode-hooks"
+      (local-set-key (kbd "C-x C-j l") 'console-log)
       ;;
       )
     (add-hook 'js-mode-hook 'my-ecmascript-config)
