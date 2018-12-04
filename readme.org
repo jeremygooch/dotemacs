@@ -1100,26 +1100,7 @@ To avoid switching applications let emacs reload the browser for me. This is spe
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (require 'browser-refresh)
 
-  (defun jrm/start-node-server ()
-    "Kill previous running node process and start new node server as a process from current buffer."
-    (interactive)
-    (setq kill-buffer-query-functions nil) ; dont prompt for killing buffer with running process
-    (if (get-buffer "node-shell") (kill-buffer "node-shell"))
-
-    (let ((previousBuffer (current-buffer)))
-      (get-buffer-create "node-shell")
-      (switch-to-buffer "node-shell")
-      (shell (current-buffer))
-      (process-send-string "node-shell" "cd ~/neon/; node --inspect dist/server;\n")
-      (switch-to-buffer previousBuffer)))
-
-  (defun jrm/neon-refresh ()
-    "Refreshes the browser after running some neon tasks."
-    (interactive)
-    (jrm/start-node-server)
-    (browser-refresh))
-
-  (global-set-key (kbd "s-r") 'jrm/refresh)
+  (global-set-key (kbd "s-r") 'browser-refresh)
   (custom-set-variables '(browser-refresh-activate nil))
 
 
