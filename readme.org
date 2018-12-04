@@ -1095,6 +1095,14 @@ I also like to use org mode's code evaluation capabilities for tinkering around 
   (setq web-mode-markup-indent-offset 4)
   (setq web-mode-code-indent-offset 4)
 #+END_SRC
+
+To avoid switching applications let emacs reload the browser for me.
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (require 'browser-refresh)
+  (global-set-key (kbd "s-r") 'browser-refresh)
+
+  (custom-set-variables '(browser-refresh-activate nil))
+#+END_SRC
 ****** PHP Development
  PHP Development
  #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
