@@ -1096,12 +1096,33 @@ I also like to use org mode's code evaluation capabilities for tinkering around 
   (setq web-mode-code-indent-offset 4)
 #+END_SRC
 
-To avoid switching applications let emacs reload the browser for me.
+To avoid switching applications let emacs reload the browser for me. This is specific to a project.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (require 'browser-refresh)
-  (global-set-key (kbd "s-r") 'browser-refresh)
 
+  (defun jrm/start-node-server ()
+    "Kill previous running node process and start new node server as a process from current buffer."
+    (interactive)
+    (setq kill-buffer-query-functions nil) ; dont prompt for killing buffer with running process
+    (if (get-buffer "node-shell") (kill-buffer "node-shell"))
+
+    (let ((previousBuffer (current-buffer)))
+      (get-buffer-create "node-shell")
+      (switch-to-buffer "node-shell")
+      (shell (current-buffer))
+      (process-send-string "node-shell" "cd ~/neon/; node --inspect dist/server;\n")
+      (switch-to-buffer previousBuffer)))
+
+  (defun jrm/neon-refresh ()
+    "Refreshes the browser after running some neon tasks."
+    (interactive)
+    (jrm/start-node-server)
+    (browser-refresh))
+
+  (global-set-key (kbd "s-r") 'jrm/refresh)
   (custom-set-variables '(browser-refresh-activate nil))
+
+
 #+END_SRC
 ****** PHP Development
  PHP Development
