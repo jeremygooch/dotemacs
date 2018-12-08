@@ -980,29 +980,20 @@ I'm accustomed to being able to highlight a region then replace it with the next
 
 A bit of helpful javascript/typsecript debugging
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (fset 'log-variable
-	(lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote ("\355console.log('', );\370kmac" 0 "%d")) arg)))
+  (defun jrm/insert-debug-log ()
+    "Inserts logging based on mode"
+    (interactive)
+    (when (or (equal major-mode 'js-mode) (equal major-mode 'typescript-mode))
+      (insert "console.log(\"\");")
+      (backward-char 3))
+    (when (equal major-mode 'clojure-mode)
+      (insert "(println (format \"%s\" ))")
+      (backward-char 2))
+    (when (equal major-mode 'emacs-lisp-mode)
+      (insert "(message (format \"%s\" ))")
+      (backward-char 2)))
 
-  (when (or (fboundp 'js-mode) (fboundp 'typescript-mode))
-    (defun my-ecmascript-config ()
-      "For use in js/ts mode-hooks"
-      (local-set-key (kbd "C-x C-j C-l") 'log-variable)
-      ;;
-      )
-    (add-hook 'js-mode-hook 'my-ecmascript-config)
-    (add-hook 'typescript-mode-hook 'my-ecmascript-config))
-
-  (fset 'console-log
-	(lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote ("console.log('');" 0 "%d")) arg)))
-
-  (when (or (fboundp 'js-mode) (fboundp 'typescript-mode))
-    (defun my-ecmascript-config ()
-      "For use in js/ts mode-hooks"
-      (local-set-key (kbd "C-x C-j l") 'console-log)
-      ;;
-      )
-    (add-hook 'js-mode-hook 'my-ecmascript-config)
-    (add-hook 'typescript-mode-hook 'my-ecmascript-config))
+  (global-set-key (kbd "C-x C-j d") 'jrm/insert-debug-log)
 #+END_SRC
 
 ***** Web development
