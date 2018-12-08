@@ -1185,23 +1185,24 @@ Clojure with Cider for interactive Clojure development
     (add-hook 'cider-repl-mode-hook #'eldoc-mode)
     (setq cider-repl-pop-to-buffer-on-connect t) ;; go to the repl when done connecting
     (setq cider-show-error-buffer t)
-    (setq cider-auto-select-error-buffer t) ;; jump to error message
-    )
+    (setq cider-auto-select-error-buffer t)) ;; jump to error message
 
-    (use-package clojure-cheatsheet
-      :ensure t
-      :config
-      '(progn
-	 (define-key clojure-mode-map (kbd "C-c C-h") #'clojure-cheatsheet))
-      (add-hook 'clojure-mode-hook 'subword-mode)
-      (use-package clojure-mode-extra-font-locking
-	:ensure t))
+    ;; (use-package clojure-cheatsheet
+    ;;   :ensure t
+    ;;   :config
+    ;;   '(progn
+    ;;      (define-key clojure-mode-map (kbd "C-c C-h") #'clojure-cheatsheet))
+    ;;   (add-hook 'clojure-mode-hook 'subword-mode)
+    ;;   (use-package clojure-mode-extra-font-locking
+    ;;     :ensure t))
 
-
-
+  (defun paredit-enable-modes ()
+    (add-hook 'emacs-lisp-mode-hook 'paredit-mode)
+    (add-hook 'clojure-mode-hook 'paredit-mode))
   (use-package paredit
     :ensure t
-    :config (add-hook 'clojure-mode-hook 'enable-paredit-mode))
+    :config (paredit-enable-modes))
+
 #+END_SRC
 
 For org-babel's clojure backend use cider rather than the default slime
@@ -1210,6 +1211,7 @@ For org-babel's clojure backend use cider rather than the default slime
 #+END_SRC
 
 ****** Clojure/Quil Workflow Customization
+
 A popup HSV color picker is helpful for quick prototyping/sketching
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (defun convert-range-360 (val)
@@ -1273,6 +1275,7 @@ AFAIK the default cider repl commands don't provide an easy way to refresh quil 
   (global-set-key (kbd "C-x C-j x")  'jrm/exit-quil-repl)
 
 #+END_SRC
+
 
 *** Consuming Content
 **** Mail
