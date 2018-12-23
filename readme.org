@@ -1376,6 +1376,8 @@ Generic auto-complete with Ivy
 	  ivy-count-format "%d/%d "))
   (ivy-mode 1)
 
+  (setq ivy-use-selectable-prompt t)
+
 #+END_SRC
 
 Ivy enhanced search (swiper) and common Emacs meta commands (counsel)
