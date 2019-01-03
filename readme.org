@@ -983,7 +983,7 @@ A bit of helpful javascript/typsecript debugging
   (defun jrm/insert-debug-log ()
     "Inserts logging based on mode"
     (interactive)
-    (when (or (equal major-mode 'js-mode) (equal major-mode 'typescript-mode))
+    (when (or (equal major-mode 'js-mode) (equal major-mode 'typescript-mode) (equal major-mode 'ng2-ts-mode))
       (insert "console.log(\"\");")
       (backward-char 3))
     (when (equal major-mode 'clojure-mode)
