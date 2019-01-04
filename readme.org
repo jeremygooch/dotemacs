@@ -20,6 +20,7 @@ Setting up basic repositories and such.
   (setq package-archives '(("marmalade"  . "http://marmalade-repo.org/packages/")
 			   ("melpa-stable" . "http://stable.melpa.org/packages/")
 			   ("gnu" . "https://elpa.gnu.org/packages/")
+			   ("org" . "https://orgmode.org/elpa/")
 			   ("melpa" . "https://melpa.org/packages/")))
 
   (unless (package-installed-p 'use-package)
