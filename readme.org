@@ -1302,7 +1302,7 @@ AFAIK the default cider repl commands don't provide an easy way to refresh quil 
       (switch-to-buffer "quil-repl")
       (process-send-string "quil-repl" "(refresh)\n")
       (switch-to-buffer previousBuffer)))
-  (global-set-key (kbd "C-x C-j q")  'jrm/reload-quil-repl)
+  (global-set-key (kbd "C-x C-j C-q")  'jrm/reload-quil-repl)
 
   (defun jrm/exit-quil-repl ()
     "Exit running quil-repl buffer"
