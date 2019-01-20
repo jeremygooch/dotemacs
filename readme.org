@@ -103,11 +103,11 @@ With EXWM it can act as a complete desktop environment.
 Fortunately EXWM also has support for multiple monitors.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (require 'exwm-randr)
-  (setq exwm-randr-workspace-output-plist '(0 "eDP-1" 1 "DP-2-2"))
+  (setq exwm-randr-workspace-output-plist '(0 "eDP1" 1 "DP2-2" 3 "DP2-2"))
   (add-hook 'exwm-randr-screen-change-hook
 	    (lambda ()
 	      (start-process-shell-command
-	       "xrandr" nil "xrandr --output eDP-1 --mode 2048x1152; xrandr --output eDP-1 --mode 2048x1152 --right-of DP-2-2 --auto")))
+	       "xrandr" nil "xrandr --output eDP1 --mode 2048x1152; xrandr --output eDP1 --mode 2048x1152 --right-of DP2-2 --auto")))
   (exwm-randr-enable)
 #+END_SRC
 
@@ -116,9 +116,15 @@ Simple script for waking up second monitor after reattaching
   (defun jrm/wake-second-monitor ()
       "Turns second monitor off and back on to wake it up. Helpful for exwm + X11 + multiple monitors."
     (interactive)
-    (shell-command "xrandr --output DP-2-2 --off && xrandr --output DP-2-2 --auto"))
+    (shell-command "xrandr --output DP2-2 --off && xrandr --output DP2-2 --auto"))
 
   (global-set-key (kbd "C-x C-j m") 'jrm/wake-second-monitor)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (add-hook 'dashboard-mode-hook
+	    (lambda ()
+	      (shell-command "xrandr --output eDP1 --mode 2048x1152")))
 #+END_SRC
 
 **** Screenshots
@@ -195,9 +201,13 @@ There are a few miscellaneous modes where the mouse should be disabled by defaul
 
 **** Lock screen with slock
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (exwm-input-set-key (kbd "s-l") (lambda ()
-	      (interactive)
-	      (start-process "" nil "/usr/bin/slock")))
+    (exwm-input-set-key (kbd "s-l") (lambda ()
+		(interactive)
+		(start-process "" nil "/usr/bin/slock")))
+
+    (exwm-input-set-key (kbd "s-s") (lambda ()
+		(interactive)
+		(shell-command "/usr/bin/slock systemctl suspend -i")))
 #+END_SRC
 
 **** Helpful Function Keys
