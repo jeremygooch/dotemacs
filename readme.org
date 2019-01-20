@@ -1258,6 +1258,57 @@ Add mail alerts for new messages.
       (eww url)))
 #+END_SRC
 
+**** Elfeed
+Many thanks to [[http://pragmaticemacs.com/emacs/read-your-rss-feeds-in-emacs-with-elfeed/][pragmatic emacs' post]] for guidance on this setup.
+#+BEGIN_SRC emacs-lisp :tangle .emacs
+  (use-package elfeed-org
+    :ensure t
+    :config
+    (elfeed-org)
+    (setq rmh-elfeed-org-files (list "~/org/personal/elfeed.org")))
+
+  ;;shortcut functions
+  (defun jrm/elfeed-show-all ()
+    (interactive)
+    (bookmark-maybe-load-default-file)
+    (bookmark-jump "elfeed-all"))
+  (defun jrm/elfeed-show-development ()
+    (interactive)
+    (bookmark-maybe-load-default-file)
+    (bookmark-jump "elfeed-development"))
+  (defun jrm/elfeed-show-news ()
+    (interactive)
+    (bookmark-maybe-load-default-file)
+    (bookmark-jump "elfeed-news"))
+  (defun jrm/elfeed-show-emacs ()
+    (interactive)
+    (bookmark-maybe-load-default-file)
+    (bookmark-jump "elfeed-emacs"))
+
+
+  (defun jrm/elfeed-load-db-and-open ()
+    "Wrapper to load the elfeed db from disk before opening"
+    (interactive)
+    (elfeed-db-load)
+    (elfeed)
+    (elfeed-search-update--force))
+
+  (defun jrm/elfeed-save-db-and-bury ()
+    "Wrapper to save the elfeed db to disk before burying buffer"
+    (interactive)
+    (elfeed-db-save)
+    (quit-window))
+
+
+  (use-package elfeed
+    :ensure t
+    :bind (:map elfeed-search-mode-map
+		("A" . jrm/elfeed-show-all)
+		("E" . jrm/elfeed-show-emacs)
+		("D" . jrm/elfeed-show-development)
+		("N" . jrm/elfeed-show-news)
+		("q" . jrm/elfeed-save-db-and-bury)))
+#+END_SRC
 *** Misc Emacs Enhancements
 **** Smex for auto complete meta commands
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
