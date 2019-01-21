@@ -1336,7 +1336,6 @@ Many thanks to [[http://pragmaticemacs.com/emacs/read-your-rss-feeds-in-emacs-wi
     (elfeed-db-save)
     (quit-window))
 
-
   (use-package elfeed
     :ensure t
     :bind (:map elfeed-search-mode-map
@@ -1345,7 +1344,20 @@ Many thanks to [[http://pragmaticemacs.com/emacs/read-your-rss-feeds-in-emacs-wi
 		("D" . jrm/elfeed-show-development)
 		("N" . jrm/elfeed-show-news)
 		("q" . jrm/elfeed-save-db-and-bury)))
+
+  (global-set-key (kbd "C-x e") 'jrm/elfeed-load-db-and-open)
+
 #+END_SRC
+
+Sometimes it's helpful to hide images for certain posts.
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (defun jrm/elfeed-show-hide-images ()
+    (interactive)
+    (let ((shr-inhibit-images t))
+      (elfeed-show-refresh)))
+  (global-set-key (kbd "C-x C-j e") 'jrm/elfeed-show-hide-images)
+#+END_SRC
+
 *** Misc Emacs Enhancements
 **** Smex for auto complete meta commands
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
