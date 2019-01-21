@@ -1273,7 +1273,7 @@ Add mail alerts for new messages.
 
 **** Elfeed
 Many thanks to [[http://pragmaticemacs.com/emacs/read-your-rss-feeds-in-emacs-with-elfeed/][pragmatic emacs' post]] for guidance on this setup.
-#+BEGIN_SRC emacs-lisp :tangle .emacs
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package elfeed-org
     :ensure t
     :config
