@@ -1337,35 +1337,43 @@ Sometimes it's helpful to hide images for certain posts.
 **** VLC/Multimedia
 Turning this off by default, but occasionally it's helpful to be able to start, play, pause and exit vlc buffers while never having to leave your current buffer. This is particularly helpful for following along with training videos.
 #+BEGIN_SRC emacs-lisp 
-(defun jrm/start-vlc-video ()
-  "Start a video in VLC that can be controlled via emacs"
-  (interactive)
-  (let ((x (read-file-name "Enter video to play:"))
-	(videoBuffer "video-controller"))
-    (get-buffer-create videoBuffer)
-    (shell videoBuffer)
-    (process-send-string videoBuffer (concat "vlc -I rc " x "\n"))
-    (message "Now playing %s." x)))
+  (defvar videoBuffer "video-controller")
 
-(defun jrm/pause-vlc-video ()
-  "Pause a running vlc stream"
-  (interactive)
-  (let ((videoBuffer "video-controller"))
-    (process-send-string videoBuffer "pause\n")))
+  (defun jrm/vlc-start-video ()
+    "Start a video in VLC that can be controlled via emacs"
+    (interactive)
+    (let ((x (read-file-name "Enter video to play:")))
+      (get-buffer-create videoBuffer)
+      (shell videoBuffer)
+      (process-send-string videoBuffer (concat "vlc -I rc " x "\n"))
+      (message "Now playing %s." x)))
+  (global-set-key (kbd "C-x C-j v s") 'jrm/vlc-start-video)
 
-(defun jrm/resume-vlc-video ()
-  "Play/resume a running vlc stream"
-  (interactive)
-  (let ((videoBuffer "video-controller"))
-    (process-send-string videoBuffer "play\n")))
+  (defun jrm/vlc-pause-video ()
+    "Toggle pausing a running vlc stream"
+    (interactive)
+    (process-send-string videoBuffer "pause\n"))
+  (global-set-key (kbd "C-x C-j v p") 'jrm/vlc-pause-video)
 
-(defun jrm/quit-vlc-video ()
-  "Quit a running vlc stream"
-  (interactive)
-  (let ((videoBuffer "video-controller"))
+  (defun jrm/vlc-go-foward-10-video ()
+    "Seek forward X seconds in a playing vlc stream"
+    (interactive)
+    (process-send-string videoBuffer "seek 10\n"))
+  (global-set-key (kbd "C-x C-j v f") 'jrm/vlc-go-foward-10-video)
+
+  (defun jrm/vlc-go-backward-10-video ()
+    "Seek forward X seconds in a playing vlc stream"
+    (interactive)
+    (process-send-string videoBuffer "seek -10\n"))
+  (global-set-key (kbd "C-x C-j v b") 'jrm/vlc-go-backward-10-video)
+
+  (defun jrm/vlc-quit-video ()
+    "Quit a running vlc stream"
+    (interactive)
     (process-send-string videoBuffer "quit\n")
     (process-send-string videoBuffer "exit\n")
-    (kill-buffer videoBuffer)))
+    (kill-buffer videoBuffer))
+  (global-set-key (kbd "C-x C-j v q") 'jrm/vlc-quit-video)
 #+END_SRC
 
 *** Misc Emacs Enhancements
