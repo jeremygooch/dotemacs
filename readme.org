@@ -1334,6 +1334,40 @@ Sometimes it's helpful to hide images for certain posts.
   (global-set-key (kbd "C-x C-j e") 'jrm/elfeed-show-hide-images)
 #+END_SRC
 
+**** VLC/Multimedia
+Turning this off by default, but occasionally it's helpful to be able to start, play, pause and exit vlc buffers while never having to leave your current buffer. This is particularly helpful for following along with training videos.
+#+BEGIN_SRC emacs-lisp 
+(defun jrm/start-vlc-video ()
+  "Start a video in VLC that can be controlled via emacs"
+  (interactive)
+  (let ((x (read-file-name "Enter video to play:"))
+	(videoBuffer "video-controller"))
+    (get-buffer-create videoBuffer)
+    (shell videoBuffer)
+    (process-send-string videoBuffer (concat "vlc -I rc " x "\n"))
+    (message "Now playing %s." x)))
+
+(defun jrm/pause-vlc-video ()
+  "Pause a running vlc stream"
+  (interactive)
+  (let ((videoBuffer "video-controller"))
+    (process-send-string videoBuffer "pause\n")))
+
+(defun jrm/resume-vlc-video ()
+  "Play/resume a running vlc stream"
+  (interactive)
+  (let ((videoBuffer "video-controller"))
+    (process-send-string videoBuffer "play\n")))
+
+(defun jrm/quit-vlc-video ()
+  "Quit a running vlc stream"
+  (interactive)
+  (let ((videoBuffer "video-controller"))
+    (process-send-string videoBuffer "quit\n")
+    (process-send-string videoBuffer "exit\n")
+    (kill-buffer videoBuffer)))
+#+END_SRC
+
 *** Misc Emacs Enhancements
 **** Smex for auto complete meta commands
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
