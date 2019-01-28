@@ -1326,15 +1326,15 @@ Turning this off by default, but occasionally it's helpful to be able to start, 
 #+BEGIN_SRC emacs-lisp 
   (defvar videoBuffer "video-controller")
 
-  (defun jrm/vlc-start-video ()
+  (defun jrm/vlc-start-video-playlist ()
     "Start a video in VLC that can be controlled via emacs"
     (interactive)
-    (let ((x (read-file-name "Enter video to play:")))
+    (let ((x (read-directory-name "Enter video directory:")))
       (get-buffer-create videoBuffer)
       (shell videoBuffer)
-      (process-send-string videoBuffer (concat "vlc -I rc " x "\n"))
-      (message "Now playing %s." x)))
-  (global-set-key (kbd "C-x C-j v s") 'jrm/vlc-start-video)
+      (process-send-string videoBuffer (concat "vlc -I rc " x "*.webm\n"))
+      (message "Now playing videos in directory %s." x)))
+  (global-set-key (kbd "C-x C-j v s") 'jrm/vlc-start-video-playlist)
 
   (defun jrm/vlc-pause-video ()
     "Toggle pausing a running vlc stream"
@@ -1348,11 +1348,23 @@ Turning this off by default, but occasionally it's helpful to be able to start, 
     (process-send-string videoBuffer "seek 10\n"))
   (global-set-key (kbd "C-x C-j v f") 'jrm/vlc-go-foward-10-video)
 
+  (defun jrm/vlc-next-video ()
+    "Jump to next video in playlist"
+    (interactive)
+    (process-send-string videoBuffer "next\n"))
+  (global-set-key (kbd "C-x C-j v n") 'jrm/vlc-next-video)
+
+  (defun jrm/vlc-last-video ()
+    "Jump to previous video in playlist"
+    (interactive)
+    (process-send-string videoBuffer "prev\n"))
+  (global-set-key (kbd "C-x C-j v n") 'jrm/vlc-last-video)
+
   (defun jrm/vlc-go-backward-10-video ()
     "Seek forward X seconds in a playing vlc stream"
     (interactive)
     (process-send-string videoBuffer "seek -10\n"))
-  (global-set-key (kbd "C-x C-j v b") 'jrm/vlc-go-backward-10-video)
+  (global-set-key (kbd "C-x C-j v r") 'jrm/vlc-go-backward-10-video)
 
   (defun jrm/vlc-quit-video ()
     "Quit a running vlc stream"
