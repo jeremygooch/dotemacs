@@ -1359,7 +1359,7 @@ Turning this off by default, but occasionally it's helpful to be able to start, 
     "Jump to previous video in playlist"
     (interactive)
     (process-send-string videoBuffer "prev\n"))
-  (global-set-key (kbd "C-x C-j v n") 'jrm/vlc-last-video)
+  (global-set-key (kbd "C-x C-j v l") 'jrm/vlc-last-video)
 
   (defun jrm/vlc-go-backward-10-video ()
     "Seek forward X seconds in a playing vlc stream"
