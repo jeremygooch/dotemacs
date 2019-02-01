@@ -1323,7 +1323,7 @@ Sometimes it's helpful to hide images for certain posts.
 
 **** VLC/Multimedia
 Turning this off by default, but occasionally it's helpful to be able to start, play, pause and exit vlc buffers while never having to leave your current buffer. This is particularly helpful for following along with training videos.
-#+BEGIN_SRC emacs-lisp 
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (defvar videoBuffer "video-controller")
 
   (defun jrm/vlc-start-video-playlist ()
@@ -1332,6 +1332,7 @@ Turning this off by default, but occasionally it's helpful to be able to start, 
     (let ((x (read-directory-name "Enter video directory:")))
       (get-buffer-create videoBuffer)
       (shell videoBuffer)
+      (process-send-string videoBuffer "cd ~/\n")
       (process-send-string videoBuffer (concat "vlc -I rc " x "*.webm\n"))
       (message "Now playing videos in directory %s." x)))
   (global-set-key (kbd "C-x C-j v s") 'jrm/vlc-start-video-playlist)
