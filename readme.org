@@ -1153,42 +1153,41 @@ I also like to use org mode's code evaluation capabilities for tinkering around 
 Clojure with Cider for interactive Clojure development
 #+BEGIN_SRC emacs-lisp :export code ~/.emacs
   (use-package clojure-mode
-    :ensure t
-    :config
-    ;; Set mode for specific files
-    (add-to-list 'auto-mode-alist '("\\.edn$" . clojure-mode))
-    (add-to-list 'auto-mode-alist '("\\.boot$" . clojure-mode))
-    (add-to-list 'auto-mode-alist '("\\.cljs.*$" . clojure-mode))
-    (add-to-list 'auto-mode-alist '("lein-env" . enh-ruby-mode)))
+	:ensure t
+	:config
+	;; Set mode for specific files
+	(add-to-list 'auto-mode-alist '("\\.edn$" . clojure-mode))
+	(add-to-list 'auto-mode-alist '("\\.boot$" . clojure-mode))
+	(add-to-list 'auto-mode-alist '("\\.cljs.*$" . clojure-mode))
+	(add-to-list 'auto-mode-alist '("lein-env" . enh-ruby-mode)))
 
   (use-package eldoc
-    :ensure t
-    :diminish eldoc-mode)
+	:ensure t
+	:diminish eldoc-mode)
 
 
   (use-package cider
-    :ensure t
-    :config
-    (add-hook 'cider-repl-mode-hook #'eldoc-mode)
-    (setq cider-repl-pop-to-buffer-on-connect t) ;; go to the repl when done connecting
-    (setq cider-show-error-buffer t)
-    (setq cider-auto-select-error-buffer t)) ;; jump to error message
+	:ensure t
+	:config
+	(add-hook 'cider-repl-mode-hook #'eldoc-mode)
+	(setq cider-repl-pop-to-buffer-on-connect t) ;; go to the repl when done connecting
+	(setq cider-show-error-buffer t)
+	(setq cider-auto-select-error-buffer t)) ;; jump to error message
 
-    ;; (use-package clojure-cheatsheet
-    ;;   :ensure t
-    ;;   :config
-    ;;   '(progn
-    ;;      (define-key clojure-mode-map (kbd "C-c C-h") #'clojure-cheatsheet))
-    ;;   (add-hook 'clojure-mode-hook 'subword-mode)
-    ;;   (use-package clojure-mode-extra-font-locking
-    ;;     :ensure t))
+	;; (use-package clojure-cheatsheet
+	;;   :ensure t
+	;;   :config
+	;;   '(progn
+	;;      (define-key clojure-mode-map (kbd "C-c C-h") #'clojure-cheatsheet))
+	;;   (add-hook 'clojure-mode-hook 'subword-mode)
+	;;   (use-package clojure-mode-extra-font-locking
+	;;     :ensure t))
 
   (defun paredit-enable-modes ()
-    (add-hook 'emacs-lisp-mode-hook 'paredit-mode)
-    (add-hook 'clojure-mode-hook 'paredit-mode))
+	(add-hook 'emacs-lisp-mode-hook 'paredit-mode))
   (use-package paredit
-    :ensure t
-    :config (paredit-enable-modes))
+	:ensure t
+	:config (paredit-enable-modes))
 
 #+END_SRC
 
@@ -1262,6 +1261,23 @@ AFAIK the default cider repl commands don't provide an easy way to refresh quil 
   (global-set-key (kbd "C-x C-j x")  'jrm/exit-quil-repl)
 
 #+END_SRC
+
+
+***** Lisp
+Some general settings for lisp dialects (elisp, clojure, etc).
+#+BEGIN_SRC emacs-lisp :export code ~/.emacs
+  (require 'org-tempo)
+
+  (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+  (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+  (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+  (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+  (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+  (add-hook 'clojure-mode-hook          #'enable-paredit-mode)
+#+End_SRC
+
 
 
 *** Consuming Content
