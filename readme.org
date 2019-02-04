@@ -497,7 +497,7 @@ Customize org capture to my liking
    '(("w" "Work Todo" entry (file "~/org/work/softwareadvice/SA.org")
 	  "** TODO %? :sa:\n  %i\n  %a")
 	 ("t" "Work Ticket Notes" entry (file "~/org/work/softwareadvice/SA.org")
-	  "** TICKET %? :saticket:\n  %T\n  %a\n")
+	  "** TICKET %? :saticket:\n  %T\n  %a\n\n*** Unit Tests\n	- [ ] \n\n*** General Notes")
 	 ("l" "Personal Todo" entry (file "~/org/personal/personal.org")
 	  "*** TODO %? :personal:\n  %i\n  %a")
 	 ("m" "Meeting" entry (file "~/org/work/softwareadvice/Meetings.org")
