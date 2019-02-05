@@ -1254,8 +1254,6 @@ Some general settings for lisp dialects (elisp, clojure, etc).
   (add-hook 'clojure-mode-hook          #'enable-paredit-mode)
 #+End_SRC
 
-
-
 *** Consuming Content
 **** Mail
 Add mail alerts for new messages.
@@ -1494,6 +1492,15 @@ Some quick help for when I get stuck in the middle of a command
     :config
       (which-key-mode))
 #+END_SRC
+**** Ace Window
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package ace-window
+    :ensure t
+    :config
+    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
+  (global-set-key (kbd "C-x o") 'ace-window)
+#+END_SRC
+
 **** Keyboard layout
 Function for quickly swapping around meta and super keys which is necessary from time to time on certain keyboards.
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
