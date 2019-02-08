@@ -228,6 +228,11 @@ Remove default scrollbars
     :ensure t)
 #+END_SRC
 
+**** Symbols
+Show symbols by default
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (global-prettify-symbols-mode 1)
+#+END_SRC
 *** Shell
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (add-hook 'shell-mode-hook 'disable-mouse-mode)
