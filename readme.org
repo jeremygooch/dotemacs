@@ -336,52 +336,10 @@ Add option to append as part of tangling a file
 
 Add custom easy-templates for inserting structural elements with as few keystrokes as possible
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (custom-set-variables
-   '(org-structure-template-alist
-     (quote
-      (("s" "#+BEGIN_SRC ?
-
-  \#+END_SRC")
-       ("e" "#+BEGIN_EXAMPLE
-  ?
-  ,#+END_EXAMPLE")
-       ("q" "#+BEGIN_QUOTE
-  ?
-  ,#+END_QUOTE")
-       ("v" "#+BEGIN_VERSE
-  ?
-  ,#+END_VERSE")
-       ("V" "#+BEGIN_VERBATIM
-  ?
-  ,#+END_VERBATIM")
-       ("c" "#+BEGIN_CENTER
-  ?
-  ,#+END_CENTER")
-       ("C" "#+BEGIN_COMMENT
-  ?
-  ,#+END_COMMENT")
-       ("l" "#+BEGIN_EXPORT latex
-  ?
-  ,#+END_EXPORT")
-       ("L" "#+LaTeX: ")
-       ("h" "#+BEGIN_EXPORT html
-  ?
-  ,#+END_EXPORT")
-       ("H" "#+HTML: ")
-       ("a" "#+BEGIN_EXPORT ascii
-  ?
-  ,#+END_EXPORT")
-       ("el" "#+BEGIN_SRC emacs-lisp ?
-
-  \#+END_SRC")
-       ("j" "#+BEGIN_SRC js ?
-
-  \#+END_SRC")
-       ("A" "#+ASCII: ")
-       ("i" "#+INDEX: ?")
-       ("I" "#+INCLUDE: %file ?")
-       ("n" "#+NAME: "))))
-   )
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("j" . "src javascript"))
+  (add-to-list 'org-structure-template-alist '("sh" . "src sh"))
+  (require 'org-tempo)
 #+END_SRC
 
 **** Org Agenda
@@ -1248,8 +1206,6 @@ AFAIK the default cider repl commands don't provide an easy way to refresh quil 
 ***** Lisp
 Some general settings for lisp dialects (elisp, clojure, etc).
 #+BEGIN_SRC emacs-lisp :export code ~/.emacs
-  (require 'org-tempo)
-
   (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
   (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
   (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
