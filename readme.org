@@ -1041,13 +1041,14 @@ I also like to use org mode's code evaluation capabilities for tinkering around 
 
 To avoid switching applications let emacs reload the browser for me. This is specific to a project.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (require 'browser-refresh)
+  (add-to-list 'load-path "~/.emacs.d/lisp/")
+  (load "browser-refresh")
 
   (global-set-key (kbd "s-r") 'browser-refresh)
   (custom-set-variables '(browser-refresh-activate nil))
 
-
 #+END_SRC
+
 ****** PHP Development
  PHP Development
  #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
