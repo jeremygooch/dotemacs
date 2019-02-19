@@ -878,6 +878,7 @@ Defining custom indentation based on project paths and setting them to functions
   ;; (add-hook 'prog-mode-hook 'jrm/develop-environment)
   (add-hook 'lua-mode-hook 'jrm/develop-environment)
   (add-hook 'web-mode-hook 'jrm/develop-environment)
+  (add-hook 'json-mode-hook 'jrm/neon-code-style)
 
   ;; Backwards delete word
   (global-set-key [M-delete] 'backward-kill-word)
