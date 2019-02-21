@@ -1206,7 +1206,7 @@ AFAIK the default cider repl commands don't provide an easy way to refresh quil 
 
 ***** Lisp
 Some general settings for lisp dialects (elisp, clojure, etc).
-#+BEGIN_SRC emacs-lisp :export code ~/.emacs
+#+BEGIN_SRC emacs-lisp :export code :tangle ~/.emacs
   (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
   (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
   (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
