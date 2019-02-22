@@ -461,9 +461,11 @@ Customize org capture to my liking
 	  "** TODO %? :sa:\n  %i\n  %a")
 	 ("t" "Work Ticket Notes" entry (file "~/org/work/softwareadvice/SA.org")
 	  "** TICKET %? :saticket:\n  %T\n  %a\n\n*** Unit Tests\n	- [ ] \n\n*** General Notes")
+	 ("m" "Neon Club Meeting Notes" entry (file "~/org/work/softwareadvice/Meetings.org")
+	  "* %<%Y-%d-%m> Neon Club Meeting Notes\n** Date\n%<%b %e %Y>\n\n** Participants\n   * \n\n** Goals\n   * Weekly Neon Club Meeting\n\n** Discussion Topics\n   - \n\n** Action Items\n\n** Decisions")
 	 ("l" "Personal Todo" entry (file "~/org/personal/personal.org")
 	  "*** TODO %? :personal:\n  %i\n  %a")
-	 ("m" "Meeting" entry (file "~/org/work/softwareadvice/Meetings.org")
+	 ("M" "Meeting" entry (file "~/org/work/softwareadvice/Meetings.org")
 	  "** MEETING with %? :MEETING:\n  %i\n"  :clock-in t :clock-resume t)
 	 ("n" "Next" entry (file "~/org/Next.org")
 	  "** NEXT %?\n  %i\n  %a")
@@ -1225,6 +1227,8 @@ Add mail alerts for new messages.
     (run-with-timer 0 60 'jrm/refresh-mu4e-alert-mode-line))
 
 #+END_SRC
+
+
 
 **** EWW
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
