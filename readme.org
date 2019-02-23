@@ -608,23 +608,21 @@ This attempts to sync an org file on save if it detects the file is in an ~/org/
 #+END_SRC
 
 **** Confluence
-Atlassian Confluence's WYSIWYG editor leaves a lot to be desired. It's much better to work in org mode then export to confluence using ox-confluence. At this time there is not a simple way to maintain a page in Confluence via org mode so this will have to suffice. Also, since ox-confluence is not in the repo, fetch it manually and put it in load path
-#+BEGIN_SRC emacs-lisp :export code :tangle ~/.emacs
-  (setq lp (concat (getenv "HOME") "/.emacs.d/lisp/"))
-  (when (not (file-directory-p lp))
-    (make-directory lp))
+Its tedious to lookup tickets in Jira when all I have is the ID. Much quicker to hack some elisp to do it for me. Using Xah's get-thing for a consistent syntax table when trying to read the id at the cursor position.
+  #+begin_src emacs-lisp
+    (use-package xah-get-thing
+      :ensure t)
 
-  (when (not (file-exists-p (concat lp "/ox-confluence.el")))
-    (url-retrieve
-     "https://raw.githubusercontent.com/emacsmirror/org/master/contrib/lisp/ox-confluence.el"
-     (lambda (s)
-       (re-search-forward "\r?\n\r?\n") ;; skip the headers
-       (write-region (point) (point-max) (concat lp "ox-confluence.el")))))
+    (defun jrm/jira-ticket-open ()
+      "Jumps to a jira ticket"
+      (interactive)
+      (let* ((read-id (xah-get-thing-at-point 'word))
+	     (jid (read-string "Enter Jira Id: " read-id)))
+	(if (equal "" jid)
+	    (jrm/jira-ticket-open)
+	  (browse-url (concat "https://softwareadvice.atlassian.net/browse/" jid)))))
+  #+end_src
 
-  (add-to-list 'load-path lp)
-  (load "ox-confluence")
-
- #+END_SRC
 *** Filesystem Navigation
 Tramp is a must have.
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
