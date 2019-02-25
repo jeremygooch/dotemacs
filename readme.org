@@ -1033,7 +1033,8 @@ To avoid switching applications let emacs reload the browser for me. This is spe
      :diminish flycheck-mode)
 
    (custom-set-variables
-    '(flycheck-typescript-tslint-executable "/home/jrm/.nvm/versions/node/v9.11.1/bin/tslint"))
+    '(flycheck-typescript-tslint-executable "/home/jrm/.nvm/versions/node/v9.11.1/bin/tslint")
+    '(tide-node-executable "/Users/jgooch/.nvm/versions/node/v10.11.0/bin/node"))
 
 
    (use-package company
