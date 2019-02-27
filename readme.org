@@ -572,7 +572,7 @@ This attempts to sync an org file on save if it detects the file is in an ~/org/
 
 **** Confluence
 Its tedious to lookup tickets in Jira when all I have is the ID. Much quicker to hack some elisp to do it for me. Using Xah's get-thing for a consistent syntax table when trying to read the id at the cursor position.
-  #+begin_src emacs-lisp
+  #+begin_src emacs-lisp :tangle ~/.emacs
     (use-package xah-get-thing
       :ensure t)
 
