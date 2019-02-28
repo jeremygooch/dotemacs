@@ -907,6 +907,31 @@ A bit of helpful javascript/typsecript debugging
   (global-set-key (kbd "C-x C-j d") 'jrm/insert-debug-log)
 #+END_SRC
 
+A bit of elisp to integrate project's build script into emacs
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+(setq neonBuffer "Watch Neon [SSR]")
+(defun jrm/start-neon ()
+  "Start an interactive Neon process"
+  (interactive)
+  (let* ((neonPath "~/src/neon/")
+	(default-directory neonPath)
+	(proc (start-process "build-neon-ssr" neonBuffer "/usr/bin/node"
+			     (expand-file-name (concat neonPath ".build/live-ssr-reloading.js")))))
+    (set-process-filter proc (lambda (proc line)
+			       (with-current-buffer neonBuffer (insert line))
+			       (if (or (string-match-p (regexp-quote "building") line)
+				       (string-match-p (regexp-quote ".^M") line)
+				       (string-match-p (regexp-quote "[rendered]") line))
+				   (message "%s" (propertize "Building Neon..." 'face '(:foreground "purple"))))
+			       (if (string-match-p (regexp-quote "Exit this program") line)
+				   (message "%s" (propertize "Neon Built successfully, reload your browser" 'face '(:foreground "green"))))))))
+(global-set-key (kbd "C-x C-j n") 'jrm/start-neon)
+
+(global-set-key (kbd "C-x C-j N") (lambda () (interactive)
+				    (process-send-string "build-neon-ssr" "q\n")
+				    (kill-buffer neonBuffer)))
+#+END_SRC
+
 ***** Web development
  Emmet mode for html/css
  #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
