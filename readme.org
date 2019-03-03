@@ -197,6 +197,12 @@ There are a few miscellaneous modes where the mouse should be disabled by defaul
 	      (start-process "" nil "/usr/bin/slock")))
 #+END_SRC
 
+*** Mac Specific Stuff
+Disable that annoying bell that sounds when you reach the end of a buffer
+#+begin_src emacs-lisp :tangle ~/.emacs
+(setq ring-bell-function 'ignore)
+#+end_src
+
 *** UI Components
 **** Dashboard
 What can I say, I like a nice big splash screen and I'm partial to the meditating GNU logo.
