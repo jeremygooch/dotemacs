@@ -228,11 +228,25 @@ Remove default scrollbars
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
 (scroll-bar-mode -1)
 #+END_SRC
-**** Clean up modeline with diminish
+**** Modeline
+Clean up modeline with diminish
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package diminish
     :ensure t)
 #+END_SRC
+
+Use the spaceline from spacemacs
+#+begin_src emacs-lisp :tangle ~/.emacs
+(use-package spaceline
+  :ensure t
+  :config
+  (require 'spaceline-config)
+  (setq powerline-default-separator (quote wave))
+  (spaceline-spacemacs-theme)
+  (setq powerline-height 20)
+  (set-face-attribute 'mode-line nil :box nil)
+  (set-face-attribute 'mode-line-inactive nil :box nil))
+#+end_src
 
 **** Symbols
 Show symbols by default
