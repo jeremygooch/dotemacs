@@ -222,11 +222,25 @@ Remove default scrollbars
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
 (scroll-bar-mode -1)
 #+END_SRC
-**** Clean up modeline with diminish
+**** Modeline
+Clean up modeline with diminish
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package diminish
     :ensure t)
 #+END_SRC
+
+Use the spaceline from spacemacs
+#+begin_src emacs-lisp :tangle ~/.emacs
+(use-package spaceline
+  :ensure t
+  :config
+  (require 'spaceline-config)
+  (setq powerline-default-separator (quote wave))
+  (spaceline-spacemacs-theme)
+  (setq powerline-height 20)
+  (set-face-attribute 'mode-line nil :box nil)
+  (set-face-attribute 'mode-line-inactive nil :box nil))
+#+end_src
 
 **** Symbols
 Show symbols by default
@@ -906,6 +920,32 @@ A bit of helpful javascript/typsecript debugging
 
   (global-set-key (kbd "C-x C-j d") 'jrm/insert-debug-log)
 #+END_SRC
+
+A bit of elisp to integrate project's build script into emacs
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (setq neonBuffer "Watch Neon [SSR]")
+  (defun jrm/start-neon ()
+    "Start an interactive Neon process"
+    (interactive)
+    (let* ((neonPath "~/neon/")
+	  (default-directory neonPath)
+	  (proc (start-process "build-neon-ssr" neonBuffer "/Users/jgooch/.nvm/versions/node/v10.11.0/bin/node"
+			       (expand-file-name (concat neonPath ".build/live-ssr-reloading.js")))))
+      (set-process-filter proc (lambda (proc line)
+				 (with-current-buffer neonBuffer (insert line))
+				 (if (or (string-match-p (regexp-quote "building") line)
+					 (string-match-p (regexp-quote ".^M") line)
+					 (string-match-p (regexp-quote "[rendered]") line))
+				     (message "%s" (propertize "Building Neon..." 'face '(:foreground "purple"))))
+				 (if (string-match-p (regexp-quote "Exit this program") line)
+				     (message "%s" (propertize "Neon Built successfully, reload your browser" 'face '(:foreground "green"))))))))
+  (global-set-key (kbd "C-x C-j n") 'jrm/start-neon)
+
+  (global-set-key (kbd "C-x C-j N") (lambda () (interactive)
+				      (process-send-string "build-neon-ssr" "q\n")
+				      (kill-buffer neonBuffer)))
+#+END_SRC
+
 
 ***** Web development
  Emmet mode for html/css
