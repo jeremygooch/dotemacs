@@ -320,11 +320,15 @@ One of the coolest features of org mode imo is the ability to evaluate almost an
      (js . t)
      (lisp . t)
      (clojure . t)
+     (plantuml . t)
      (typescript . t)
      (rust . t)
      (sql . t)
      (java . t)))
-   (require 'ob-clojure)
+  (require 'ob-clojure)
+
+  (setq org-plantuml-jar-path
+	(expand-file-name "~/src/plantuml.jar"))
 #+END_SRC
 
 When evaluating a source code block in org mode do not prompt for input, just run it.
