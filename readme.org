@@ -27,7 +27,8 @@ Setting up basic repositories and such.
     (package-refresh-contents)
     (package-install 'use-package))
 
-  (setq use-package-always-ensure t)﻿
+  (require 'use-package-ensure)
+  (setq use-package-always-ensure t)
 
 #+END_SRC
 *** Personal Information
