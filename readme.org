@@ -27,6 +27,9 @@ Setting up basic repositories and such.
     (package-refresh-contents)
     (package-install 'use-package))
 
+  (require 'use-package-ensure)
+  (setq use-package-always-ensure t)
+
 #+END_SRC
 *** Personal Information
 For the sake of completeness, configure name and email address
@@ -84,16 +87,13 @@ The default keybindings for naviating split views can be cumbersome, so remap th
 
 We'll need to turn off the mouse from time to time
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-    (use-package disable-mouse
-      :ensure t
-      :diminish disable-mouse-mode)
+    (use-package disable-mouse :diminish disable-mouse-mode)
 #+END_SRC
 
 **** EXWM
 With EXWM it can act as a complete desktop environment.
 #+BEGIN_SRC emacs-lisp :tangle  ~/.emacs
-  (use-package exwm
-    :ensure t)
+  (use-package exwm)
   (use-package exwm-config
     :config
     (exwm-config-default)
@@ -159,10 +159,7 @@ I took this from Uncle Dave's config. Its a super slick screenshot function for 
 
 **** Application Launcher with dmenu
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (use-package dmenu
-    :ensure t
-    :bind
-      ("s-SPC" . 'dmenu))
+  (use-package dmenu :bind ("s-SPC" . 'dmenu))
 #+END_SRC
 
 **** X11
@@ -239,7 +236,6 @@ There are a few miscellaneous modes where the mouse should be disabled by defaul
 What can I say, I like a nice big splash screen and I'm partial to the meditating GNU logo.
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package dashboard
-    :ensure t
     :config
       (dashboard-setup-startup-hook)
       (setq dashboard-startup-banner (concat (getenv "HOME") "/src/dotemacs/assets/gnu-meditate-scaled.png"))
@@ -251,8 +247,7 @@ What can I say, I like a nice big splash screen and I'm partial to the meditatin
 
 **** Theme
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package zerodark-theme
-    :ensure t)
+  (use-package zerodark-theme)
 #+END_SRC
 
 Remove default scrollbars
@@ -262,14 +257,12 @@ Remove default scrollbars
 **** Modeline
 Clean up modeline with diminish
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package diminish
-    :ensure t)
+  (use-package diminish)
 #+END_SRC
 
 Use the spaceline from spacemacs
 #+begin_src emacs-lisp :tangle ~/.emacs
   (use-package spaceline
-    :ensure t
     :config
     (require 'spaceline-config)
     (setq powerline-default-separator (quote wave))
@@ -277,6 +270,7 @@ Use the spaceline from spacemacs
     (setq powerline-height 20)
     (set-face-attribute 'mode-line nil :box nil)
     (set-face-attribute 'mode-line-inactive nil :box nil))
+
 #+end_src
 
 **** Symbols
@@ -324,24 +318,20 @@ Load some basic minor modes by default
 Show the asterisks as bullets
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
 (use-package org-bullets
-  :ensure t
   :config
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
 #+END_SRC
 
 Add some export modes for getting content out of org
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package ox-twbs
-    :ensure t)
+  (use-package ox-twbs)
 #+END_SRC
 **** Literate programming
 One of the coolest features of org mode imo is the ability to evaluate almost any language via org-babel. Lets load in the non-common ones.
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package ob-typescript
-    :ensure t
     :diminish typescript-mode)
-  (use-package ob-rust
-    :ensure t)
+  (use-package ob-rust)
   (add-to-list 'org-src-lang-modes '("js" . "javascript")
 	       '("php" . "php"))
 
@@ -530,8 +520,7 @@ Customize org capture to my liking
 **** Presentations
 ***** Reveal JS
 #+BEGIN_SRC emacs-lisp  ~/.emacs
-  (use-package htmlize
-    :ensure t)
+  (use-package htmlize)
 
 
   (add-to-list 'load-path "~/.emacs.d/lisp/org-reveal")
@@ -625,8 +614,7 @@ This attempts to sync an org file on save if it detects the file is in an ~/org/
 **** Confluence
 Its tedious to lookup tickets in Jira when all I have is the ID. Much quicker to hack some elisp to do it for me. Using Xah's get-thing for a consistent syntax table when trying to read the id at the cursor position.
   #+begin_src emacs-lisp
-    (use-package xah-get-thing
-      :ensure t)
+    (use-package xah-get-thing)
 
     (defun jrm/jira-ticket-open ()
       "Jumps to a jira ticket"
@@ -694,7 +682,6 @@ Setup Ibuffer and organize by mode type
 Dumb jump for jumping around projects
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package dumb-jump
-    :ensure t
     :config
     (dumb-jump-mode)
     (global-set-key (kbd "C-c C-j") 'dumb-jump-go)
@@ -727,9 +714,7 @@ Result is full path."
 
 Projectile for project level interaction
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package projectile
-    :ensure t
-    :diminish projectile-mode)
+  (use-package projectile :diminish projectile-mode)
 #+END_SRC
 
 Ignore certain directories by default for grep
@@ -749,8 +734,7 @@ Easier paragraph jumping
 
 Avy is great for speed-of-thought navigation
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package avy
-    :ensure t)
+  (use-package avy)
   (global-set-key (kbd "M-s") 'avy-goto-char)
   (global-set-key (kbd "C-c SPC") 'avy-goto-line)
 #+END_SRC
@@ -828,7 +812,6 @@ Disable the narrow-to-region message
 I prefer to see trailing whitespace; however, I don't care about it in every situation, like when I'm reading prose.
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package whitespace
-    :ensure t
     :config
     (setq-default show-trailing-whitespace t)
 
@@ -862,27 +845,18 @@ Various modes helpful for development
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
 
   (use-package yaml-mode
-    :ensure t
     :config
     (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode)))
 
-
-  (use-package restclient
-    :ensure t)
-
-  (use-package groovy-mode
-    :ensure t)
-
-
-  (use-package go-mode
-    :ensure t)
+  (use-package restclient)
+  (use-package groovy-mode)
+  (use-package go-mode)
 #+END_SRC
 
 Magit for version control
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
 
   (use-package magit
-    :ensure t
     :config
     (global-set-key (kbd "C-x g") 'magit-status))
 #+END_SRC
@@ -987,16 +961,14 @@ A bit of elisp to integrate project's build script into emacs
 ***** Web development
  Emmet mode for html/css
  #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-   (use-package emmet-mode
-     :ensure t)
+   (use-package emmet-mode)
    (add-hook 'sgml-mode-hook 'emmet-mode)
    (add-hook 'css-mode-hook  'emmet-mode)
  #+END_SRC
 
  Using Node JS Repl which is helpful for node development as well as just tinkering around with JS
  #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-   (use-package nodejs-repl
-     :ensure t)
+   (use-package nodejs-repl)
    (add-hook 'js-mode-hook
 	     (lambda ()
 	       (define-key js-mode-map (kbd "C-c C-e") 'nodejs-repl-send-last-expression)
@@ -1026,7 +998,6 @@ I also like to use org mode's code evaluation capabilities for tinkering around 
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   ;; SCSS Mode
   (use-package sass-mode
-    :ensure t
     :config
     (setq exec-path (cons (expand-file-name "/usr/bin/sass") exec-path)))
 
@@ -1053,7 +1024,6 @@ I also like to use org mode's code evaluation capabilities for tinkering around 
 
 
   (use-package web-mode
-    :ensure t
     :config
     (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
     (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
@@ -1080,34 +1050,29 @@ I also like to use org mode's code evaluation capabilities for tinkering around 
   ;; PHP Mode Improved (http://www.emacswiki.org/emacs/php-mode-improved.el)
   ;; (add-to-list 'load-path "~/.emacs.d/lisp/")
   (use-package php-mode
-    :ensure t
     :config
     (autoload 'php-mode "php-mode-improved" "Major mode for editing php code." t)
     (add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
     (add-to-list 'auto-mode-alist '("\\.inc$" . php-mode)))
 #+END_SRC
+
 ****** Angular/TS Development
  Angular setup
  #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (setenv "PATH" (concat (getenv "PATH") ":/Users/jgooch/.nvm/versions/node/v10.8.0/bin"))
   (setq exec-path (append exec-path '("/Users/jgooch/.nvm/versions/node/v10.8.0/bin")))
-  (use-package ng2-mode
-    :ensure t)
+  (use-package ng2-mode)
 
-  (use-package flycheck
-    :ensure t
-    :diminish flycheck-mode)
+  (use-package flycheck :diminish flycheck-mode)
 
    (custom-set-variables
     '(flycheck-typescript-tslint-executable "/home/jrm/.nvm/versions/node/v9.11.1/bin/tslint")
     '(tide-node-executable "/home/jrm/.nvm/versions/node/v9.11.1/bin/node"))
 
   (use-package company
-    :ensure t
     :diminish company-mode)
 
   (use-package tide
-    :ensure t
     :config
     (defun setup-tide-mode ()
       (interactive)
@@ -1157,7 +1122,6 @@ I also like to use org mode's code evaluation capabilities for tinkering around 
 Clojure with Cider for interactive Clojure development
 #+BEGIN_SRC emacs-lisp :export code ~/.emacs
   (use-package clojure-mode
-	:ensure t
 	:config
 	;; Set mode for specific files
 	(add-to-list 'auto-mode-alist '("\\.edn$" . clojure-mode))
@@ -1166,12 +1130,9 @@ Clojure with Cider for interactive Clojure development
 	(add-to-list 'auto-mode-alist '("lein-env" . enh-ruby-mode)))
 
   (use-package eldoc
-	:ensure t
 	:diminish eldoc-mode)
 
-
   (use-package cider
-	:ensure t
 	:config
 	(add-hook 'cider-repl-mode-hook #'eldoc-mode)
 	(setq cider-repl-pop-to-buffer-on-connect t) ;; go to the repl when done connecting
@@ -1190,7 +1151,6 @@ Clojure with Cider for interactive Clojure development
   (defun paredit-enable-modes ()
 	(add-hook 'emacs-lisp-mode-hook 'paredit-mode))
   (use-package paredit
-	:ensure t
 	:config (paredit-enable-modes))
 
 #+END_SRC
@@ -1285,7 +1245,6 @@ Some general settings for lisp dialects (elisp, clojure, etc).
 Add mail alerts for new messages.
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package mu4e-alert
-    :ensure t
     :after mu4e
     :init
     (setq mu4e-alert-interesting-mail-query
@@ -1319,7 +1278,6 @@ Add mail alerts for new messages.
 Many thanks to [[http://pragmaticemacs.com/emacs/read-your-rss-feeds-in-emacs-with-elfeed/][pragmatic emacs' post]] for guidance on this setup.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package elfeed-org
-    :ensure t
     :config
     (elfeed-org)
     (setq rmh-elfeed-org-files (list "~/org/personal/elfeed.org")))
@@ -1357,7 +1315,6 @@ Many thanks to [[http://pragmaticemacs.com/emacs/read-your-rss-feeds-in-emacs-wi
     (quit-window))
 
   (use-package elfeed
-    :ensure t
     :bind (:map elfeed-search-mode-map
 		("A" . jrm/elfeed-show-all)
 		("E" . jrm/elfeed-show-emacs)
@@ -1437,7 +1394,6 @@ Turning this off by default, but occasionally it's helpful to be able to start, 
 **** Smex for auto complete meta commands
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
 (use-package smex
-  :ensure t
  :init
   (smex-initialize)
   :bind
@@ -1452,8 +1408,7 @@ Turning this off by default, but occasionally it's helpful to be able to start, 
   (setq ido-everywhere t)
   (ido-mode 1)
 
-  (use-package ido-vertical-mode
-    :ensure t)
+  (use-package ido-vertical-mode)
   (ido-vertical-mode 1)
   (setq ido-vertical-define-keys 'C-n-and-C-p-only)
 #+END_SRC
@@ -1462,7 +1417,6 @@ Turning this off by default, but occasionally it's helpful to be able to start, 
 Generic auto-complete with Ivy
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package ivy :demand
-    :ensure t
     :diminish ivy-mode
     :config
     (setq ivy-use-virtual-buffers t
@@ -1476,12 +1430,10 @@ Generic auto-complete with Ivy
 Ivy enhanced search (swiper) and common Emacs meta commands (counsel)
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package counsel
-    :ensure t
     :config
     (global-set-key (kbd "M-x") 'counsel-M-x))
 
   (use-package swiper
-    :ensure t
     :config
     (global-set-key (kbd "C-s") 'swiper))
 
@@ -1515,15 +1467,11 @@ Helpful for finding the cursor when jumping around
 **** Which key
 Some quick help for when I get stuck in the middle of a command
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package which-key
-    :ensure t
-    :config
-      (which-key-mode))
+  (use-package which-key :config (which-key-mode))
 #+END_SRC
 **** Ace Window
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package ace-window
-    :ensure t
     :config
     (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
   (global-set-key (kbd "C-x o") 'ace-window)
