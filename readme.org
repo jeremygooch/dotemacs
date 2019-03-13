@@ -268,15 +268,15 @@ Clean up modeline with diminish
 
 Use the spaceline from spacemacs
 #+begin_src emacs-lisp :tangle ~/.emacs
-(use-package spaceline
-  :ensure t
-  :config
-  (require 'spaceline-config)
-  (setq powerline-default-separator (quote wave))
-  (spaceline-spacemacs-theme)
-  (setq powerline-height 20)
-  (set-face-attribute 'mode-line nil :box nil)
-  (set-face-attribute 'mode-line-inactive nil :box nil))
+  (use-package spaceline
+    :ensure t
+    :config
+    (require 'spaceline-config)
+    (setq powerline-default-separator (quote wave))
+    (spaceline-spacemacs-theme)
+    (setq powerline-height 20)
+    (set-face-attribute 'mode-line nil :box nil)
+    (set-face-attribute 'mode-line-inactive nil :box nil))
 #+end_src
 
 **** Symbols
@@ -354,6 +354,7 @@ One of the coolest features of org mode imo is the ability to evaluate almost an
      (typescript . t)
      (rust . t)
      (sql . t)
+     (shell . t)
      (java . t)))
    (require 'ob-clojure)
 #+END_SRC
@@ -390,7 +391,7 @@ Add custom easy-templates for inserting structural elements with as few keystrok
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
   (add-to-list 'org-structure-template-alist '("j" . "src javascript"))
   (add-to-list 'org-structure-template-alist '("sh" . "src sh"))
-  (require 'org-tempo)
+  ;; (require 'org-tempo)
 #+END_SRC
 
 **** Org Agenda
@@ -473,7 +474,7 @@ Super simple reordering from Org Agenda -> Todo view
     (org-agenda-redo)
     )
 
-  (define-key org-agenda-mode-map (kbd "1") 'jrm/org-agenda-item-to-top)
+   ;; (define-key org-agenda-mode-map (kbd "1") 'jrm/org-agenda-item-to-top)
 #+END_SRC
 
 Setup reminders with [[http://sachachua.com/blog/2007/11/setting-up-appointment-reminders-in-org/][org-agenda-to-appt]].
