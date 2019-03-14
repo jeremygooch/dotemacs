@@ -254,6 +254,12 @@ Remove default scrollbars
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
 (scroll-bar-mode -1)
 #+END_SRC
+
+Set Org mode source block background color to dark gray so it stands out from the typical background
+#+begin_src emacs-lisp :tangle ~/.emacs
+(custom-set-faces '(org-block ((t (:inherit shadow :background "gray12")))))
+#+end_src
+
 **** Modeline
 Clean up modeline with diminish
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
