@@ -1131,7 +1131,7 @@ I also like to use org mode's code evaluation capabilities for tinkering around 
 
 ***** Clojure Development
 Clojure with Cider for interactive Clojure development
-#+BEGIN_SRC emacs-lisp :export code ~/.emacs
+#+BEGIN_SRC emacs-lisp :export code :tangle ~/.emacs
   (use-package clojure-mode
 	:config
 	;; Set mode for specific files
