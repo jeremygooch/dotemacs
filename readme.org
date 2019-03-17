@@ -754,6 +754,14 @@ Wrap long lines so I can see everything at a glance
   (global-visual-line-mode t)
 #+END_SRC
 
+Some basic code folding
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package yafolding
+    :hook ((ng2-ts-mode . yafolding-mode)
+	   (js-mode . yafolding-mode)
+	   (fundamental-mode . yafolding-mode)))
+#+END_SRC
+
 *** File Editing utilities
 I find it helpful to be able to backtab (shift+tab) to un-indent
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
