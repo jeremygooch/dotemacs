@@ -44,6 +44,7 @@ Setup a prefix for custom commands.
     (define-prefix-command 'jrm-key-map))
 
   (global-set-key (kbd "C-x C-j") jrm-key-map)
+
 #+END_SRC
 
 *** Run emacs as a replacement for desktop/window manager
@@ -304,6 +305,8 @@ One of the coolest features of org mode imo is the ability to evaluate almost an
   (use-package ob-rust)
   (add-to-list 'org-src-lang-modes '("js" . "javascript")
 	       '("php" . "php"))
+
+  (use-package ob-async)
 
   (org-babel-do-load-languages
    'org-babel-load-languages
@@ -1095,6 +1098,48 @@ I also like to use org mode's code evaluation capabilities for tinkering around 
        (setq tide-tsserver-executable path)
        ))
  #+END_SRC
+
+Hide/show the imports at the top of the buffer with a bit of help from yafolding.
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (defun jrm/narrow-neon ()
+    "Hide code based on JS/TS syntax for standard imports of multiple modules"
+    (interactive)
+    (let ((final-location (point)))
+      (if (equal major-mode 'typescript-mode)
+	  (funcall (lambda () "Use regex to hide the imports"
+      (end-of-buffer)
+      (search-backward-regexp "from[^\(].*;")
+      (next-line)
+      (set-mark-command nil)
+      (beginning-of-buffer)
+
+      (let ((new-overlay (make-overlay (region-beginning) (region-end))))
+	(overlay-put new-overlay 'invisible t)
+	(overlay-put new-overlay 'intangible t)
+	(overlay-put new-overlay 'evaporate t)
+	(overlay-put new-overlay 'before-string (yafolding-ellipsis))
+	(overlay-put new-overlay 'category "narrow-neon"))
+
+      (goto-char final-location)
+      (pop-mark)
+      (message "Imports hidden"))))))
+
+  (defun jrm/widen-neon ()
+    "Widen and recenter buffer"
+    (interactive)
+    (if (equal major-mode 'typescript-mode)
+	(mapcar
+	 'delete-overlay
+	 (delq nil
+	       (mapcar (lambda (overlay)
+			 (and (member "narrow-neon" (overlay-properties overlay)) overlay))
+		       (overlays-in (point-min) (point-max)))))))
+
+
+  (global-set-key (kbd "C-x C-j C-n") 'jrm/narrow-neon)
+  (global-set-key (kbd "C-x C-j C-w") 'jrm/widen-neon)
+
+#+end_src
 
 ***** Clojure Development
 Clojure with Cider for interactive Clojure development
