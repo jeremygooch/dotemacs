@@ -48,12 +48,20 @@ Setup a prefix for custom commands.
 
 #+END_SRC
 
-*** Run emacs as a replacement for desktop/window manager
-Emacs was the original terminal multiplexer so manages split views quite nicely.
-
-First, get some basics out of the way. Switch to fullscreen mode and hide the menus and also adjust the default font size while we're at it.
+*** Run emacs for MacOS Desktop
+First, get some basics out of the way. Fix the top panel and hide the menus and also adjust the default font size while we're at it.
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (set-frame-parameter nil 'fullscreen 'fullboth)
+  (add-to-list 'default-frame-alist
+	       '(ns-transparent-titlebar . t))
+
+  (add-to-list 'default-frame-alist
+	       '(ns-appearance . dark))
+
+  ;; Autohide the top panel if necessary
+  (setq ns-auto-hide-menu-bar t)
+  (set-frame-parameter nil 'alpha '(90 . 75))
+  (toggle-frame-maximized)
+
   (set-face-attribute 'default nil :height 120)
   (menu-bar-mode -1)
   (tool-bar-mode -1)
@@ -92,84 +100,6 @@ We'll need to turn off the mouse from time to time
     (use-package disable-mouse :diminish disable-mouse-mode)
 #+END_SRC
 
-**** EXWM
-With EXWM it can act as a complete desktop environment.
-
-#+BEGIN_SRC emacs-lisp  ~/.emacs
-  (use-package exwm)
-  (use-package exwm-config
-    :config
-    (exwm-config-default)
-    (exwm-config-ido)
-    (global-set-key (kbd "C-x O")  'exwm-workspace-switch-to-buffer))
-#+END_SRC
-
-Fortunately EXWM also has support for multiple monitors.
-#+BEGIN_SRC emacs-lisp  ~/.emacs
-  (require 'exwm-randr)
-  (setq exwm-randr-workspace-output-plist '(0 "eDP-1" 1 "DP-2-2"))
-  (add-hook 'exwm-randr-screen-change-hook
-	    (lambda ()
-	      (start-process-shell-command
-	       "xrandr" nil "xrandr --output eDP-1 --mode 2048x1152 --right-of DP-2-2 --auto")))
-  (exwm-randr-enable)
-#+END_SRC
-
-Simple script for waking up second monitor after reattaching
-#+BEGIN_SRC emacs-lisp ~/.emacs
-  (defun jrm/wake-second-monitor ()
-      "Turns second monitor off and back on to wake it up. Helpful for exwm + X11 + multiple monitors."
-    (interactive)
-    (shell-command "xrandr --output DP-2-2 --off && xrandr --output DP-2-2 --auto"))
-
-  (global-set-key (kbd "C-x C-j m") 'jrm/wake-second-monitor)
-#+END_SRC
-
-**** Screenshots
-I took this from Uncle Dave's config. Its a super slick screenshot function for taking both fullscreen as well as region screenshots.
-#+BEGIN_SRC emacs-lisp  ~/.emacs
-  (defun jrm3/take-screenshot ()
-    "Takes a fullscreenshot of the current workspace"
-    (interactive)
-    (when window-system
-      (cl-loop for i downfrom 3 to 1 do
-	       (progn
-		 (message (concat (number-to-string i) "..."))
-		 (sit-for 1)))
-      (message "Cheese!")
-      (sit-for 1)
-      (start-process "screenshot" nil "import" "-window" "root"
-		     (concat (getenv "HOME") "/Pictures/" (current-time-string) ".png"))
-      (message "Screenshot taken!")))
-  (global-set-key (kbd "C-x C-j <C-print>") 'jrm/take-screenshot)
-
-  (defun jrm/take-screenshot-region ()
-    "Takes a screenshot of a region selected by the user"
-    (interactive)
-    (when window-system
-      (call-process "import" nil nil nil ".newScreenshot.png")
-      (call-process "convert" nil nil nil ".newScreenshot.png" "-shave" "1x1"
-		    (concat (getenv "HOME") "/Pictures/" (current-time-string) ".png"))
-      (call-process "rm" nil nil nil ".newScreenshot.png")))
-  (global-set-key (kbd "C-x C-j <print>") 'jrm/take-screenshot-region)
-#+END_SRC
-
-**** Application Launcher with dmenu
-#+BEGIN_SRC emacs-lisp ~/.emacs
-(use-package dmenu
-  :bind
-    ("s-SPC" . 'dmenu))
-#+END_SRC
-
-**** X11
-According to the [[https://www.systutorials.com/docs/linux/man/1-Xorg.wrap/][man page]], edit [[/etc/X11/Xwrapper.config]] to include the line:
-~allowed_users=anybody~ and ~needs_root_rights=yes~.
-
-#+BEGIN_SRC shell ~/.xinitrc
-#!/bin/bash
-exec emacs
-#+END_SRC
-
 **** Minibuffer considerations for desktop/fullscreen usage
 Display the current time and battery indicator
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
@@ -180,30 +110,17 @@ Display the current time and battery indicator
   (display-battery-mode 1)
 #+END_SRC
 
-**** Send keys to EXWM Line Mode buffers
-I find the default way (C-c C-q) of exwm sending keys like ctrl to an async buffer difficult. C-c C-c is much simpler for me.
-#+BEGIN_SRC emacs-lisp ~/.emacs
-  (define-key exwm-mode-map [?\C-c ?\C-c] 'exwm-input-send-next-key)
-#+END_SRC
-
 **** Mouse/Trackpad
 There are a few miscellaneous modes where the mouse should be disabled by default.
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (add-hook 'lisp-interaction-mode 'disable-mouse-mode)
 #+END_SRC
 
-**** Lock screen with slock
-#+BEGIN_SRC emacs-lisp ~/.emacs
-  (exwm-input-set-key (kbd "s-l") (lambda ()
-	      (interactive)
-	      (start-process "" nil "/usr/bin/slock")))
-#+END_SRC
-
-*** Mac Specific Stuff
-Disable that annoying bell that sounds when you reach the end of a buffer
-#+begin_src emacs-lisp :tangle ~/.emacs
-(setq ring-bell-function 'ignore)
-#+end_src
+**** More Mac Specific Stuff
+ Disable that annoying bell that sounds when you reach the end of a buffer
+ #+begin_src emacs-lisp :tangle ~/.emacs
+ (setq ring-bell-function 'ignore)
+ #+end_src
 
 *** UI Components
 **** Dashboard
@@ -214,7 +131,7 @@ What can I say, I like a nice big splash screen and I'm partial to the meditatin
       (dashboard-setup-startup-hook)
       (setq dashboard-startup-banner (concat (getenv "HOME") "/src/dotemacs/assets/gnu-meditate-scaled.png"))
       (setq dashboard-items '((recents  . 5)
-                              (projects . 5)))
+			      (projects . 5)))
       (setq dashboard-banner-logo-title ""))
 
 #+END_SRC
@@ -222,6 +139,7 @@ What can I say, I like a nice big splash screen and I'm partial to the meditatin
 **** Theme
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package zerodark-theme)
+  (set-background-color "gray8")
 #+END_SRC
 
 Remove default scrollbars
@@ -231,7 +149,7 @@ Remove default scrollbars
 
 Set Org mode source block background color to dark gray so it stands out from the typical background
 #+begin_src emacs-lisp :tangle ~/.emacs
-(custom-set-faces '(org-block ((t (:inherit shadow :background "gray12")))))
+(custom-set-faces '(org-block ((t (:inherit shadow :background "gray0")))))
 #+end_src
 
 **** Modeline
@@ -1076,6 +994,10 @@ To avoid switching applications let emacs reload the browser for me. This is spe
 
    (use-package company :diminish company-mode)
 
+   ;; company-mode with icons
+   (use-package company-box
+     :hook (company-mode . company-box-mode))
+
    (use-package tide
      :config
      (defun setup-tide-mode ()
@@ -1513,6 +1435,7 @@ Instead of using the display's popup, prompt for gpg creds in the minibuffer
 Helpful for finding the cursor when jumping around
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (global-hl-line-mode +1)
+  (set-face-background hl-line-face "black")
 #+END_SRC
 **** Which key
 Some quick help for when I get stuck in the middle of a command
