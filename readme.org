@@ -1142,6 +1142,23 @@ I also like to use org mode's code evaluation capabilities for tinkering around 
 
 Hide/show the imports at the top of the buffer with a bit of help from yafolding.
 #+begin_src emacs-lisp :tangle ~/.emacs
+  (defcustom jrm/imports-placeholder-content "[imports hidden]"
+    "Text to show in place of a folded block."
+    :tag "Ellipsis"
+    :type 'string
+    :group 'jrmhideimports)
+
+  (defface jrm/imports-placeholder-face
+    '()
+    "Face for folded blocks"
+    :group 'jrmhideimports)
+
+  (defun jrm/imports-placeholder ()
+    "Return propertized ellipsis content."
+    (concat " "
+	    (propertize jrm/imports-placeholder-content 'face 'jrm/imports-placeholder-face)
+	    " "))
+
   (defun jrm/neon-hide-imports ()
     "Hide standard imports based on regex for standard JS/TS imports of multiple modules"
     (let ((final-location (point)))
@@ -1156,7 +1173,7 @@ Hide/show the imports at the top of the buffer with a bit of help from yafolding
 		   (overlay-put new-overlay 'invisible t)
 		   (overlay-put new-overlay 'intangible t)
 		   (overlay-put new-overlay 'evaporate t)
-		   (overlay-put new-overlay 'before-string (yafolding-ellipsis))
+		   (overlay-put new-overlay 'before-string (jrm/imports-placeholder))
 		   (overlay-put new-overlay 'category "hide-js-imports"))
 
 		 (goto-char final-location)
