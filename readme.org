@@ -156,6 +156,7 @@ Set Org mode source block background color to dark gray so it stands out from th
 Clean up modeline with diminish
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package diminish)
+
 #+END_SRC
 
 Use the spaceline from spacemacs
@@ -367,7 +368,7 @@ Super simple reordering from Org Agenda -> Todo view
     (org-agenda-redo)
     )
 
-  (define-key org-agenda-mode-map (kbd "1") 'jrm/org-agenda-item-to-top)
+  ;; (define-key org-agenda-mode-map (kbd "1") 'jrm/org-agenda-item-to-top)
 #+END_SRC
 
 Setup reminders with [[http://sachachua.com/blog/2007/11/setting-up-appointment-reminders-in-org/][org-agenda-to-appt]].
@@ -784,10 +785,10 @@ Defining custom indentation based on project paths and setting them to functions
     (setq-local js-indent-level n) ; js-mode
     (setq-local typescript-indent-level n) ; typescript-mode
     ;; (setq-local js2-basic-offset n) ; js2-mode, in latest js2-mode, it's alias of js-indent-level
-    (setq-local web-mode-markup-indent-offset 4) ; web-mode, html tag in html file
-    (setq-local web-mode-css-indent-offset 4) ; web-mode, css in html file
+    (setq-local web-mode-markup-indent-offset 2) ; web-mode, html tag in html file
+    (setq-local web-mode-css-indent-offset 2) ; web-mode, css in html file
     (setq-local web-mode-code-indent-offset n) ; web-mode, js code in html file
-    (setq-local css-indent-offset 4) ; css-mode
+    (setq-local css-indent-offset 2) ; css-mode
     )
 
   ;; Allow manual changing of coding styles
@@ -993,12 +994,13 @@ To avoid switching applications let emacs reload the browser for me. This is spe
 
 
    (use-package company :diminish company-mode)
-
    ;; company-mode with icons
    (use-package company-box
-     :hook (company-mode . company-box-mode))
+     :hook (company-mode . company-box-mode)
+     :diminish company-box-mode)
 
    (use-package tide
+     :diminish tide-mode
      :config
      (defun setup-tide-mode ()
        (interactive)
@@ -1007,7 +1009,7 @@ To avoid switching applications let emacs reload the browser for me. This is spe
        (setq flycheck-check-syntax-automatically '(save mode-enabled))
        (eldoc-mode +1)
        (tide-hl-identifier-mode +1)
-       ;; company is an optional dependency. 
+       ;; company is an optional dependency.
        (company-mode +1))
 
      ;; aligns annotation to the right hand side
@@ -1049,7 +1051,7 @@ To avoid switching applications let emacs reload the browser for me. This is spe
 
 Hide/show the imports at the top of the buffer with a bit of help from yafolding.
 #+begin_src emacs-lisp :tangle ~/.emacs
-  (defcustom jrm/imports-placeholder-content "[imports hidden]"
+  (defcustom jrm/imports-placeholder-content "[=== Imports Hidden ===]"
     "Text to show in place of a folded block."
     :tag "Ellipsis"
     :type 'string
@@ -1106,6 +1108,11 @@ Hide/show the imports at the top of the buffer with a bit of help from yafolding
       (jrm/neon-hide-imports)))
 
   (global-set-key (kbd "C-x C-j C-n") 'jrm/neon-toggle-imports)
+
+  (add-hook 'ng2-ts-mode-hook 'jrm/neon-hide-imports)
+  (add-hook 'typescript-mode-hook 'jrm/neon-hide-imports)
+
+
 #+end_src
 
 ***** Clojure Development
