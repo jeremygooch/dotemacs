@@ -438,7 +438,7 @@ Super simple reordering from Org Agenda -> Todo view
     (org-agenda-redo)
     )
 
-  (define-key org-agenda-mode-map (kbd "1") 'jrm/org-agenda-item-to-top)
+  ;; (define-key org-agenda-mode-map (kbd "1") 'jrm/org-agenda-item-to-top)
 #+END_SRC
 
 Setup reminders with [[http://sachachua.com/blog/2007/11/setting-up-appointment-reminders-in-org/][org-agenda-to-appt]].
@@ -1108,7 +1108,7 @@ I also like to use org mode's code evaluation capabilities for tinkering around 
 
 Hide/show the imports at the top of the buffer with a bit of help from yafolding.
 #+begin_src emacs-lisp :tangle ~/.emacs
-  (defcustom jrm/imports-placeholder-content "[imports hidden]"
+  (defcustom jrm/imports-placeholder-content "[=== Imports Hidden ===]"
     "Text to show in place of a folded block."
     :tag "Ellipsis"
     :type 'string
@@ -1165,6 +1165,11 @@ Hide/show the imports at the top of the buffer with a bit of help from yafolding
       (jrm/neon-hide-imports)))
 
   (global-set-key (kbd "C-x C-j C-n") 'jrm/neon-toggle-imports)
+
+  (add-hook 'ng2-ts-mode-hook 'jrm/neon-hide-imports)
+  (add-hook 'typescript-mode-hook 'jrm/neon-hide-imports)
+
+
 #+end_src
 
 ***** Clojure Development
