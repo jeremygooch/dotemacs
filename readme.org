@@ -197,6 +197,35 @@ Suppress async shell command buffers by default.
   '("\\*Async Shell Command\\*.*" display-buffer-no-window))
 #+END_SRC
 
+*** Dired Mode
+Some basic setup
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (global-auto-revert-mode 1)
+  (setq global-auto-revert-non-file-buffers t)
+  (setq auto-revert-verbose nil)
+  (setq dired-listing-switches "-alh")
+#+END_SRC
+
+Helpful dired functionality lifted from [[https://www.youtube.com/watch?v=pZzDayi5lRo&t=21s][Mike Zamanski's video]].
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+(use-package dired-narrow
+  :config
+  (bind-key "C-c C-n" #'dired-narrow)
+  (bind-key "C-c C-f" #'dired-narrow-fuzzy)
+  (bind-key "C-c C-N" #'dired-narrow-regexp))
+
+(use-package dired-subtree
+  :after dired
+  :config
+  (bind-key "<tab>" #'dired-subtree-toggle dired-mode-map)
+  (bind-key "<backtab>" #'dired-subtree-cycle dired-mode-map))
+
+(use-package all-the-icons-dired)
+
+(add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
+
+#+END_SRC
+
 *** Org Mode
 Load some basic minor modes by default
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs 
@@ -927,13 +956,6 @@ I also like to use org mode's code evaluation capabilities for tinkering around 
   (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
   (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
   (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-
-  ;; Dired Mode
-  (global-auto-revert-mode 1)
-  (setq global-auto-revert-non-file-buffers t)
-  (setq auto-revert-verbose nil)
-  (setq dired-listing-switches "-alh")
-
 
   (use-package web-mode
     :config
