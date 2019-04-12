@@ -359,6 +359,34 @@ One of the coolest features of org mode imo is the ability to evaluate almost an
    (require 'ob-clojure)
 #+END_SRC
 
+
+I like org source blocks for typescript to use different compiler settings than what ships with ob-typescript. Not sure if there's a better way to do this, but just overwriting the function from the source with the code below using the configuration I prefer.
+#+begin_src emacs-lisp :tangle ~/.emacs
+(defun org-babel-execute:typescript (body params)
+  "Execute a block of Typescript code with org-babel.  This function is
+called by `org-babel-execute-src-block'"
+  (let* ((tmp-src-file (org-babel-temp-file "ts-src-" ".ts"))
+         (tmp-out-file (org-babel-temp-file "ts-src-" ".js"))
+         (cmdline (cdr (assoc :cmdline params)))
+         (cmdline (if cmdline (concat " " cmdline) ""))
+         (jsexec (if (assoc :wrap params) ""
+                   (concat " ; node " (org-babel-process-file-name tmp-out-file))
+                   )))
+    (with-temp-file tmp-src-file (insert body))
+    (let ((results (org-babel-eval (format "tsc %s --lib 'ES7,DOM' -out %s %s %s"
+                                           cmdline
+                                           (org-babel-process-file-name tmp-out-file)
+                                           (org-babel-process-file-name tmp-src-file)
+                                           jsexec)
+                                   ""))
+          (jstrans (with-temp-buffer
+                     (insert-file-contents tmp-out-file)
+                     (buffer-substring-no-properties (point-min) (point-max))
+                     )))
+      (if (eq jsexec "") jstrans results)
+)))
+#+end_src
+
 When evaluating a source code block in org mode do not prompt for input, just run it.
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (setq org-confirm-babel-evaluate nil)
