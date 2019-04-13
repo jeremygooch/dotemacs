@@ -173,9 +173,13 @@ Use the spaceline from spacemacs
 
 Show spaceline icons
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (use-package spaceline-all-the-icons
-    :after spaceline
-    :config (spaceline-all-the-icons-theme))
+    (use-package spaceline-all-the-icons
+      :after spaceline
+      :config (spaceline-all-the-icons-theme))
+
+
+  (custom-set-variables
+   '(spaceline-all-the-icons-separator-type (quote arrow)))
 #+END_SRC
 
 **** Symbols
