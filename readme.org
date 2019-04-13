@@ -96,6 +96,7 @@ With EXWM it can act as a complete desktop environment.
 #+BEGIN_SRC emacs-lisp :tangle  ~/.emacs
   (use-package exwm)
   (use-package exwm-config
+    :ensure nil
     :config
     (exwm-config-default)
     (exwm-config-ido)
