@@ -880,6 +880,7 @@ Turn on linum mode for almost everything.
   (dolist (hook '(org-mode-hook
 		  magit-mode-hook
 		  text-mode-hook
+		  exwm-mode-hook
 		  special-mode-hook
 		  shell-mode-hook
 		  help-mode-hook))
