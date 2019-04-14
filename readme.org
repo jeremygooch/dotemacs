@@ -826,10 +826,26 @@ Keep temporary and backup buffers out of current directory like a civilized huma
   (make-directory "~/.emacs.d/autosaves/" t)
 #+END_SRC
 
-I don't mind using the minibuffer for the current line num, but vertical line numbers is helpful for pair programming situations
+Turn on linum mode for almost everything.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (global-set-key (kbd "C-c l l") 'linum-mode)
-  (global-set-key (kbd "C-c l d") (lambda () (interactive) (linum-mode 0)))
+  (global-linum-mode 1)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (defun linum-off-mode-setup ()
+    (linum-mode 0))
+
+  (dolist (hook '(org-mode-hook
+		  magit-mode-hook
+		  text-mode-hook
+		  special-mode-hook
+		  shell-mode-hook
+		  help-mode-hook))
+    (add-hook hook 'linum-off-mode-setup))
+
+  (setq linum-format "%d ")
+
 #+END_SRC
 
 Turn off the mouse/trackpad when editing certain files
