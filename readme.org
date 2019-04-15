@@ -767,14 +767,12 @@ Turn on linum mode for almost everything.
     (linum-mode 0))
 
   (dolist (hook '(org-mode-hook
-		  magit-mode-hook
-		  text-mode-hook
-		  special-mode-hook
-		  shell-mode-hook
-		  help-mode-hook))
+                  magit-mode-hook
+                  text-mode-hook
+                  special-mode-hook
+                  shell-mode-hook
+                  help-mode-hook))
     (add-hook hook 'linum-off-mode-setup))
-
-  (setq linum-format "%d ")
 
 #+END_SRC
 
