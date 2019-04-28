@@ -219,21 +219,28 @@ Some basic setup
 
 Helpful dired functionality lifted from [[https://www.youtube.com/watch?v=pZzDayi5lRo&t=21s][Mike Zamanski's video]].
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-(use-package dired-narrow
-  :config
-  (bind-key "C-c C-n" #'dired-narrow)
-  (bind-key "C-c C-f" #'dired-narrow-fuzzy)
-  (bind-key "C-c C-N" #'dired-narrow-regexp))
+  (use-package dired-narrow
+    :config
+    (bind-key "C-c C-n" #'dired-narrow)
+    (bind-key "C-c C-f" #'dired-narrow-fuzzy)
+    (bind-key "C-c C-N" #'dired-narrow-regexp))
 
-(use-package dired-subtree
-  :after dired
-  :config
-  (bind-key "<tab>" #'dired-subtree-toggle dired-mode-map)
-  (bind-key "<backtab>" #'dired-subtree-cycle dired-mode-map))
+  (defun jrm/dired-subtree-toggle-and-refresh ()
+    "Calls dired toggle and refreshes the buffer."
+    (interactive)
+    (dired-subtree-toggle)
+    (revert-buffer)
+    (recenter-top-bottom))
 
-(use-package all-the-icons-dired)
+  (use-package dired-subtree
+    :after dired
+    :config
+    (bind-key "<tab>" #'jrm/dired-subtree-toggle-and-refresh dired-mode-map)
+    (bind-key "<backtab>" #'dired-subtree-cycle dired-mode-map))
 
-(add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
+  (use-package all-the-icons-dired)
+
+  (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
 
 #+END_SRC
 
