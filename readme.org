@@ -93,7 +93,7 @@ We'll need to turn off the mouse from time to time
 
 **** EXWM
 With EXWM it can act as a complete desktop environment.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp ~/.emacs
   (use-package exwm)
   (use-package exwm-config
     :config
@@ -103,7 +103,7 @@ With EXWM it can act as a complete desktop environment.
 #+END_SRC
 
 Fortunately EXWM also has support for multiple monitors.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp ~/.emacs
   (require 'exwm-randr)
   (setq exwm-randr-workspace-output-plist '(0 "eDP-1" 1 "DP-2-2"))
   (add-hook 'exwm-randr-screen-change-hook
@@ -114,7 +114,7 @@ Fortunately EXWM also has support for multiple monitors.
 #+END_SRC
 
 Simple script for waking up second monitor after reattaching
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp ~/.emacs
   (defun jrm/wake-second-monitor ()
       "Turns second monitor off and back on to wake it up. Helpful for exwm + X11 + multiple monitors."
     (interactive)
@@ -125,7 +125,7 @@ Simple script for waking up second monitor after reattaching
 
 **** Screenshots
 I took this from Uncle Dave's config. Its a super slick screenshot function for taking both fullscreen as well as region screenshots.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp ~/.emacs
     (defun jrm/take-screenshot ()
     "Takes a fullscreenshot of the current workspace"
     (interactive)
@@ -180,7 +180,7 @@ Display the current time and battery indicator
 
 **** Send keys to EXWM Line Mode buffers
 I find the default way (C-c C-q) of exwm sending keys like ctrl to an async buffer difficult. C-c C-c is much simpler for me.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp ~/.emacs
   (define-key exwm-mode-map [?\C-c ?\C-c] 'exwm-input-send-next-key)
 #+END_SRC
 
@@ -191,7 +191,7 @@ There are a few miscellaneous modes where the mouse should be disabled by defaul
 #+END_SRC
 
 **** Lock screen with slock
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp ~/.emacs
   (exwm-input-set-key (kbd "s-l") (lambda ()
 	      (interactive)
 	      (start-process "" nil "/usr/bin/slock")))
@@ -430,6 +430,9 @@ Add custom easy-templates for inserting structural elements with as few keystrok
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
   (add-to-list 'org-structure-template-alist '("j" . "src javascript"))
   (add-to-list 'org-structure-template-alist '("sh" . "src sh"))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp ~/.emacs
   (require 'org-tempo)
 #+END_SRC
 
