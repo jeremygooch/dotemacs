@@ -1257,7 +1257,7 @@ Hide/show the imports at the top of the buffer with a bit of help from yafolding
 
   (add-hook 'ng2-ts-mode-hook 'jrm/neon-toggle-imports)
   (add-hook 'typescript-mode-hook 'jrm/neon-toggle-imports)
-  ;; (global-set-key (kbd "C-x C-j C-n") 'jrm/neon-toggle-imports)
+  (global-set-key (kbd "C-x C-j C-n") 'jrm/neon-toggle-imports)
 
 
 #+end_src
@@ -1265,7 +1265,11 @@ Hide/show the imports at the top of the buffer with a bit of help from yafolding
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs 
   (defun jrm/stack-imports ()
     "Uses regex to stack import statements in JS/TS files."
-    (interactive)
+    (if (or (equal major-mode 'typescript-mode) (equal major-mode 'ng2-ts-mode))
+	(jrm/stack-imports-by-regexp)))
+
+  (defun jrm/stack-imports-by-regexp ()
+    "Stack the imports based on regexp"
     (beginning-of-buffer)
     (toggle-truncate-lines t)
     (while (re-search-forward "import[[:space:]\.].*,.*from[[:space:]\.].*;" nil t)
@@ -1290,7 +1294,7 @@ Hide/show the imports at the top of the buffer with a bit of help from yafolding
     (toggle-truncate-lines nil))
 
 
-  (global-set-key (kbd "C-x C-j C-n") (lambda () (interactive) (jrm/stack-imports) (jrm/neon-toggle-imports)))
+  (add-hook 'before-save-hook 'jrm/stack-imports)
 
 #+END_SRC
 
