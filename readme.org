@@ -115,7 +115,7 @@ Fortunately EXWM also has support for multiple monitors.
 #+END_SRC
 
 Simple script for waking up second monitor after reattaching
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp ~/.emacs
   (defun jrm/wake-second-monitor ()
       "Turns second monitor off and back on to wake it up. Helpful for exwm + X11 + multiple monitors."
     (interactive)
@@ -132,7 +132,7 @@ Simple script for waking up second monitor after reattaching
 
 **** Screenshots
 I took this from Uncle Dave's config. Its a super slick screenshot function for taking both fullscreen as well as region screenshots.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp ~/.emacs
     (defun jrm/take-screenshot ()
     "Takes a fullscreenshot of the current workspace"
     (interactive)
@@ -340,8 +340,7 @@ Helpful dired functionality lifted from [[https://www.youtube.com/watch?v=pZzDay
     "Calls dired toggle and refreshes the buffer."
     (interactive)
     (dired-subtree-toggle)
-    (revert-buffer)
-    (recenter-top-bottom))
+    (revert-buffer))
 
   (use-package dired-subtree
     :after dired
@@ -1295,12 +1294,48 @@ Hide/show the imports at the top of the buffer with a bit of help from yafolding
 	(jrm/neon-show-imports)
       (jrm/neon-hide-imports)))
 
-  (global-set-key (kbd "C-x C-j C-n") 'jrm/neon-toggle-imports)
-
   (add-hook 'ng2-ts-mode-hook 'jrm/neon-toggle-imports)
   (add-hook 'typescript-mode-hook 'jrm/neon-toggle-imports)
+  (global-set-key (kbd "C-x C-j C-n") 'jrm/neon-toggle-imports)
+
 
 #+end_src
+
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs 
+  (defun jrm/stack-imports ()
+    "Uses regex to stack import statements in JS/TS files."
+    (if (or (equal major-mode 'typescript-mode) (equal major-mode 'ng2-ts-mode))
+	(jrm/stack-imports-by-regexp)))
+
+  (defun jrm/stack-imports-by-regexp ()
+    "Stack the imports based on regexp"
+    (beginning-of-buffer)
+    (toggle-truncate-lines t)
+    (while (re-search-forward "import[[:space:]\.].*,.*from[[:space:]\.].*;" nil t)
+      (let ((regEnd (point)))
+	(beginning-of-line)
+	(let ((regStart (point)))
+	  (while (and (>= regEnd (point)) (re-search-forward "," nil t))
+	    ;; the cursor will have moved during the test so check again that we haven't overflowed
+	    (if (>= regEnd (point))
+		(replace-match ",
+  ")))
+	  (goto-char regStart)
+	  (re-search-forward "{" nil t)
+	  (replace-match "{
+  ")
+	  (goto-char regStart)
+	  (re-search-forward "[^,] } from" nil t)
+	  (beginning-of-line)
+	  (re-search-forward " } from" nil t)
+	  (replace-match ",
+  } from"))))
+    (toggle-truncate-lines nil))
+
+
+  (add-hook 'before-save-hook 'jrm/stack-imports)
+
+#+END_SRC
 
 ***** Clojure Development
 Clojure with Cider for interactive Clojure development
@@ -1412,6 +1447,11 @@ AFAIK the default cider repl commands don't provide an easy way to refresh quil 
 
 
 ***** Lisp
+Paredit for maintaining sanity while working with lisp
+#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
+(use-package paredit)
+#+END_SRC
+
 Some general settings for lisp dialects (elisp, clojure, etc).
 #+BEGIN_SRC emacs-lisp :export code ~/.emacs
   (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
