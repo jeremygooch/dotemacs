@@ -303,8 +303,7 @@ Helpful dired functionality lifted from [[https://www.youtube.com/watch?v=pZzDay
     "Calls dired toggle and refreshes the buffer."
     (interactive)
     (dired-subtree-toggle)
-    (revert-buffer)
-    (recenter-top-bottom))
+    (revert-buffer))
 
   (use-package dired-subtree
     :after dired
