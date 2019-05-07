@@ -100,6 +100,83 @@ We'll need to turn off the mouse from time to time
     (use-package disable-mouse :diminish disable-mouse-mode)
 #+END_SRC
 
+**** EXWM
+With EXWM it can act as a complete desktop environment.
+#+BEGIN_SRC emacs-lisp ~/.emacs
+  (use-package exwm)
+  (use-package exwm-config
+    :config
+    (exwm-config-default)
+    (exwm-config-ido)
+    (global-set-key (kbd "C-x O")  'exwm-workspace-switch-to-buffer))
+#+END_SRC
+
+Fortunately EXWM also has support for multiple monitors.
+#+BEGIN_SRC emacs-lisp ~/.emacs
+  (require 'exwm-randr)
+  (setq exwm-randr-workspace-output-plist '(0 "eDP-1" 1 "DP-2-2"))
+  (add-hook 'exwm-randr-screen-change-hook
+	    (lambda ()
+	      (start-process-shell-command
+	       "xrandr" nil "xrandr --output eDP-1 --mode 2048x1152 --right-of DP-2-2 --auto")))
+  (exwm-randr-enable)
+#+END_SRC
+
+Simple script for waking up second monitor after reattaching
+#+BEGIN_SRC emacs-lisp ~/.emacs
+  (defun jrm/wake-second-monitor ()
+      "Turns second monitor off and back on to wake it up. Helpful for exwm + X11 + multiple monitors."
+    (interactive)
+    (shell-command "xrandr --output DP-2-2 --off && xrandr --output DP-2-2 --auto"))
+
+  (global-set-key (kbd "C-x C-j m") 'jrm/wake-second-monitor)
+#+END_SRC
+
+**** Screenshots
+I took this from Uncle Dave's config. Its a super slick screenshot function for taking both fullscreen as well as region screenshots.
+#+BEGIN_SRC emacs-lisp ~/.emacs
+    (defun jrm/take-screenshot ()
+    "Takes a fullscreenshot of the current workspace"
+    (interactive)
+    (when window-system
+      (cl-loop for i downfrom 3 to 1 do
+	    (progn
+	      (message (concat (number-to-string i) "..."))
+	      (sit-for 1)))
+      (message "Cheese!")
+      (sit-for 1)
+      (start-process "screenshot" nil "import" "-window" "root"
+		     (concat (getenv "HOME") "/Pictures/" (current-time-string) ".png"))
+      (message "Screenshot taken!")))
+  (global-set-key (kbd "C-x C-j <C-print>") 'jrm/take-screenshot)
+
+  (defun jrm/take-screenshot-region ()
+    "Takes a screenshot of a region selected by the user"
+    (interactive)
+    (when window-system
+      (call-process "import" nil nil nil ".newScreenshot.png")
+      (call-process "convert" nil nil nil ".newScreenshot.png" "-shave" "1x1"
+		    (concat (getenv "HOME") "/Pictures/" (current-time-string) ".png"))
+      (call-process "rm" nil nil nil ".newScreenshot.png")))
+  (global-set-key (kbd "C-x C-j <print>") 'jrm/take-screenshot-region)
+#+END_SRC
+
+**** Application Launcher with dmenu
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+(use-package dmenu
+  :bind
+    ("s-SPC" . 'dmenu))
+#+END_SRC
+
+**** X11
+According to the [[https://www.systutorials.com/docs/linux/man/1-Xorg.wrap/][man page]], edit [[/etc/X11/Xwrapper.config]] to include the line:
+~allowed_users=anybody~ and ~needs_root_rights=yes~.
+
+#+BEGIN_SRC shell  :tangle ~/.xinitrc
+#!/bin/bash
+exec emacs
+#+END_SRC
+
 **** Minibuffer considerations for desktop/fullscreen usage
 Display the current time and battery indicator
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
@@ -108,6 +185,12 @@ Display the current time and battery indicator
   (display-time-mode 1)
 
   (display-battery-mode 1)
+#+END_SRC
+
+**** Send keys to EXWM Line Mode buffers
+I find the default way (C-c C-q) of exwm sending keys like ctrl to an async buffer difficult. C-c C-c is much simpler for me.
+#+BEGIN_SRC emacs-lisp ~/.emacs
+  (define-key exwm-mode-map [?\C-c ?\C-c] 'exwm-input-send-next-key)
 #+END_SRC
 
 **** Mouse/Trackpad
@@ -121,6 +204,13 @@ There are a few miscellaneous modes where the mouse should be disabled by defaul
  #+begin_src emacs-lisp :tangle ~/.emacs
  (setq ring-bell-function 'ignore)
  #+end_src
+
+**** Lock screen with slock
+#+BEGIN_SRC emacs-lisp ~/.emacs
+  (exwm-input-set-key (kbd "s-l") (lambda ()
+	      (interactive)
+	      (start-process "" nil "/usr/bin/slock")))
+#+END_SRC
 
 *** UI Components
 **** Dashboard
@@ -229,8 +319,7 @@ Helpful dired functionality lifted from [[https://www.youtube.com/watch?v=pZzDay
     "Calls dired toggle and refreshes the buffer."
     (interactive)
     (dired-subtree-toggle)
-    (revert-buffer)
-    (recenter-top-bottom))
+    (revert-buffer))
 
   (use-package dired-subtree
     :after dired
@@ -360,6 +449,9 @@ Add custom easy-templates for inserting structural elements with as few keystrok
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
   (add-to-list 'org-structure-template-alist '("j" . "src javascript"))
   (add-to-list 'org-structure-template-alist '("sh" . "src sh"))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp ~/.emacs
   (require 'org-tempo)
 #+END_SRC
 
@@ -1193,16 +1285,63 @@ Hide/show the imports at the top of the buffer with a bit of help from yafolding
 	(jrm/neon-show-imports)
       (jrm/neon-hide-imports)))
 
-  (global-set-key (kbd "C-x C-j C-n") 'jrm/neon-toggle-imports)
-
   (add-hook 'ng2-ts-mode-hook 'jrm/neon-toggle-imports)
   (add-hook 'typescript-mode-hook 'jrm/neon-toggle-imports)
+  (global-set-key (kbd "C-x C-j C-n") 'jrm/neon-toggle-imports)
+
 
 #+end_src
 
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs 
+  (defun jrm/stack-imports ()
+    "Uses regex to stack import statements in JS/TS files."
+    (interactive)
+    (if (or (equal major-mode 'typescript-mode) (equal major-mode 'ng2-ts-mode))
+	(jrm/stack-imports-by-regexp)))
+
+
+  (defun jrm/filter-list (@predicate @sequence)
+    "Return a new list such that *predicate is true on all members of *sequence.
+  Lifted from http://ergoemacs.org/emacs/elisp_filter_list.html"
+    (delete "e3824ad41f2ec1ed"
+	    (mapcar (lambda ($x) (if (funcall @predicate $x) $x "e3824ad41f2ec1ed")) @sequence)))
+
+  (defun formatLineByStacking (list)
+    "Stacks a list of ts/js imports via string matching"
+    (when list
+      (let ((word (car list)))
+	(if (> (length (jrm/filter-list '(lambda (x) (string-match-p x word)) '("'" "\"" ";"))) 0)
+	    (insert word)
+	  (if (or (member (downcase word) '("import" "from"))
+		  (string-match-p "}" word))
+	      (insert word " ")
+	    (if (string-match-p "{" word) (insert word "\n")
+	      (if (string-match-p "," word) (insert word "\n")
+		(if (member word '("" " " ","))
+		    (insert "")
+		  (insert word ",\n")))))))
+      (formatLineByStacking (cdr list))))
+
+  (defun jrm/stack-imports-by-regexp ()
+    "Stack the imports based on regexp"
+    (setq origPos (point))
+    (beginning-of-buffer)
+
+    (while (re-search-forward "import[[:space:]\.].*,.*from[[:space:]\.].*;" nil t)
+      (let ((line (split-string (buffer-substring-no-properties (line-beginning-position) (line-end-position)) " ")))
+	(beginning-of-line)
+	(kill-line)
+	(formatLineByStacking line)
+	(indent-region (point-min) (point-max))))
+    (goto-char origPos))
+
+  (add-hook 'before-save-hook 'jrm/stack-imports)
+
+#+END_SRC
+
 ***** Clojure Development
 Clojure with Cider for interactive Clojure development
-#+BEGIN_SRC emacs-lisp :export code ~/.emacs
+#+BEGIN_SRC emacs-lisp :export code :tangle ~/.emacs
   (use-package clojure-mode
 	:config
 	;; Set mode for specific files
@@ -1310,6 +1449,11 @@ AFAIK the default cider repl commands don't provide an easy way to refresh quil 
 
 
 ***** Lisp
+Paredit for maintaining sanity while working with lisp
+#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
+(use-package paredit)
+#+END_SRC
+
 Some general settings for lisp dialects (elisp, clojure, etc).
 #+BEGIN_SRC emacs-lisp :export code :tangle ~/.emacs
   (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
