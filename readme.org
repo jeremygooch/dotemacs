@@ -1264,39 +1264,45 @@ Hide/show the imports at the top of the buffer with a bit of help from yafolding
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs 
   (defun jrm/stack-imports ()
     "Uses regex to stack import statements in JS/TS files."
+    (interactive)
     (if (or (equal major-mode 'typescript-mode) (equal major-mode 'ng2-ts-mode))
 	(jrm/stack-imports-by-regexp)))
 
+
+  (defun jrm/filter-list (@predicate @sequence)
+    "Return a new list such that *predicate is true on all members of *sequence.
+  Lifted from http://ergoemacs.org/emacs/elisp_filter_list.html"
+    (delete "e3824ad41f2ec1ed"
+	    (mapcar (lambda ($x) (if (funcall @predicate $x) $x "e3824ad41f2ec1ed")) @sequence)))
+
   (defun formatLineByStacking (list)
-	""
-	(when list
-	  (let ((word (car list)))
-	    (if (or (string-match-p "'" word)
-		    (string-match-p "\"" word)
-		    (string-match-p ";" word))
-		(insert word)
-	      (if (or (string= "import" (downcase word))
-		      (string= "from" (downcase word))
-		      (string-match-p "}" word)) (insert word " ")
-		(if (string-match-p "{" word) (insert word "\n")
-		  (if (string-match-p "," word) (insert word "\n")
-		    (insert word ",\n"))))))
-	  (formatLineByStacking (cdr list))))
+    "Stacks a list of ts/js imports via string matching"
+    (when list
+      (let ((word (car list)))
+	(if (> (length (jrm/filter-list '(lambda (x) (string-match-p x word)) '("'" "\"" ";"))) 0)
+	    (insert word)
+	  (if (or (member (downcase word) '("import" "from"))
+		  (string-match-p "}" word))
+	      (insert word " ")
+	    (if (string-match-p "{" word) (insert word "\n")
+	      (if (string-match-p "," word) (insert word "\n")
+		(if (member word '("" " " ","))
+		    (insert "")
+		  (insert word ",\n")))))))
+      (formatLineByStacking (cdr list))))
 
   (defun jrm/stack-imports-by-regexp ()
     "Stack the imports based on regexp"
+    (setq origPos (point))
     (beginning-of-buffer)
 
     (while (re-search-forward "import[[:space:]\.].*,.*from[[:space:]\.].*;" nil t)
       (let ((line (split-string (buffer-substring-no-properties (line-beginning-position) (line-end-position)) " ")))
-	(message (format "%S" line))
 	(beginning-of-line)
 	(kill-line)
 	(formatLineByStacking line)
 	(indent-region (point-min) (point-max))))
-
-    )
-
+    (goto-char origPos))
 
   (add-hook 'before-save-hook 'jrm/stack-imports)
 
