@@ -59,7 +59,7 @@ First, get some basics out of the way. Fix the top panel and hide the menus and 
 
   ;; Autohide the top panel if necessary
   (setq ns-auto-hide-menu-bar t)
-  (set-frame-parameter nil 'alpha '(90 . 75))
+  (set-frame-parameter nil 'alpha '(100 . 90))
   (toggle-frame-maximized)
 
   (set-face-attribute 'default nil :height 120)
@@ -1285,8 +1285,8 @@ Hide/show the imports at the top of the buffer with a bit of help from yafolding
 	(jrm/neon-show-imports)
       (jrm/neon-hide-imports)))
 
-  (add-hook 'ng2-ts-mode-hook 'jrm/neon-toggle-imports)
-  (add-hook 'typescript-mode-hook 'jrm/neon-toggle-imports)
+  (remove-hook 'ng2-ts-mode-hook 'jrm/neon-toggle-imports)
+  (remove-hook 'typescript-mode-hook 'jrm/neon-toggle-imports)
   (global-set-key (kbd "C-x C-j C-n") 'jrm/neon-toggle-imports)
 
 
