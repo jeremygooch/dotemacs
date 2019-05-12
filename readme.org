@@ -838,23 +838,7 @@ Keep temporary and backup buffers out of current directory like a civilized huma
 Turn on linum mode for almost everything.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (global-set-key (kbd "C-c l l") 'linum-mode)
-  (global-linum-mode 1)
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (defun linum-off-mode-setup ()
-    (linum-mode 0))
-
-  (dolist (hook '(org-mode-hook
-		  magit-mode-hook
-		  text-mode-hook
-		  special-mode-hook
-		  shell-mode-hook
-		  help-mode-hook))
-    (add-hook hook 'linum-off-mode-setup))
-
   (setq linum-format "%d ")
-
 #+END_SRC
 
 Turn off the mouse/trackpad when editing certain files
