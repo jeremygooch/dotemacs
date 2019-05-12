@@ -59,7 +59,7 @@ First, get some basics out of the way. Fix the top panel and hide the menus and 
 
   ;; Autohide the top panel if necessary
   (setq ns-auto-hide-menu-bar t)
-  (set-frame-parameter nil 'alpha '(90 . 75))
+  (set-frame-parameter nil 'alpha '(100 . 90))
   (toggle-frame-maximized)
 
   (set-face-attribute 'default nil :height 120)
