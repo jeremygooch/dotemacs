@@ -1145,6 +1145,8 @@ I also like to use org mode's code evaluation capabilities for tinkering around 
      :hook (company-mode . company-box-mode)
      :diminish company-box-mode)
 
+   (setq company-idle-delay 0.2)
+
    (use-package tide
      :diminish tide-mode
      :config
@@ -1254,8 +1256,6 @@ Hide/show the imports at the top of the buffer with a bit of help from yafolding
 	(jrm/neon-show-imports)
       (jrm/neon-hide-imports)))
 
-  (add-hook 'ng2-ts-mode-hook 'jrm/neon-toggle-imports)
-  (add-hook 'typescript-mode-hook 'jrm/neon-toggle-imports)
   (global-set-key (kbd "C-x C-j C-n") 'jrm/neon-toggle-imports)
 
 
