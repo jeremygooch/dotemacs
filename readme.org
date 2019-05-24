@@ -1661,6 +1661,21 @@ Instead of using the display's popup, prompt for gpg creds in the minibuffer
   (setq-default pcre-mode t)
 #+END_SRC
 
+**** Copy Entire Buffer easily
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+    (defun jrm/copy-all ()
+    "Copy the current buffer without loosing your place"
+    (interactive)
+    (let ((original-position (point)))
+      (mark-whole-buffer)
+      (kill-ring-save 0 0 t)
+      (goto-char original-position)
+      (message "Buffer contents yanked.")))
+
+  (global-set-key (kbd "C-x C-j C-c") 'jrm/copy-all)
+
+#+END_SRC
+
 **** Company for auto-complete
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (add-hook 'after-init-hook 'global-company-mode)
