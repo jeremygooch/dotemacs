@@ -1327,7 +1327,7 @@ Hide/show the imports at the top of the buffer with a bit of help from yafolding
 
 ***** Clojure Development
 Clojure with Cider for interactive Clojure development
-#+BEGIN_SRC emacs-lisp :export code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp :export code ~/.emacs
   (use-package clojure-mode
 	:config
 	;; Set mode for specific files
