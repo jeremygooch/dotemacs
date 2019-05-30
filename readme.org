@@ -215,20 +215,23 @@ There are a few miscellaneous modes where the mouse should be disabled by defaul
   (defun jrm3/volume-increase ()
     "Bump up the volume by 5%"
     (interactive)
-       (with-temp-buffer (shell-command "/usr/bin/amixer set Master 5%+" t)))
+    (with-temp-buffer (shell-command "/usr/bin/amixer set Master 5%+" t))
+    (message "%s" (shell-command-to-string "/usr/bin/amixer get Master")))
   (global-set-key (kbd "<XF86AudioRaiseVolume>") 'jrm3/volume-increase)
 
 
   (defun jrm3/volume-decrease ()
     "Bump down the volume by 5%"
     (interactive)
-       (with-temp-buffer (shell-command "/usr/bin/amixer set Master 5%-" t)))
+    (with-temp-buffer (shell-command "/usr/bin/amixer set Master 5%-" t))
+    (message "%s" (shell-command-to-string "/usr/bin/amixer get Master")))
   (global-set-key (kbd "<XF86AudioLowerVolume>") 'jrm3/volume-decrease)
 
   (defun jrm3/volume-mute-toggle ()
     "Toggle volume mute on/off"
     (interactive)
-       (with-temp-buffer (shell-command "/usr/bin/amixer set Master toggle" t)))
+    (with-temp-buffer (shell-command "/usr/bin/amixer set Master toggle" t))
+    (message "%s" (shell-command-to-string "/usr/bin/amixer get Master")))
   (global-set-key (kbd "<XF86AudioMute>") 'jrm3/volume-mute-toggle)
 
 #+END_SRC
