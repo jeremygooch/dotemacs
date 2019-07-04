@@ -810,9 +810,9 @@ Avy is great for speed-of-thought navigation
   (global-set-key (kbd "C-c SPC") 'avy-goto-line)
 #+END_SRC
 
-Wrap long lines so I can see everything at a glance
+Turn off visual line mode so swiper doesn't lag
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (global-visual-line-mode t)
+  (global-visual-line-mode nil)
 #+END_SRC
 
 Some basic code folding
@@ -855,10 +855,9 @@ Keep temporary and backup buffers out of current directory like a civilized huma
   (make-directory "~/.emacs.d/autosaves/" t)
 #+END_SRC
 
-Turn on linum mode for almost everything.
+Turn on use display line numbers mode.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (global-set-key (kbd "C-c l l") 'linum-mode)
-  (setq linum-format "%d ")
+  (global-set-key (kbd "C-c l l") 'display-line-numbers-mode)
 #+END_SRC
 
 Turn off the mouse/trackpad when editing certain files
@@ -1122,7 +1121,7 @@ To avoid switching applications let emacs reload the browser for me. This is spe
   (add-to-list 'load-path "~/.emacs.d/lisp/")
   (load "browser-refresh")
 
-  (global-set-key (kbd "s-r") 'browser-refresh)
+  (global-set-key (kbd "<f5>") 'browser-refresh)
   (custom-set-variables '(browser-refresh-activate nil))
 
 #+END_SRC
