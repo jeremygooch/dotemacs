@@ -229,6 +229,7 @@ What can I say, I like a nice big splash screen and I'm partial to the meditatin
 **** Theme
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package zerodark-theme)
+  (load-theme 'zerodark)
   (set-background-color "gray8")
 #+END_SRC
 
@@ -1017,7 +1018,7 @@ A bit of elisp to integrate project's build script into emacs
   (defun jrm/start-neon ()
     "Start an interactive Neon process"
     (interactive)
-    (let* ((neonPath "~/neon/")
+    (let* ((neonPath "~/src/neon/")
 	  (default-directory neonPath)
 	  (proc (start-process "build-neon-ssr" neonBuffer "/Users/jgooch/.nvm/versions/node/v10.11.0/bin/node"
 			       (expand-file-name (concat neonPath ".build/live-ssr-reloading.js")))))
@@ -1119,7 +1120,7 @@ I also like to use org mode's code evaluation capabilities for tinkering around 
 To avoid switching applications let emacs reload the browser for me. This is specific to a project.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (add-to-list 'load-path "~/.emacs.d/lisp/")
-  (load "browser-refresh")
+  ;; (load "browser-refresh")
 
   (global-set-key (kbd "<f5>") 'browser-refresh)
   (custom-set-variables '(browser-refresh-activate nil))
@@ -1130,7 +1131,6 @@ To avoid switching applications let emacs reload the browser for me. This is spe
  PHP Development
  #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
    ;; PHP Mode Improved (http://www.emacswiki.org/emacs/php-mode-improved.el)
-   ;; (add-to-list 'load-path "~/.emacs.d/lisp/")
    (use-package php-mode
      :config
      (autoload 'php-mode "php-mode-improved" "Major mode for editing php code." t)
@@ -1177,17 +1177,22 @@ To avoid switching applications let emacs reload the browser for me. This is spe
      (setq company-tooltip-align-annotations t)
 
      ;; formats the buffer before saving
-     (add-hook 'before-save-hook 'tide-format-before-save)
+     (remove-hook 'before-save-hook 'tide-format-before-save)
 
      (add-hook 'typescript-mode-hook #'setup-tide-mode)
      (setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil :IndentStyle 2))
 
      (define-key tide-mode-map (kbd "C-c C-d") 'tide-documentation-at-point)
      (define-key tide-mode-map (kbd "C-c C-i") 'tide-organize-imports))
-
-   (when (memq window-system '(mac ns x))
-     (exec-path-from-shell-initialize))
  #+END_SRC
+
+Fixes emacs and osx path issues.
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package exec-path-from-shell
+    :config
+    (when (memq window-system '(mac ns x))
+      (exec-path-from-shell-initialize)))
+#+END_SRC
 
  Check for ts lint errors
  #+BEGIN_SRC emacs-lisp  ~/.emacs
@@ -1353,11 +1358,12 @@ Clojure with Cider for interactive Clojure development
 	;;   (add-hook 'clojure-mode-hook 'subword-mode)
 	;;   (use-package clojure-mode-extra-font-locking
 	;;     :ensure t))
+  (use-package paredit
+	:config (paredit-enable-modes))
 
   (defun paredit-enable-modes ()
 	(add-hook 'emacs-lisp-mode-hook 'paredit-mode))
-  (use-package paredit
-	:config (paredit-enable-modes))
+
 
 #+END_SRC
 
