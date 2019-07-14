@@ -1,22 +1,35 @@
-* Jeremy's Emacs of Emacs setup
+#+OPTIONS: toc:nil
+
+* My Personal Config
 #+NAME:   Emacs Dashboard
 [[./assets/screenshot.png]]
 
 ** Installation
-This is my personal emacs configuration. I prefer to keep this repo seperate from my =~/.emacs.d/= dir, therefore, the =~/.emacs= file can be generated directly from this readme by tangling the code snippets. This can be done globally with org-babel-tangle (~C-c C-v t~). After tangling the file you should be able to relaunch (or simply evaluate) the resulting =~/.emacs= file and, assuming you have a working [[https://github.com/jwiegley/use-package][use-package]] configuration, emacs should work without issue.
+This is my personal emacs configuration written in a literate-programming style. To generate the config tangle this file with org-babel-tangle (~C-c C-v t~).
 
-Before tangling the file, please read through the random thoughts throughout and turn on/off the features that you would like by removing the ~:tangle~ flag from the source blocks. Tangling the entire file will overwrite anything in your local =~/.emacs= file.
+Some of the code blocks pertain to the OS and will be tangled automatically. There are several blocks for Linux that pertain to running emacs as a window manager. These blocks can be found in [[X Window Manager][this section]].
 
-Credit where credit is due: a lot of the content in my configuration was lifted from fellow emacsers like [[https://github.com/daedreth/UncleDavesEmacs][Uncle Dave]], [[http://sachachua.com/blog/category/emacs/][Sacha Chua]] and [[http://cestlaz.github.io/stories/emacs/][Mike Zamanski]] to name a few; as well as countless reddit, emacs.stackexchange and stackoverflow contributors.
+*** Global Configs
+Define some configurations like directory paths.
+#+NAME: config
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (defvar *home-dir* (getenv "HOME"))
+  (defvar *dotemacs-dir* (concat *home-dir* "/src/dotemacs/"))
+  (defvar *node-dir* (concat *home-dir* "/.nvm/versions/node/v9.11.1/bin/"))
+  (defvar *org-dir* (concat *home-dir* "/org/"))
+  (defvar *screenshot-dir* (concat *home-dir* "/Pictures/")) ; used only for x11 desktops
+#+END_SRC
 
-** Configuration
-*** Package archives and use-package
-Setting up basic repositories and such.
+* Configuration
+#+TOC: headlines 2
+
+** Initialization
+*** Package Sources
+Setting up basic repositories and [[https://github.com/jwiegley/use-package][use-package]].
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (package-initialize)
   (require 'package)
   (setq package-enable-at-startup nil)
-
   (setq package-archives '(("marmalade"  . "http://marmalade-repo.org/packages/")
 			   ("melpa-stable" . "http://stable.melpa.org/packages/")
 			   ("gnu" . "https://elpa.gnu.org/packages/")
@@ -29,7 +42,6 @@ Setting up basic repositories and such.
 
   (require 'use-package-ensure)
   (setq use-package-always-ensure t)
-
 #+END_SRC
 *** Personal Information
 For the sake of completeness, configure name and email address
@@ -40,250 +52,39 @@ For the sake of completeness, configure name and email address
 
 Setup a prefix for custom commands.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (progn
-    (define-prefix-command 'jrm-key-map))
-
+  (progn (define-prefix-command 'jrm-key-map))
   (global-set-key (kbd "C-x C-j") jrm-key-map)
-
 #+END_SRC
 
-*** Run emacs as a replacement for desktop/window manager
-Emacs was the original terminal multiplexer so manages split views quite nicely.
+** General Configuration
+*** Basic Emacs Settings Preferences
+I prefer emacs to just ask y/n not yes/no
+ #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+   (fset 'yes-or-no-p 'y-or-n-p)
+ #+END_SRC
 
-First, get some basics out of the way. Switch to fullscreen mode and hide the menus and also adjust the default font size while we're at it.
+When killing a buffer always pick the current buffer by default
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (set-frame-parameter nil 'fullscreen 'fullboth)
-  (set-face-attribute 'default nil :height 100)
-  (menu-bar-mode -1)
-  (tool-bar-mode -1)
-#+END_SRC
-
-I find myself need specific font sizes for different scenarios, i.e. projecting, screen-sharing on conference calls, etc. So, binding these to a quick way to toggle through them.
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (defvar jrm/screens-alist '((?1 "small" (lambda () (set-face-attribute 'default nil :height 110) 'default))
-			      (?2 "medium" (lambda () (set-face-attribute 'default nil :height 120) 'proj))
-			      (?3 "large" (lambda () (set-face-attribute 'default nil :height 140) 'proj))
-			      (?4 "xtra-large" (lambda () (set-face-attribute 'default nil :height 160) 'projLg)))
-    "List that associates number letters to descriptions and actions.")
-
-  (defun jrm/adjust-font-size ()
-    "Lets the user choose the the font size and takes the corresponding action.
-  Returns whatever the action returns."
+  (defun kill-current-buffer ()
+    "Kills the current buffer."
     (interactive)
-    (let ((choice (read-char-choice (mapconcat (lambda (item) (format "%c: %s" (car item) (cadr item))) jrm/screens-alist "; ")
-				    (mapcar #'car jrm/screens-alist))))
-      (funcall (nth 2 (assoc choice jrm/screens-alist)))))
-
-  (global-set-key (kbd "C-x C-j p")  'jrm/adjust-font-size)
+    (kill-buffer (current-buffer)))
+  (global-set-key (kbd "C-x k") 'kill-current-buffer)
 #+END_SRC
 
-The default keybindings for naviating split views can be cumbersome, so remap them to something a bit easier.
+Prevent async shell command buffers from popping-up:
+#+BEGIN_SRC emacs-lisp 
+  (add-to-list 'display-buffer-alist
+    '("\\*Async Shell Command\\*.*" display-buffer-no-window))
+#+END_SRC
+
+Fix emacs' regex
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-
-  (global-set-key (kbd "C-c <left>")  'windmove-left)
-  (global-set-key (kbd "C-c <right>") 'windmove-right)
-  (global-set-key (kbd "C-c <up>")    'windmove-up)
-  (global-set-key (kbd "C-c <down>")  'windmove-down)
+  (setq-default pcre-mode t)
 #+END_SRC
 
-We'll need to turn off the mouse from time to time
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-    (use-package disable-mouse :diminish disable-mouse-mode)
-#+END_SRC
-
-**** EXWM
-With EXWM it can act as a complete desktop environment.
-#+BEGIN_SRC emacs-lisp ~/.emacs
-  (use-package exwm)
-  (use-package exwm-config
-    :config
-    (exwm-config-default)
-    (exwm-config-ido)
-    (global-set-key (kbd "C-x O")  'exwm-workspace-switch-to-buffer))
-#+END_SRC
-
-Fortunately EXWM also has support for multiple monitors.
-#+BEGIN_SRC emacs-lisp ~/.emacs
-  (require 'exwm-randr)
-  (setq exwm-randr-workspace-output-plist '(0 "eDP-1" 1 "DP-2-2"))
-  (add-hook 'exwm-randr-screen-change-hook
-	    (lambda ()
-	      (start-process-shell-command
-	       "xrandr" nil "xrandr --output eDP-1 --mode 2048x1152 --right-of DP-2-2 --auto")))
-  (exwm-randr-enable)
-#+END_SRC
-
-Simple script for waking up second monitor after reattaching
-#+BEGIN_SRC emacs-lisp ~/.emacs
-  (defun jrm/wake-second-monitor ()
-      "Turns second monitor off and back on to wake it up. Helpful for exwm + X11 + multiple monitors."
-    (interactive)
-    (shell-command "xrandr --output DP-2-2 --off && xrandr --output DP-2-2 --auto"))
-
-  (global-set-key (kbd "C-x C-j m") 'jrm/wake-second-monitor)
-#+END_SRC
-
-**** Screenshots
-I took this from Uncle Dave's config. Its a super slick screenshot function for taking both fullscreen as well as region screenshots.
-#+BEGIN_SRC emacs-lisp ~/.emacs
-    (defun jrm/take-screenshot ()
-    "Takes a fullscreenshot of the current workspace"
-    (interactive)
-    (when window-system
-      (cl-loop for i downfrom 3 to 1 do
-	    (progn
-	      (message (concat (number-to-string i) "..."))
-	      (sit-for 1)))
-      (message "Cheese!")
-      (sit-for 1)
-      (start-process "screenshot" nil "import" "-window" "root"
-		     (concat (getenv "HOME") "/Pictures/" (current-time-string) ".png"))
-      (message "Screenshot taken!")))
-  (global-set-key (kbd "C-x C-j <C-print>") 'jrm/take-screenshot)
-
-  (defun jrm/take-screenshot-region ()
-    "Takes a screenshot of a region selected by the user"
-    (interactive)
-    (when window-system
-      (call-process "import" nil nil nil ".newScreenshot.png")
-      (call-process "convert" nil nil nil ".newScreenshot.png" "-shave" "1x1"
-		    (concat (getenv "HOME") "/Pictures/" (current-time-string) ".png"))
-      (call-process "rm" nil nil nil ".newScreenshot.png")))
-  (global-set-key (kbd "C-x C-j <print>") 'jrm/take-screenshot-region)
-#+END_SRC
-
-**** Application Launcher with dmenu
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-(use-package dmenu
-  :bind
-    ("s-SPC" . 'dmenu))
-#+END_SRC
-
-**** X11
-According to the [[https://www.systutorials.com/docs/linux/man/1-Xorg.wrap/][man page]], edit [[/etc/X11/Xwrapper.config]] to include the line:
-~allowed_users=anybody~ and ~needs_root_rights=yes~.
-
-#+BEGIN_SRC shell  :tangle ~/.xinitrc
-#!/bin/bash
-exec emacs
-#+END_SRC
-
-**** Minibuffer considerations for desktop/fullscreen usage
-Display the current time and battery indicator
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (setq display-time-24hr-format t)
-  (setq display-time-format "%H:%M - %d.%b.%y")
-  (display-time-mode 1)
-
-  (display-battery-mode 1)
-#+END_SRC
-
-**** Send keys to EXWM Line Mode buffers
-I find the default way (C-c C-q) of exwm sending keys like ctrl to an async buffer difficult. C-c C-c is much simpler for me.
-#+BEGIN_SRC emacs-lisp ~/.emacs
-  (define-key exwm-mode-map [?\C-c ?\C-c] 'exwm-input-send-next-key)
-#+END_SRC
-
-**** Mouse/Trackpad
-There are a few miscellaneous modes where the mouse should be disabled by default.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (add-hook 'lisp-interaction-mode 'disable-mouse-mode)
-#+END_SRC
-
-**** Lock screen with slock
-#+BEGIN_SRC emacs-lisp ~/.emacs
-  (exwm-input-set-key (kbd "s-l") (lambda ()
-	      (interactive)
-	      (start-process "" nil "/usr/bin/slock")))
-#+END_SRC
-
-*** UI Components
-**** Dashboard
-What can I say, I like a nice big splash screen and I'm partial to the meditating GNU logo.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package dashboard
-    :config
-      (dashboard-setup-startup-hook)
-      (setq dashboard-startup-banner (concat (getenv "HOME") "/dotemacs/assets/gnu-meditate-scaled.png"))
-      (setq dashboard-items '((recents  . 5)
-                              (projects . 5)))
-      (setq dashboard-banner-logo-title ""))
-
-#+END_SRC
-
-**** Theme
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package zerodark-theme)
-#+END_SRC
-
-Remove default scrollbars
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-(scroll-bar-mode -1)
-#+END_SRC
-
-Set Org mode source block background color to dark gray so it stands out from the typical background
-#+begin_src emacs-lisp :tangle ~/.emacs
-(custom-set-faces '(org-block ((t (:inherit shadow :background "gray12")))))
-#+end_src
-
-**** Modeline
-Clean up modeline with diminish
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package diminish)
-
-#+END_SRC
-
-Use the spaceline from spacemacs
-#+begin_src emacs-lisp :tangle ~/.emacs
-(use-package spaceline
-  :config
-  (require 'spaceline-config)
-  (setq powerline-default-separator (quote wave))
-  (spaceline-spacemacs-theme)
-  (setq powerline-height 20)
-  (set-face-attribute 'mode-line nil :box nil)
-  (set-face-attribute 'mode-line-inactive nil :box nil))
-#+end_src
-
-Show spaceline icons
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-    (use-package spaceline-all-the-icons
-      :after spaceline
-      :config (spaceline-all-the-icons-theme))
-
-
-  (custom-set-variables
-   '(spaceline-all-the-icons-separator-type (quote arrow)))
-#+END_SRC
-
-**** Symbols
-Show symbols by default
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (global-prettify-symbols-mode 1)
-#+END_SRC
-*** Shell
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (add-hook 'shell-mode-hook 'disable-mouse-mode)
-  ;; Make shells interactive (i.e. M-!, or source blocks in org)
-  (setq shell-command-switch "-ic")
-#+END_SRC
-
-By default just use bash for all shells
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (defvar my-term-shell "/bin/bash")
-  (defadvice ansi-term (before force-bash)
-    (interactive (list my-term-shell)))
-  (ad-activate 'ansi-term)
-#+END_SRC
-
-Suppress async shell command buffers by default.
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-(add-to-list 'display-buffer-alist
-  '("\\*Async Shell Command\\*.*" display-buffer-no-window))
-#+END_SRC
-
-*** Dired Mode
-Some basic setup
+*** Dired
+Some basic Dired setup
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (global-auto-revert-mode 1)
   (setq global-auto-revert-non-file-buffers t)
@@ -291,14 +92,8 @@ Some basic setup
   (setq dired-listing-switches "-alh")
 #+END_SRC
 
-Helpful dired functionality lifted from [[https://www.youtube.com/watch?v=pZzDayi5lRo&t=21s][Mike Zamanski's video]].
+It's nice to be able to tab through directories in dired, and I'm a sucker for eye candy with icons
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (use-package dired-narrow
-    :config
-    (bind-key "C-c C-n" #'dired-narrow)
-    (bind-key "C-c C-f" #'dired-narrow-fuzzy)
-    (bind-key "C-c C-N" #'dired-narrow-regexp))
-
   (defun jrm/dired-subtree-toggle-and-refresh ()
     "Calls dired toggle and refreshes the buffer."
     (interactive)
@@ -312,462 +107,15 @@ Helpful dired functionality lifted from [[https://www.youtube.com/watch?v=pZzDay
     (bind-key "<backtab>" #'dired-subtree-cycle dired-mode-map))
 
   (use-package all-the-icons-dired)
-
   (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
-
 #+END_SRC
 
-*** Org Mode
-Load some basic minor modes by default
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs 
-  (add-hook 'org-mode-hook
-            (lambda ()
-              (disable-mouse-mode)
-              (no-trailing-whitespace)
-              ))
-  (add-hook 'org-src-mode-hook 'disable-mouse-mode)
-
-  (add-hook 'org-mode-hook 'flyspell-mode)
-
-  (eval-after-load "org"
-    '(require 'ox-md nil t))
-#+END_SRC
-
-Show the asterisks as bullets
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-(use-package org-bullets
-  :config
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
-#+END_SRC
-
-Add some export modes for getting content out of org
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package ox-twbs)
-#+END_SRC
-**** Literate programming
-One of the coolest features of org mode imo is the ability to evaluate almost any language via org-babel. Lets load in the non-common ones.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package ob-typescript
-    :diminish typescript-mode)
-  (use-package ob-rust)
-  (add-to-list 'org-src-lang-modes '("js" . "javascript")
-	       '("php" . "php"))
-
-  (use-package ob-async)
-
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((python . t)
-     (js . t)
-     (lisp . t)
-     (clojure . t)
-     (typescript . t)
-     (rust . t)
-     (sql . t)
-     (shell . t)
-     (java . t)))
-   (require 'ob-clojure)
-#+END_SRC
-
-
-I like org source blocks for typescript to use different compiler settings than what ships with ob-typescript. Not sure if there's a better way to do this, but just overwriting the function from the source with the code below using the configuration I prefer.
-#+begin_src emacs-lisp :tangle ~/.emacs
-(defun org-babel-execute:typescript (body params)
-  "Execute a block of Typescript code with org-babel.  This function is
-called by `org-babel-execute-src-block'"
-  (let* ((tmp-src-file (org-babel-temp-file "ts-src-" ".ts"))
-         (tmp-out-file (org-babel-temp-file "ts-src-" ".js"))
-         (cmdline (cdr (assoc :cmdline params)))
-         (cmdline (if cmdline (concat " " cmdline) ""))
-         (jsexec (if (assoc :wrap params) ""
-                   (concat " ; node " (org-babel-process-file-name tmp-out-file))
-                   )))
-    (with-temp-file tmp-src-file (insert body))
-    (let ((results (org-babel-eval (format "tsc %s --lib 'ES7,DOM' -out %s %s %s"
-                                           cmdline
-                                           (org-babel-process-file-name tmp-out-file)
-                                           (org-babel-process-file-name tmp-src-file)
-                                           jsexec)
-                                   ""))
-          (jstrans (with-temp-buffer
-                     (insert-file-contents tmp-out-file)
-                     (buffer-substring-no-properties (point-min) (point-max))
-                     )))
-      (if (eq jsexec "") jstrans results)
-)))
-#+end_src
-
-When evaluating a source code block in org mode do not prompt for input, just run it.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (setq org-confirm-babel-evaluate nil)
-#+END_SRC
-
-Make it easier to tangle the current source block
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-(global-set-key (kbd "C-c v t") (lambda () (interactive) (org-babel-tangle-block)))
-#+END_SRC
-
-Add option to append as part of tangling a file
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (defun org-babel-tangle-append ()
-    "Append source code block at point to its tangle file.
-  The command works like `org-babel-tangle' with prefix arg
-  but `delete-file' is ignored."
-    (interactive)
-    (cl-letf (((symbol-function 'delete-file) #'ignore))
-      (org-babel-tangle '(4))))
-
-  (defun org-babel-tangle-append-setup ()
-    "Add key-binding C-c C-v C-t for `org-babel-tangle-append'."
-    (org-defkey org-mode-map (kbd "C-c C-v +") 'org-babel-tangle-append))
-
-  (add-hook 'org-mode-hook #'org-babel-tangle-append-setup)
-#+END_SRC
-
-Add custom easy-templates for inserting structural elements with as few keystrokes as possible
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-  (add-to-list 'org-structure-template-alist '("j" . "src javascript"))
-  (add-to-list 'org-structure-template-alist '("sh" . "src sh"))
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp ~/.emacs
-  (require 'org-tempo)
-#+END_SRC
-
-**** Org Agenda
-Bind org agenda to shortcut and give it our todo paths. Note that the paths are not recursive for org-agenda-files.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (define-key global-map "\C-ca" 'org-agenda)
-
-  (setq org-agenda-files (list "~/org/work/softwareadvice"
-			       "~/org/personal"))
-
-  ;; ;; Exclude certain directories/files
-  (eval-when-compile (require 'cl))
-  (setq org-agenda-files
-	(remove-if '(lambda (x)
-		      (string-match
-		       (concat "^" (regexp-quote (expand-file-name "~/org/work/softwareadvice/org-jira/")))
-		       x))
-		   org-agenda-files))
-#+END_SRC
-
-Setup the default view for org agenda
+*** Tramp
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (custom-set-variables
-   '(org-agenda-custom-commands
-     (quote
-      (("n" "Agenda and all TODOs"
-	((agenda ""
-		 ((org-agenda-span
-		   (quote day))))
-	 (alltodo "" nil))
-	nil)))))
+  (use-package tramp :config (setq tramp-default-method "scp"))
 #+END_SRC
 
-Super simple reordering from Org Agenda -> Todo view
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-
-  ;; The following was lifted from http://pragmaticemacs.com/emacs/reorder-todo-items-in-your-org-mode-agenda/
-  (defun jrm/org-headline-to-top ()
-    "Move the current org headline to the top of its section"
-    (interactive)
-    ;; check if we are at the top level
-    (let ((lvl (org-current-level)))
-      (cond
-       ;; above all headlines so nothing to do
-       ((not lvl)
-	(message "No headline to move"))
-       ((= lvl 1)
-	;; if at top level move current tree to go above first headline
-	(org-cut-subtree)
-	(beginning-of-buffer)
-	;; test if point is now at the first headline and if not then
-	;; move to the first headline
-	(unless (looking-at-p "*")
-	  (org-next-visible-heading 1))
-	(org-paste-subtree))
-       ((> lvl 1)
-	;; if not at top level then get position of headline level above
-	;; current section and refile to that position. Inspired by
-	;; https://gist.github.com/alphapapa/2cd1f1fc6accff01fec06946844ef5a5
-	(let* ((org-reverse-note-order t)
-	       (pos (save-excursion
-		      (outline-up-heading 1)
-		      (point)))
-	       (filename (buffer-file-name))
-	       (rfloc (list nil filename nil pos)))
-	  (org-refile nil nil rfloc))))))
-
-  (defun jrm/org-agenda-item-to-top ()
-    "Move the current agenda item to the top of the subtree in its file"
-    (interactive)
-    ;; save buffers to preserve agenda
-    (org-save-all-org-buffers)
-    ;; switch to buffer for current agenda item
-    (org-agenda-switch-to)
-    ;; move item to top
-    (jrm/org-headline-to-top)
-    ;; go back to agenda view
-    (switch-to-buffer (other-buffer (current-buffer) 1))
-    ;; refresh agenda
-    (org-agenda-redo)
-    )
-
-  ;; (define-key org-agenda-mode-map (kbd "1") 'jrm/org-agenda-item-to-top)
-#+END_SRC
-
-Setup reminders with [[http://sachachua.com/blog/2007/11/setting-up-appointment-reminders-in-org/][org-agenda-to-appt]].
-#+BEGIN_SRC emacs-lisp  ~/.emacs
-  (defun org-agenda-to-appt ()
-    "Activate appointments found in `org-agenda-files'."
-    (interactive)
-    (require 'org)
-    (let* ((today (org-date-to-gregorian
-           (time-to-days (current-time))))
-       (files org-agenda-files) entries file)
-      (while (setq file (pop files))
-        (setq entries (append entries (org-agenda-get-day-entries
-                       file today :timestamp))))
-      (setq entries (delq nil entries))
-      (mapc (lambda(x)
-          (let* ((event (org-trim (get-text-property 1 'txt x)))
-             (time-of-day (get-text-property 1 'time-of-day x)) tod)
-            (when time-of-day
-          (setq tod (number-to-string time-of-day)
-                tod (when (string-match
-                    "\\([0-9]\\{1,2\\}\\)\\([0-9]\\{2\\}\\)" tod)
-                   (concat (match-string 1 tod) ":"
-                       (match-string 2 tod))))
-          (if tod (appt-add tod event))))) entries)))
-
-  (org-agenda-to-appt)
-#+END_SRC
-
-**** Org Capture
-Customize org capture to my liking
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (global-set-key (kbd "C-c c") 'org-capture)
-  (setq org-capture-templates
-   '(("w" "Work Todo" entry (file "~/org/work/softwareadvice/SA.org")
-	  "** TODO %? :sa:\n  %i\n  %a")
-	 ("t" "Work Ticket Notes" entry (file "~/org/work/softwareadvice/SA.org")
-	  "** TICKET %? :saticket:\n  %T\n  %a\n\n*** Unit Tests\n	- [ ] \n\n*** General Notes")
-	 ("m" "Neon Club Meeting Notes" entry (file "~/org/work/softwareadvice/Meetings.org")
-	  "* %<%Y-%d-%m> Neon Club Meeting Notes\n** Date\n%<%b %e %Y>\n\n** Participants\n   * \n\n** Goals\n   * Weekly Neon Club Meeting\n\n** Discussion Topics\n   - \n\n** Action Items\n\n** Decisions")
-	 ("l" "Personal Todo" entry (file "~/org/personal/personal.org")
-	  "*** TODO %? :personal:\n  %i\n  %a")
-	 ("M" "Meeting" entry (file "~/org/work/softwareadvice/Meetings.org")
-	  "** MEETING with %? :MEETING:\n  %i\n"  :clock-in t :clock-resume t)
-	 ("n" "Next" entry (file "~/org/Next.org")
-	  "** NEXT %?\n  %i\n  %a")
-	 ("M" "Milestone" entry (file "~/org/work/softwareadvice/SA-milestones.org")
-	  "* %u %?\n*Summary*: \n\n*Description*: \n\n" :clock-in t :clock-resume t)))
-
-
-#+END_SRC
-
-**** Presentations
-***** Reveal JS
-#+BEGIN_SRC emacs-lisp  ~/.emacs
-  (use-package htmlize)
-
-
-  (add-to-list 'load-path "~/.emacs.d/lisp/org-reveal")
-  (require 'ox-reveal)
-#+END_SRC
-**** Update Custom Org workflow
-Lifted from [[http://cachestocaches.com/2016/9/my-workflow-org-agenda/]]. Need to customize to my preferences.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  ;; (setq org-todo-keywords '((type "TODO" "NEXT" "DONE" "WITING" "INACTIVE" "CANCELLED" "MEETING"))
-
-  ;; == Tags ==
-  (setq org-tag-alist '((:startgroup)
-		("@errand" . ?r)
-		("personal" . ?L)
-		(:endgroup)
-		("admin" . ?a)
-		("sa" . ?s)
-		("productivity" . ?p)
-		("engineering" . ?e)
-		("extra" . ?x)
-		("culture" . ?c)
-		("devops" . ?v)
-		))
-
-  ;; Allow setting single tags without the menu
-  (setq org-fast-tag-selection-single-key 'expert)
-
-  ;; Include the todo keywords
-  (setq org-fast-tag-selection-include-todo t)
-
-  ;; == Custom State Keywords ==
-  (setq org-use-fast-todo-selection t)
-  (setq org-todo-keywords
-	'((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-      (sequence "WAITING(w@/!)" "INACTIVE(i@/!)" "|" "CANCELLED(C@/!)" "MEETING")))
-  ;; Custom colors for the keywords
-  (setq org-todo-keyword-faces
-	'(("TODO" :foreground "red" :weight bold)
-      ("NEXT" :foreground "blue" :weight bold)
-      ("DONE" :foreground "forest green" :weight bold)
-      ("WAITING" :foreground "orange" :weight bold)
-      ("INACTIVE" :foreground "magenta" :weight bold)
-      ("CANCELLED" :foregroundhttp://cachestocaches.com/2016/9/my-workflow-org-agenda/ "forest green" :weight bold)
-      ("MEETING" :foreground "forest green" :weight bold)))
-  ;; Auto-update tags whenever the state is changed
-  (setq org-todo-state-tags-triggers
-	'(("CANCELLED" ("CANCELLED" . t))
-      ("WAITING" ("WAITING" . t))
-      ("INACTIVE" ("WAITING") ("INACTIVE" . t))
-      (done ("WAITING") ("INACTIVE"))
-      ("TODO" ("WAITING") ("CANCELLED") ("INACTIVE"))
-      ("NEXT" ("WAITING") ("CANCELLED") ("INACTIVE"))
-      ("DONE" ("WAITING") ("CANCELLED") ("INACTIVE"))))
-  (defun gs/mark-next-done-parent-tasks-todo ()
-    "Visit each parent task and change NEXT (or DONE) states to TODO."
-    ;; Don't change the value if new state is "DONE"
-    (let ((mystate (or (and (fboundp 'org-state)
-			    (member state
-		    (list "NEXT" "TODO")))
-		       (member (nth 2 (org-heading-components))
-		   (list "NEXT" "TODO")))))
-      (when mystate
-	(save-excursion
-	  (while (org-up-heading-safe)
-	    (when (member (nth 2 (org-heading-components)) (list "NEXT" "DONE"))
-	      (org-todo "TODO")))))))
-  (add-hook 'org-after-todo-state-change-hook 'gs/mark-next-done-parent-tasks-todo 'append)
-
-#+END_SRC
-
-***** Poor mans dropbox/text-file-syncing
-This attempts to sync an org file on save if it detects the file is in an ~/org/~ directory. Also added option to sync manually
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (defun jrm/sync-org ()
-    "Pulls latest changes to org repo locally"
-    (interactive)
-
-    (shell-command "cd ~/org && git add -A; git commit -m \"$(date)\" && git pull origin master && git push origin master &"))
-  (global-set-key (kbd "C-x C-j 1")  'jrm/sync-org)
-
-  (defun jrm/sync-org-on-save ()
-    "Detects if is an org file and is in org directory and if so, syncs changes"
-    (if (equal major-mode 'org-mode)
-	(if (string-match-p (regexp-quote "/org/") (file-name-directory buffer-file-name))
-	    (jrm/sync-org))))
-
-  (add-hook 'after-save-hook 'jrm/sync-org-on-save)
-
-#+END_SRC
-
-**** Confluence
-Its tedious to lookup tickets in Jira when all I have is the ID. Much quicker to hack some elisp to do it for me. Using Xah's get-thing for a consistent syntax table when trying to read the id at the cursor position.
-  #+begin_src emacs-lisp
-    (use-package xah-get-thing)
-
-    (defun jrm/jira-ticket-open ()
-      "Jumps to a jira ticket"
-      (interactive)
-      (let* ((read-id (xah-get-thing-at-point 'word))
-	     (jid (read-string "Enter Jira Id: " read-id)))
-	(if (equal "" jid)
-	    (jrm/jira-ticket-open)
-	  (browse-url (concat "https://softwareadvice.atlassian.net/browse/" jid)))))
-  #+end_src
-
-*** Filesystem Navigation
-Tramp is a must have.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package tramp
-    :config
-    (setq tramp-default-method "scp"))
-#+END_SRC
-
-Setup Ibuffer and organize by mode type
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (global-set-key (kbd "C-x C-b") 'ibuffer)
-
-  (setq ibuffer-saved-filter-groups
-        (quote (("default"
-                 ("dired" (mode . dired-mode))
-                 ("org" (mode . org-mode))
-                 ("shell" (mode . shell-mode))
-                 ("git" (name . "^magit\*"))
-                 ("Slack" (or
-                           (mode . slack-mode)
-                           (name . "^\\*Slack.*$")
-                           ))
-                 ("email" (name . "^\\*mu4e-.*\\*$"))
-                 ("javascript" (or
-                                (mode . javascript-mode)
-                                (name . "^.*.js$")
-                                (name . "^.*.ts")
-                                (name . "^.*.json$")
-                                ))
-                 ("markup" (or
-                            (mode . web-mode)
-                            (name . "^.*.tpl")
-                            (name . "^.*.mst")
-                            (name . "^.*.html")
-                            ))
-                 ("images" (name . "^.*png$"))
-                 ("process" (or
-                             (mode . grep-mode)
-                             (name . "^\\*tramp*$")
-                             ))
-                 ("emacs" (or
-                           (name . "^\\*scratch\\*$")
-                           (name . "^\\*Messages\\*$")
-                           (name . "^\\*eww\\*$")
-                           (name . "^\\*GNU Emacs\\*$")
-                           ))
-                 ))))
-
-  (add-hook 'ibuffer-mode-hook
-            (lambda ()
-              (ibuffer-switch-to-saved-filter-groups "default")))
-#+END_SRC
-
-Dumb jump for jumping around projects
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package dumb-jump
-    :config
-    (dumb-jump-mode)
-    (global-set-key (kbd "C-c C-j") 'dumb-jump-go)
-    )
-#+END_SRC
-
-Copy current file path. Lifted from (http://ergoemacs.org/emacs/emacs_copy_file_path.html)
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-;; Copy the file path of the current buffer
-(defun jrm/copy-file-path (&optional *dir-path-only-p)
-  "Copy the current buffer's file path or dired path to `kill-ring'.
-Result is full path."
-  (interactive "P")
-  (let ((-fpath
-         (if (equal major-mode 'dired-mode)
-             (expand-file-name default-directory)
-           (if (buffer-file-name)
-               (buffer-file-name)
-             (user-error "Current buffer is not associated with a file.")))))
-    (kill-new
-     (if *dir-path-only-p
-         (progn
-           (message "Directory path copied: 「%s」" (file-name-directory -fpath))
-           (file-name-directory -fpath))
-       (progn
-         (message "File path copied: 「%s」" -fpath)
-         -fpath )))))
-
-#+END_SRC
-
-Projectile for project level interaction
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package projectile :diminish projectile-mode)
-#+END_SRC
-
+*** Grep
 Ignore certain directories by default for grep
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (custom-set-variables
@@ -776,25 +124,228 @@ Ignore certain directories by default for grep
       ("SCCS" "RCS" "CVS" "MCVS" ".src" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "node_modules" "vendor"))))
 #+END_SRC
 
+*** IBuffer
+
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
+  (setq ibuffer-saved-filter-groups
+	(quote (("default"
+		 ("dired" (mode . dired-mode))
+		 ("org" (mode . org-mode))
+		 ("shell" (mode . shell-mode))
+		 ("git" (name . "^magit\*"))
+		 ("Slack" (or (mode . slack-mode)
+			      (name . "^\\*Slack.*$")))
+		 ("email" (name . "^\\*mu4e-.*\\*$"))
+		 ("javascript" (or (mode . javascript-mode)
+				   (name . "^.*.js$")
+				   (name . "^.*.ts")
+				   (name . "^.*.json$")))
+		 ("markup" (or (mode . web-mode)
+			       (name . "^.*.tpl")
+			       (name . "^.*.mst")
+			       (name . "^.*.html")))
+		 ("images" (name . "^.*png$"))
+		 ("process" (or (mode . grep-mode)
+				(name . "^\\*tramp*$")))
+		 ("emacs" (or (name . "^\\*scratch\\*$")
+			      (name . "^\\*Messages\\*$")
+			      (name . "^\\*eww\\*$")
+			      (name . "^\\*GNU Emacs\\*$")))))))
+  (add-hook 'ibuffer-mode-hook (lambda () (ibuffer-switch-to-saved-filter-groups "default")))
+#+END_SRC
+
+*** GPG Pinentry
+Instead of using the display's popup, prompt for gpg creds in the minibuffer
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+  (setq epa-pinentry-mode 'loopback)
+#+END_SRC
+
+*** General Auto Completion
+**** Ido Mode
+Ido is great for lots of stuff including fuzzy matching
+ #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+   (setq ido-enable-flex-matching nil)
+   (setq ido-create-new-buffer 'always) ;; create a buffer with specific name if it doesn't exist already
+   (setq ido-everywhere t)
+   (ido-mode 1)
+   (use-package ido-vertical-mode
+     :config (ido-vertical-mode 1))
+   (setq ido-vertical-define-keys 'C-n-and-C-p-only)
+ #+END_SRC
+
+**** Ivy/Counsel/Swiper
+Generic auto-complete with Ivy which 
+ #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+   (use-package ivy :demand
+     :diminish ivy-mode
+     :config
+     (setq ivy-use-virtual-buffers t
+	   ivy-count-format "%d/%d "))
+   (ivy-mode 1)
+   (setq ivy-use-selectable-prompt t)
+ #+END_SRC
+
+ Ivy enhanced search (swiper) and common Emacs meta commands (counsel)
+ #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+   (use-package counsel
+     :config
+     (global-set-key (kbd "M-x") 'counsel-M-x))
+
+   (use-package swiper
+     :config
+     (global-set-key (kbd "C-s") 'swiper))
+ #+END_SRC
+
+To make swiper quicker, disable global visual line mode.
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (global-visual-line-mode nil)
+#+END_SRC
+
+**** Company mode
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+  (use-package company :diminish company-mode
+    :init (add-hook 'after-init-hook 'global-company-mode))
+#+END_SRC
+
+Company-mode with icons
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+(use-package company-box
+  :hook (company-mode . company-box-mode)
+  :diminish company-box-mode)
+(setq company-idle-delay 0.2)
+#+END_SRC
+
+** Introspection
+*** M-x Enhancements: Smex for auto complete meta commands
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package smex
+    :init (smex-initialize)
+    :bind ("M-x" . smex))
+#+END_SRC
+
+*** Which key
+Some quick help for when I get stuck in the middle of a command
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package which-key :config (which-key-mode))
+#+END_SRC
+
+** File Editing/Navigation
+*** General Settings
+ Keep temporary and backup buffers out of current directory like a civilized human being.
+ #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+   (custom-set-variables
+    '(auto-save-file-name-transforms '((".*" "~/.emacs.d/autosaves/\\1" t)))
+    '(backup-directory-alist '((".*" . "~/.emacs.d/backups/")))
+    '(delete-old-versions t))
+
+   (make-directory "~/.emacs.d/autosaves/" t)
+ #+END_SRC
+
+ Disable the narrow-to-region message
+ #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+   (put 'narrow-to-region 'disabled nil)
+ #+END_SRC
+
+I'm accustomed to being able to highlight a region then replace it with the next keystroke, (i.e. a letter, return, backspace, etc.).
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (delete-selection-mode 1)
+#+END_SRC
+
 *** In-file Navigation
 Easier paragraph jumping
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (global-set-key (kbd "M-p") 'backward-paragraph)
-  (global-set-key (kbd "M-n") 'forward-paragraph)
-#+END_SRC
+ #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+   (global-set-key (kbd "M-p") 'backward-paragraph)
+   (global-set-key (kbd "M-n") 'forward-paragraph)
+ #+END_SRC
 
 Avy is great for speed-of-thought navigation
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package avy)
-  (global-set-key (kbd "M-s") 'avy-goto-char)
-  (global-set-key (kbd "C-c SPC") 'avy-goto-line)
+ #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+   (use-package avy)
+   (global-set-key (kbd "M-s") 'avy-goto-char)
+   (global-set-key (kbd "C-c SPC") 'avy-goto-line)
+ #+END_SRC
+
+Turn on linum mode for almost everything.
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (global-set-key (kbd "C-c l l") 'display-line-numbers-mode)
 #+END_SRC
 
-Wrap long lines so I can see everything at a glance
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (global-visual-line-mode t)
+*** Programming
+**** Lisps
+***** General Settings
+Paredit for maintaining sanity while working with lisp
+#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
+(use-package paredit)
 #+END_SRC
 
+Some general settings for lisp dialects (elisp, clojure, etc).
+#+BEGIN_SRC emacs-lisp :export code ~/.emacs
+  (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+  (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+  (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+  (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+  (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+  (add-hook 'clojure-mode-hook          #'enable-paredit-mode)
+#+End_SRC
+
+***** elisp
+Make evaluating elisp buffers even quicker
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (global-set-key (kbd "C-c C-e")  'eval-buffer)
+#+END_SRC
+***** Clojure Development
+Clojure with Cider for interactive Clojure development
+#+BEGIN_SRC emacs-lisp :export code :tangle ~/.emacs
+  (use-package clojure-mode
+    :config
+    (add-to-list 'auto-mode-alist '("\\.edn$" . clojure-mode))
+    (add-to-list 'auto-mode-alist '("\\.boot$" . clojure-mode))
+    (add-to-list 'auto-mode-alist '("\\.cljs.*$" . clojure-mode))
+    (add-to-list 'auto-mode-alist '("lein-env" . enh-ruby-mode)))
+
+  (use-package eldoc :diminish eldoc-mode)
+
+  (use-package cider
+    :config
+    (add-hook 'cider-repl-mode-hook #'eldoc-mode)
+    (setq cider-repl-pop-to-buffer-on-connect t) ;; go to the repl when done connecting
+    (setq cider-show-error-buffer t)
+    (setq cider-auto-select-error-buffer t)) ;; jump to error message
+
+  (defun paredit-enable-modes () (add-hook 'emacs-lisp-mode-hook 'paredit-mode))
+
+  (use-package paredit :config (paredit-enable-modes))
+#+END_SRC
+
+****** Clojure/Quil Workflow Customization
+A popup HSV color picker is helpful for quick prototyping/sketching
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (defun convert-range-360 (val)
+    "Converts a value from a 0-1 range to 0-360 range. Used for calculating hue."
+    (* (/ (- val 0) (- 1 0)) (+ (- 360 0) 0)))
+
+  (defun jrm/insert-color-hsb ()
+    "Select a color and insert its hue/saturation/brightness[lumenosity] format."
+    (interactive "*")
+    (let ((buf (current-buffer)))
+      (custom-set-variables '(list-colors-sort (quote hsv)))
+      (list-colors-display
+       nil nil `(lambda (name)
+		  (interactive)
+		  (quit-window)
+		  (with-current-buffer ,buf
+		    (setq hsb (apply 'color-rgb-to-hsl (color-name-to-rgb name)))
+		    (setq hue (convert-range-360 (nth 0 hsb)))
+		    (setq sat (* 100 (nth 1 hsb)))
+		    (insert (format "%s" hue 100) " " (format "%s" sat) " " (format "%s" 100.0)))))))
+  (global-set-key (kbd "C-x C-j H")  'jrm/insert-color-hsb)
+#+END_SRC
+
+**** ECMAScript
+***** General Settings
 Some basic code folding
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package yafolding
@@ -803,447 +354,51 @@ Some basic code folding
 	   (fundamental-mode . yafolding-mode)))
 #+END_SRC
 
-*** File Editing utilities
-I find it helpful to be able to backtab (shift+tab) to un-indent
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (global-set-key (kbd "<backtab>") 'un-indent-by-removing-4-spaces)
-  (defun un-indent-by-removing-4-spaces ()
-    "Remove 4 spaces from beginning of of line."
-    (interactive)
-    (save-excursion
-      (save-match-data
-        (beginning-of-line)
-        ;; get rid of tabs at beginning of line
-        (when (looking-at "^\\s-+")
-          (untabify (match-beginning 0) (match-end 0)))
-        (when (looking-at "^    ")
-          (replace-match "")))))
-#+END_SRC
-
-Make evaluating lisp buffers even quicker
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (global-set-key (kbd "C-c C-e")  'eval-buffer)
-#+END_SRC
-
-Keep temporary and backup buffers out of current directory like a civilized human being.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+***** Angular/TS Development
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (setq exec-path (append exec-path '(*node-dir*)))
   (custom-set-variables
-   '(auto-save-file-name-transforms '((".*" "~/.emacs.d/autosaves/\\1" t)))
-   '(backup-directory-alist '((".*" . "~/.emacs.d/backups/")))
-   '(delete-old-versions t))
-
-  (make-directory "~/.emacs.d/autosaves/" t)
+   '(flycheck-typescript-tslint-executable (concat *node-dir* "tslint"))
+   '(tide-node-executable (concat *node-dir* "node")))
+  (use-package ng2-mode)
+  (use-package flycheck :diminish flycheck-mode)
+  (use-package tide :diminish tide-mode
+    :config
+    (defun setup-tide-mode ()
+      (interactive)
+      (tide-setup)
+      (flycheck-mode +1)
+      (setq flycheck-check-syntax-automatically '(save mode-enabled))
+      (eldoc-mode +1)
+      (tide-hl-identifier-mode +1)
+      ;; company is an optional dependency.
+      (company-mode +1))
+    (setq company-tooltip-align-annotations t)
+    ;; formats the buffer before saving
+    ;; (add-hook 'before-save-hook 'tide-format-before-save)
+    (add-hook 'typescript-mode-hook #'setup-tide-mode)
+    (setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil :IndentStyle 2)))
 #+END_SRC
 
-Turn on linum mode for almost everything.
+Check for ts lint errors
+#+BEGIN_SRC emacs-lisp  ~/.emacs
+  (flycheck-add-mode 'typescript-tslint 'ng2-ts-mode)
+  (flycheck-add-mode 'typescript-tide 'ng2-ts-mode)
+#+END_SRC
+
+For Tide integration, use the local tsserver and fallback to the default one installed with tide
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (global-set-key (kbd "C-c l l") 'display-line-numbers-mode)
+  (let* ((package-root (locate-dominating-file default-directory "package.json"))
+	 (path (and package-root
+		    (expand-file-name "node_modules/typescript/bin/tsserver"
+				      (expand-file-name package-root)))))
+    (when (and path (file-exists-p path))
+      (make-local-variable 'tide-tsserver-executable)
+      (setq tide-tsserver-executable path)))
 #+END_SRC
 
-Turn off the mouse/trackpad when editing certain files
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (add-hook 'javascript-mode-hook 'disable-mouse-mode)
-  (add-hook 'text-mode-hook 'disable-mouse-mode)
-  (add-hook 'web-mode-hook 'disable-mouse-mode)
-  (add-hook 'dired-mode-hook 'disable-mouse-mode)
-  (add-hook 'org-mode-hoook 'disable-mouse-mode)
-  (add-hook 'lisp-interaction-mode-hook 'disable-mouse-mode)
-  (add-hook 'emacs-lisp-mode-hook 'disable-mouse-mode)
-  (add-hook 'special-mode-hook 'disable-mouse-mode)
-  (add-hook 'fundamental-mode-hook 'disable-mouse-mode)
-  (add-hook 'groovy-mode-hook 'disable-mouse-mode)
-  (add-hook 'ng2-ts-mode-hook 'disable-mouse-mode)
-  (add-hook 'org-agenda-mode-hook 'disable-mouse-mode)
-  (add-hook 'eshell-mode-hook 'disable-mouse-mode)
-  (add-hook 'slack-message-buffer-mode-hook 'disable-mouse-mode)
-  (add-hook 'typescript-mode-hook 'disable-mouse-mode)
-  (add-hook 'clojure-mode-hook 'disable-mouse-mode)
-  (add-hook 'repl-mode-hook 'disable-mouse-mode)
-#+END_SRC
-
-Disable the narrow-to-region message
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (put 'narrow-to-region 'disabled nil)
-#+END_SRC
-
-**** Programming & Ops
-I prefer to see trailing whitespace; however, I don't care about it in every situation, like when I'm reading prose.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package whitespace
-    :config
-    (setq-default show-trailing-whitespace t)
-
-    (defun no-trailing-whitespace ()
-      (setq show-trailing-whitespace nil))
-
-    (add-hook 'minibuffer-setup-hook
-	      'no-trailing-whitespace)
-    (add-hook 'eww-mode-hook
-	      'no-trailing-whitespace)
-    (add-hook 'shell-mode-hook
-	      'no-trailing-whitespace)
-    (add-hook 'mu4e:view-mode-hook
-	      'no-trailing-whitespace)
-    (add-hook 'eshell-mode-hook
-	      'no-trailing-whitespace)
-    (add-hook 'help-mode-hook
-	      'no-trailing-whitespace)
-    (add-hook 'term-mode-hook
-	      'no-trailing-whitespace)
-    (add-hook 'slack-message-buffer-mode-hook
-	      'no-trailing-whitespace)
-    (add-hook 'mu4e:view-mode-hook
-	      'no-trailing-whitespace)
-    (add-hook 'calendar-mode-hook
-	      'no-trailing-whitespace))
-
-#+END_SRC
-
-Various modes helpful for development
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-
-  (use-package yaml-mode
-    :config
-    (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode)))
-
-  (use-package restclient)
-  (use-package groovy-mode)
-  (use-package go-mode)
-#+END_SRC
-
-Magit for version control
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-
-  (use-package magit
-    :config
-    (global-set-key (kbd "C-x g") 'magit-status))
-#+END_SRC
-
-Defining custom indentation based on project paths and setting them to functions that I can call as needed. This also sets backtab.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (defun jrm/setup-indent (n)
-    (setq indent-tabs-mode nil)
-    ;; java/c/c++
-    (setq-local c-basic-offset n)
-    ;; web development
-    (setq-local coffee-tab-width n) ; coffeescript
-    (setq-local javascript-indent-level n) ; javascript-mode
-    (setq-local js-indent-level n) ; js-mode
-    (setq-local typescript-indent-level n) ; typescript-mode
-    ;; (setq-local js2-basic-offset n) ; js2-mode, in latest js2-mode, it's alias of js-indent-level
-    (setq-local web-mode-markup-indent-offset 2) ; web-mode, html tag in html file
-    (setq-local web-mode-css-indent-offset 2) ; web-mode, css in html file
-    (setq-local web-mode-code-indent-offset n) ; web-mode, js code in html file
-    (setq-local css-indent-offset 2) ; css-mode
-    )
-
-  ;; Allow manual changing of coding styles
-  (defun jrm/neon-code-style ()
-    (interactive)
-    (message "Using Neon coding style")
-    ;; indent 2 spaces width
-    (jrm/setup-indent 2))
-
-  (defun jrm/personal-code-style ()
-    (interactive)
-    (message "Using personal coding style")
-    ;; indent 4 spaces width
-    (jrm/setup-indent 4))
-
-
-  (defun jrm/develop-environment ()
-    (let ((proj-dir (file-name-directory (buffer-file-name))))
-      (if (string-match-p "neon/" proj-dir)
-	  (jrm/neon-code-style))))
-
-
-
-  (add-hook 'typescript-mode-hook 'jrm/develop-environment)
-  ;; (add-hook 'prog-mode-hook 'jrm/develop-environment)
-  (add-hook 'lua-mode-hook 'jrm/develop-environment)
-  (add-hook 'web-mode-hook 'jrm/develop-environment)
-  (add-hook 'json-mode-hook 'jrm/neon-code-style)
-
-  ;; Backwards delete word
-  (global-set-key [M-delete] 'backward-kill-word)
-#+END_SRC
-
-I'm accustomed to being able to highlight a region then replace it with the next keystroke, (i.e. a letter, return, backspace, etc.).
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (delete-selection-mode 1)
-#+END_SRC
-
-A bit of helpful javascript/typsecript debugging
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (defun jrm/insert-debug-log ()
-    "Inserts logging based on mode"
-    (interactive)
-    (when (or (equal major-mode 'js-mode) (equal major-mode 'typescript-mode) (equal major-mode 'ng2-ts-mode))
-      (insert "console.log(\"\");")
-      (backward-char 3))
-    (when (equal major-mode 'clojure-mode)
-      (insert "(println (format \"%s\" ))")
-      (backward-char 2))
-    (when (equal major-mode 'emacs-lisp-mode)
-      (insert "(message (format \"%s\" ))")
-      (backward-char 2)))
-
-  (global-set-key (kbd "C-x C-j d") 'jrm/insert-debug-log)
-#+END_SRC
-
-A bit of elisp to integrate project's build script into emacs
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-(setq neonBuffer "Watch Neon [SSR]")
-(defun jrm/start-neon ()
-  "Start an interactive Neon process"
-  (interactive)
-  (let* ((neonPath "~/src/neon/")
-	(default-directory neonPath)
-	(proc (start-process "build-neon-ssr" neonBuffer "/usr/bin/node"
-			     (expand-file-name (concat neonPath ".build/live-ssr-reloading.js")))))
-    (set-process-filter proc (lambda (proc line)
-			       (with-current-buffer neonBuffer (insert line))
-			       (if (or (string-match-p (regexp-quote "building") line)
-				       (string-match-p (regexp-quote ".^M") line)
-				       (string-match-p (regexp-quote "[rendered]") line))
-				   (message "%s" (propertize "Building Neon..." 'face '(:foreground "purple"))))
-			       (if (string-match-p (regexp-quote "Exit this program") line)
-				   (message "%s" (propertize "Neon Built successfully, reload your browser" 'face '(:foreground "green"))))))))
-(global-set-key (kbd "C-x C-j n") 'jrm/start-neon)
-
-(global-set-key (kbd "C-x C-j N") (lambda () (interactive)
-				    (process-send-string "build-neon-ssr" "q\n")
-				    (kill-buffer neonBuffer)))
-#+END_SRC
-
-***** Web development
- Emmet mode for html/css
- #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-   (use-package emmet-mode)
-   (add-hook 'sgml-mode-hook 'emmet-mode)
-   (add-hook 'css-mode-hook  'emmet-mode)
- #+END_SRC
-
- Using Node JS Repl which is helpful for node development as well as just tinkering around with JS
- #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-   (use-package nodejs-repl)
-   (add-hook 'js-mode-hook
-	     (lambda ()
-	       (define-key js-mode-map (kbd "C-c C-e") 'nodejs-repl-send-last-expression)
-	       (define-key js-mode-map (kbd "C-c C-c") 'nodejs-repl-send-buffer)
-	       (define-key js-mode-map (kbd "C-c C-j") 'nodejs-repl-send-line)
-	       (define-key js-mode-map (kbd "C-c C-r") 'nodejs-repl-send-region)
-	       (define-key js-mode-map (kbd "C-c C-l") 'nodejs-repl-load-file)
-	       (define-key js-mode-map (kbd "C-c C-z") 'nodejs-repl-switch-to-repl)))
- #+END_SRC
-
-I also like to use org mode's code evaluation capabilities for tinkering around with different languages. Here's a bit of elisp to automate the manual part of that process:
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-(defun jrm/js-playground()
-  "Creates an org buffer for fiddling around with JS code. Uses org so that results can be evaluated."
-  (interactive)
-  (get-buffer-create "js-playground")
-  (switch-to-buffer "js-playground")
-  (org-mode)
-  (goto-char 1)
-  (insert "#+BEGIN_SRC js\n\n#+END_SRC\n")
-  (goto-char 16))
-(global-set-key (kbd "C-x C-j C-j") 'jrm/js-playground)
-
-#+END_SRC
-
-
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  ;; SCSS Mode
-  (use-package sass-mode
-    :config
-    (setq exec-path (cons (expand-file-name "/usr/bin/sass") exec-path)))
-
-  ;; SGML Mode - Indentation
-  (add-hook 'sgml-mode-hook
-	    (lambda ()
-	      ;; Default indentation to 2, but let SGML mode guess, too.
-	      (set (make-local-variable 'sgml-basic-offset) 4)
-	      (sgml-guess-indent))
-	    )
-
-  ;; Markdown Mode
-  (autoload 'markdown-mode "markdown-mode"
-    "Major mode for editing Markdown files" t)
-  (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
-  (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
-  (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-
-  (use-package web-mode
-    :config
-    (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.tpl\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.mst\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.hbs\\'" . web-mode)))
-
-  ;; Last but not least
-  (setq c-basic-offset 4)
-  (setq web-mode-css-indent-offset 4)
-  (setq web-mode-markup-indent-offset 4)
-  (setq web-mode-code-indent-offset 4)
-#+END_SRC
-****** PHP Development
- PHP Development
- #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-   ;; PHP Mode Improved (http://www.emacswiki.org/emacs/php-mode-improved.el)
-   ;; (add-to-list 'load-path "~/.emacs.d/lisp/")
-   (use-package php-mode
-     :config
-     (autoload 'php-mode "php-mode-improved" "Major mode for editing php code." t)
-     (add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
-     (add-to-list 'auto-mode-alist '("\\.inc$" . php-mode)))
- #+END_SRC
-
-****** Angular/TS Development
- Angular setup
- #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-   (setq exec-path (append exec-path '("/home/jrm/.nvm/versions/node/v9.11.1/bin")))
-   (use-package ng2-mode)
-
-   (use-package flycheck
-     :diminish flycheck-mode)
-
-   (custom-set-variables
-    '(flycheck-typescript-tslint-executable "/home/jrm/.nvm/versions/node/v9.11.1/bin/tslint")
-    '(tide-node-executable "/Users/jgooch/.nvm/versions/node/v10.11.0/bin/node"))
-
-
-   (use-package company :diminish company-mode)
-
-   ;; company-mode with icons
-   (use-package company-box
-     :hook (company-mode . company-box-mode)
-     :diminish company-box-mode)
-
-   (setq company-idle-delay 0.2)
-
-   (use-package tide
-     :diminish tide-mode
-     :config
-     (defun setup-tide-mode ()
-       (interactive)
-       (tide-setup)
-       (flycheck-mode +1)
-       (setq flycheck-check-syntax-automatically '(save mode-enabled))
-       (eldoc-mode +1)
-       (tide-hl-identifier-mode +1)
-       ;; company is an optional dependency.
-       (company-mode +1))
-
-     ;; aligns annotation to the right hand side
-     (setq company-tooltip-align-annotations t)
-
-     ;; formats the buffer before saving
-     (add-hook 'before-save-hook 'tide-format-before-save)
-
-     (add-hook 'typescript-mode-hook #'setup-tide-mode)
-     (setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil :IndentStyle 2))
-
-     (define-key tide-mode-map (kbd "C-c C-d") 'tide-documentation-at-point)
-     (define-key tide-mode-map (kbd "C-c C-i") 'tide-organize-imports))
- #+END_SRC
-
- Check for ts lint errors
- #+BEGIN_SRC emacs-lisp  ~/.emacs
-   (flycheck-add-mode 'typescript-tslint 'ng2-ts-mode)
-   (flycheck-add-mode 'typescript-tide 'ng2-ts-mode)
- #+END_SRC
-
- For Tide integration, use the local tsserver and fallback to the default one installed with tide
- #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-   (let* ((package-root (locate-dominating-file default-directory
-						"package.json"))
-          (path
-           (and package-root
-		(expand-file-name "node_modules/typescript/bin/tsserver"
-                                  (expand-file-name package-root)))))
-     (when (and path
-		(file-exists-p path))
-       (make-local-variable 'tide-tsserver-executable)
-       (setq tide-tsserver-executable path)
-       ))
- #+END_SRC
-
-Hide/show the imports at the top of the buffer with a bit of help from yafolding.
-#+begin_src emacs-lisp :tangle ~/.emacs
-  (defcustom jrm/imports-placeholder-content "[=== Imports Hidden ===]"
-    "Text to show in place of a folded block."
-    :tag "Ellipsis"
-    :type 'string
-    :group 'jrmhideimports)
-
-  (defface jrm/imports-placeholder-face
-    '()
-    "Face for folded blocks"
-    :group 'jrmhideimports)
-
-  (defun jrm/imports-placeholder ()
-    "Return propertized ellipsis content."
-    (concat " "
-	    (propertize jrm/imports-placeholder-content 'face 'jrm/imports-placeholder-face)
-	    " "))
-
-  (defun jrm/neon-hide-imports ()
-    "Hide standard imports based on regex for standard JS/TS imports of multiple modules"
-    (let ((final-location (point)))
-      (funcall (lambda () "Use regex to hide the imports"
-		 ;; Ignore if file is under node_modules
-		 (if (string-match-p (regexp-quote "/node_modules/") (file-name-directory buffer-file-name))
-		     (toggle-truncate-lines)
-		   (end-of-buffer)
-		   (search-backward-regexp "from[[:space:]\.].*;")
-		   (end-of-line)
-		   (set-mark-command nil)
-		   (beginning-of-buffer)
-
-		   (let ((new-overlay (make-overlay (region-beginning) (region-end))))
-		     (overlay-put new-overlay 'invisible t)
-		     (overlay-put new-overlay 'intangible t)
-		     (overlay-put new-overlay 'evaporate t)
-		     (overlay-put new-overlay 'before-string (jrm/imports-placeholder))
-		     (overlay-put new-overlay 'category "hide-js-imports"))
-
-		   (goto-char final-location)
-		   (pop-mark)
-		   (toggle-truncate-lines)
-		   (message "Imports hidden"))))))
-
-  (defun jrm/has-import-overlay ()
-    "Finds any matching overlays"
-    (mapcar (lambda (overlay)
-	      (and (member "hide-js-imports" (overlay-properties overlay)) overlay))
-	    (overlays-in (point-min) (point-max))))
-
-  (defun jrm/neon-show-imports ()
-    "Show module imports"
-    (mapcar 'delete-overlay (delq nil (jrm/has-import-overlay))))
-
-  (defun jrm/neon-toggle-imports ()
-    "Show/Hide standard module import code"
-    (interactive)
-
-    (if (delq nil (jrm/has-import-overlay))
-	(jrm/neon-show-imports)
-      (jrm/neon-hide-imports)))
-
-  (global-set-key (kbd "C-x C-j C-n") 'jrm/neon-toggle-imports)
-
-
-#+end_src
-
+***** Destructured Imports
+Provide a way to stack imports as there is currently no option using linters
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs 
   (defun jrm/stack-imports ()
     "Uses regex to stack import statements in JS/TS files."
@@ -1288,179 +443,608 @@ Hide/show the imports at the top of the buffer with a bit of help from yafolding
     (goto-char origPos))
 
   (add-hook 'before-save-hook 'jrm/stack-imports)
-
 #+END_SRC
 
-***** Clojure Development
-Clojure with Cider for interactive Clojure development
-#+BEGIN_SRC emacs-lisp :export code :tangle ~/.emacs
-  (use-package clojure-mode
-	:config
-	;; Set mode for specific files
-	(add-to-list 'auto-mode-alist '("\\.edn$" . clojure-mode))
-	(add-to-list 'auto-mode-alist '("\\.boot$" . clojure-mode))
-	(add-to-list 'auto-mode-alist '("\\.cljs.*$" . clojure-mode))
-	(add-to-list 'auto-mode-alist '("lein-env" . enh-ruby-mode)))
+By stacking imports the actual code gets pushed pretty far down in a view, so provide a way to fold them out of the view. Depends on yafolding.
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (defcustom jrm/imports-placeholder-content "[=== Imports Hidden ===]"
+    "Text to show in place of a folded block."
+    :tag "Ellipsis" :type 'string :group 'jrmhideimports)
 
-  (use-package eldoc
-	:diminish eldoc-mode)
+  (defface jrm/imports-placeholder-face '()
+    "Face for folded blocks"
+    :group 'jrmhideimports)
 
-  (use-package cider
-	:config
-	(add-hook 'cider-repl-mode-hook #'eldoc-mode)
-	(setq cider-repl-pop-to-buffer-on-connect t) ;; go to the repl when done connecting
-	(setq cider-show-error-buffer t)
-	(setq cider-auto-select-error-buffer t)) ;; jump to error message
+  (defun jrm/imports-placeholder ()
+    "Return propertized ellipsis content."
+    (concat " " (propertize jrm/imports-placeholder-content 'face 'jrm/imports-placeholder-face) " "))
 
-	;; (use-package clojure-cheatsheet
-	;;   :ensure t
-	;;   :config
-	;;   '(progn
-	;;      (define-key clojure-mode-map (kbd "C-c C-h") #'clojure-cheatsheet))
-	;;   (add-hook 'clojure-mode-hook 'subword-mode)
-	;;   (use-package clojure-mode-extra-font-locking
-	;;     :ensure t))
+  (defun jrm/neon-hide-imports ()
+    "Hide standard imports based on regex for standard JS/TS imports of multiple modules"
+    (let ((final-location (point)))
+      (funcall (lambda () "Use regex to hide the imports"
+		 ;; Ignore if file is under node_modules
+		 (if (string-match-p (regexp-quote "/node_modules/") (file-name-directory buffer-file-name))
+		     (toggle-truncate-lines)
+		   (end-of-buffer)
+		   (search-backward-regexp "from[[:space:]\.].*;")
+		   (end-of-line)
+		   (set-mark-command nil)
+		   (beginning-of-buffer)
+		   (let ((new-overlay (make-overlay (region-beginning) (region-end))))
+		     (overlay-put new-overlay 'invisible t)
+		     (overlay-put new-overlay 'intangible t)
+		     (overlay-put new-overlay 'evaporate t)
+		     (overlay-put new-overlay 'before-string (jrm/imports-placeholder))
+		     (overlay-put new-overlay 'category "hide-js-imports"))
+		   (goto-char final-location)
+		   (pop-mark)
+		   (toggle-truncate-lines)
+		   (message "Imports hidden"))))))
 
-  (defun paredit-enable-modes ()
-	(add-hook 'emacs-lisp-mode-hook 'paredit-mode))
-  (use-package paredit
-	:config (paredit-enable-modes))
+  (defun jrm/has-import-overlay ()
+    "Finds any matching overlays"
+    (mapcar (lambda (overlay) (and (member "hide-js-imports" (overlay-properties overlay)) overlay))
+	    (overlays-in (point-min) (point-max))))
 
+  (defun jrm/neon-show-imports ()
+    "Show module imports"
+    (mapcar 'delete-overlay (delq nil (jrm/has-import-overlay))))
+
+  (defun jrm/neon-toggle-imports ()
+    "Show/Hide standard module import code"
+    (interactive)
+    (if (delq nil (jrm/has-import-overlay)) (jrm/neon-show-imports) (jrm/neon-hide-imports)))
+
+  (global-set-key (kbd "C-x C-j C-n") 'jrm/neon-toggle-imports)
+#+end_src
+
+***** Indentation
+Defining custom indentation based on project paths and setting them to functions that I can call as needed. 
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (defun jrm/setup-indent (n)
+    (setq indent-tabs-mode nil)
+    (setq-local c-basic-offset n)
+    (setq-local javascript-indent-level n)
+    (setq-local js-indent-level n)
+    (setq-local typescript-indent-level n)
+    (setq-local web-mode-markup-indent-offset 2)
+    (setq-local web-mode-css-indent-offset 2)
+    (setq-local web-mode-code-indent-offset n)
+    (setq-local css-indent-offset 2))
+
+  (defun jrm/neon-code-style ()
+    "indent 2 spaces width"
+    (interactive)
+    (message "Using Neon coding style")
+    (jrm/setup-indent 2))
+
+  (defun jrm/personal-code-style ()
+    "indent 4 spaces width"
+    (interactive)
+    (message "Using personal coding style")
+    (jrm/setup-indent 4))
+
+  (defun jrm/develop-environment ()
+    "if 'neon' is in the path, set the indentation accordingly"
+    (let ((proj-dir (file-name-directory (buffer-file-name))))
+      (if (string-match-p "neon/" proj-dir)
+	  (jrm/neon-code-style))))
+
+  (add-hook 'typescript-mode-hook 'jrm/develop-environment)
+  (add-hook 'lua-mode-hook 'jrm/develop-environment)
+  (add-hook 'web-mode-hook 'jrm/develop-environment)
+  (add-hook 'json-mode-hook 'jrm/neon-code-style)
 #+END_SRC
+**** HTML/CSS
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package sass-mode :config (setq exec-path (cons (expand-file-name "/usr/bin/sass") exec-path)))
+  (add-hook 'sgml-mode-hook (lambda () (set (make-local-variable 'sgml-basic-offset) 4) (sgml-guess-indent)))
+
+  (use-package web-mode
+    :config
+    (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.tpl\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.mst\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.hbs\\'" . web-mode)))
+#+END_SRC
+
+**** PHP Development
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package php-mode
+    :config
+    (autoload 'php-mode "php-mode-improved" "Major mode for editing php code." t)
+    (add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
+    (add-to-list 'auto-mode-alist '("\\.inc$" . php-mode)))
+#+END_SRC
+
+**** Additional Languages
+Various modes helpful for development
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package yaml-mode :config (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode)))
+  (use-package restclient)
+  (use-package groovy-mode)
+  (use-package go-mode)
+  (use-package emmet-mode :config (add-hook 'sgml-mode-hook 'emmet-mode) (add-hook 'css-mode-hook  'emmet-mode))
+#+END_SRC
+
+**** Version Control
+Magit for version control
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package magit
+    :config
+    (global-set-key (kbd "C-x g") 'magit-status)
+    (add-hook 'magit-status-sections-hook 'magit-insert-recent-commits)
+    (add-hook 'magit-status-sections-hook 'magit-insert-stashes)
+    (add-hook 'magit-status-sections-hook 'magit-insert-upstream-branch-header)
+    (add-hook 'magit-status-sections-hook 'magit-insert-head-branch-header)
+    (add-hook 'magit-status-sections-hook 'magit-insert-tags-header))
+#+END_SRC
+
+** Theme/UI
+*** General Settings
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package zerodark-theme)
+#+END_SRC
+
+Remove default scrollbars
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+(scroll-bar-mode -1)
+#+END_SRC
+
+Hide the default toolbars
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+#+END_SRC
+
+I prefer to see trailing whitespace but not for every mode (e.g. org, elfeed, etc)
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package whitespace
+    :config
+    (setq-default show-trailing-whitespace t)
+    (defun no-trailing-whitespace ()
+      (setq show-trailing-whitespace nil))
+    (add-hook 'minibuffer-setup-hook              'no-trailing-whitespace)
+    (add-hook 'eww-mode-hook                      'no-trailing-whitespace)
+    (add-hook 'shell-mode-hook                    'no-trailing-whitespace)
+    (add-hook 'mu4e:view-mode-hook                'no-trailing-whitespace)
+    (add-hook 'eshell-mode-hook                   'no-trailing-whitespace)
+    (add-hook 'help-mode-hook                     'no-trailing-whitespace)
+    (add-hook 'term-mode-hook                     'no-trailing-whitespace)
+    (add-hook 'slack-message-buffer-mode-hook     'no-trailing-whitespace)
+    (add-hook 'mu4e:view-mode-hook                'no-trailing-whitespace)
+    (add-hook 'calendar-mode-hook                 'no-trailing-whitespace))
+#+END_SRC
+
+*** Dashboard
+I like a nice big splash screen and I'm partial to the meditating GNU logo.
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package dashboard
+    :config
+    (dashboard-setup-startup-hook)
+    (setq dashboard-startup-banner (concat *dotemacs-dir* "assets/gnu-meditate-scaled.png"))
+    (setq dashboard-items '((recents  . 10)))
+    (setq dashboard-banner-logo-title ""))
+#+END_SRC
+*** Highlight line
+Helpful for finding the cursor when jumping around
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (global-hl-line-mode +1)
+#+END_SRC
+
+*** Modeline
+Clean up modeline with diminish
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package diminish)
+#+END_SRC
+
+Use the spaceline from spacemacs
+#+begin_src emacs-lisp :tangle ~/.emacs
+(use-package spaceline
+  :config
+  (require 'spaceline-config)
+  (setq powerline-default-separator (quote wave))
+  (spaceline-spacemacs-theme)
+  (setq powerline-height 20)
+  (set-face-attribute 'mode-line nil :box nil)
+  (set-face-attribute 'mode-line-inactive nil :box nil))
+#+end_src
+
+Show spaceline icons
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+    (use-package spaceline-all-the-icons
+      :after spaceline
+      :config (spaceline-all-the-icons-theme))
+  (custom-set-variables
+   '(spaceline-all-the-icons-separator-type (quote arrow)))
+#+END_SRC
+
+*** Minibuffer
+Display the current time and battery indicator
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (setq display-time-24hr-format t)
+  (setq display-time-format "%H:%M - %d.%b.%y")
+  (display-time-mode 1)
+  (display-battery-mode 1)
+#+END_SRC
+
+*** Frames
+Assign keyboard shortcut to more closely match the [[EXWM][exwm]] shortcuts.
+#+BEGIN_SRC emacs-lisp :tangle (if (not (string-equal system-type "gnu/linux")) "~/.emacs")
+  (global-set-key (kbd "s-1") 'other-frame)
+  (global-set-key (kbd "s-2") 'other-frame)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle (if (not (string-equal system-type "gnu/linux")) "~/.emacs")
+  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+  (add-to-list 'default-frame-alist '(ns-appearance . dark))
+
+  ;; Autohide the top panel if necessary
+  (setq ns-auto-hide-menu-bar t)
+  (set-frame-parameter nil 'alpha '(100 . 90))
+  (toggle-frame-maximized)
+
+  (set-face-attribute 'default nil :height 120)
+#+END_SRC
+
+*** Mouse
+We'll need to turn off the mouse from time to time
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package disable-mouse :diminish disable-mouse-mode)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
+  (global-disable-mouse-mode)
+#+END_SRC
+
+Because linux runs exwm
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs")
+  (add-hook 'lisp-interaction-mode                'disable-mouse-mode)
+  (add-hook 'shell-mode-hook                      'disable-mouse-mode)
+  (add-hook 'org-src-mode-hook                    'disable-mouse-mode)
+  (add-hook 'org-mode-hook                        'disable-mouse-mode)
+  (add-hook 'javascript-mode-hook                 'disable-mouse-mode)
+  (add-hook 'text-mode-hook                       'disable-mouse-mode)
+  (add-hook 'web-mode-hook                        'disable-mouse-mode)
+  (add-hook 'dired-mode-hook                      'disable-mouse-mode)
+  (add-hook 'org-mode-hoook                       'disable-mouse-mode)
+  (add-hook 'lisp-interaction-mode-hook           'disable-mouse-mode)
+  (add-hook 'emacs-lisp-mode-hook                 'disable-mouse-mode)
+  (add-hook 'special-mode-hook                    'disable-mouse-mode)
+  (add-hook 'fundamental-mode-hook                'disable-mouse-mode)
+  (add-hook 'groovy-mode-hook                     'disable-mouse-mode)
+  (add-hook 'ng2-ts-mode-hook                     'disable-mouse-mode)
+  (add-hook 'org-agenda-mode-hook                 'disable-mouse-mode)
+  (add-hook 'eshell-mode-hook                     'disable-mouse-mode)
+  (add-hook 'slack-message-buffer-mode-hook       'disable-mouse-mode)
+  (add-hook 'typescript-mode-hook                 'disable-mouse-mode)
+  (add-hook 'clojure-mode-hook                    'disable-mouse-mode)
+  (add-hook 'repl-mode-hook                       'disable-mouse-mode)
+#+END_SRC
+
+*** Symbols
+Show symbols by default
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (global-prettify-symbols-mode 1)
+#+END_SRC
+
+*** X Window Manager
+This section is specific to running emacs as a tiling window manager desktop via EXWM. Source blocks here will if the OS is GNU/Linux.
+**** General Setup
+According to the [[https://www.systutorials.com/docs/linux/man/1-Xorg.wrap/][man page]], edit [[/etc/X11/Xwrapper.config]] to include the line:
+~allowed_users=anybody~ and ~needs_root_rights=yes~.
+
+#+BEGIN_SRC shell :tangle (if (string-equal system-type "gnu/linux") "~/.xinitrc")
+#!/bin/bash
+exec emacs
+#+END_SRC
+
+Go fullscreen and set the default font size.
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs")
+  (set-frame-parameter nil 'fullscreen 'fullboth)
+  (set-face-attribute 'default nil :height 100)
+#+END_SRC
+
+**** EXWM
+With EXWM it can act as a complete desktop environment.
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs")
+  (use-package exwm)
+  (use-package exwm-config
+    :config
+    (exwm-config-default)
+    (exwm-config-ido)
+    (global-set-key (kbd "C-x O")  'exwm-workspace-switch-to-buffer))
+#+END_SRC
+***** Multiple Monitor Support
+Fortunately EXWM also has support for multiple monitors.
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs")
+  (require 'exwm-randr)
+  (setq exwm-randr-workspace-output-plist '(0 "eDP-1" 1 "DP-2-2"))
+  (add-hook 'exwm-randr-screen-change-hook
+	    (lambda () (start-process-shell-command "xrandr" nil "xrandr --output eDP-1 --mode 2048x1152 --right-of DP-2-2 --auto")))
+  (exwm-randr-enable)
+#+END_SRC
+
+Simple script for waking up second monitor after reattaching
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs")
+  (defun jrm/wake-second-monitor ()
+      "Turns second monitor off and back on to wake it up. Helpful for exwm + X11 + multiple monitors."
+    (interactive)
+    (shell-command "xrandr --output DP-2-2 --off && xrandr --output DP-2-2 --auto"))
+  (global-set-key (kbd "C-x C-j m") 'jrm/wake-second-monitor)
+#+END_SRC
+
+**** Applications
+***** DMenu Application Launcher
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs")
+  (use-package dmenu :bind ("s-SPC" . 'dmenu))
+#+END_SRC
+***** VLC/Multimedia
+Occasionally it's helpful to be able to start, play, pause and exit vlc buffers while never having to leave your current buffer. This is particularly helpful for following along with training videos.
+    #+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs")
+      (defvar videoBuffer "video-controller")
+
+      (defun jrm/vlc-start-video-playlist ()
+	"Start a video in VLC that can be controlled via emacs"
+	(interactive)
+	(let ((x (read-directory-name "Enter video directory:")))
+	  (get-buffer-create videoBuffer)
+	  (shell videoBuffer)
+	  (process-send-string videoBuffer "cd ~/\n")
+	  (process-send-string videoBuffer (concat "vlc -I rc " x "*.webm\n"))
+	  (message "Now playing videos in directory %s." x)))
+      (global-set-key (kbd "C-x C-j v s") 'jrm/vlc-start-video-playlist)
+
+      (defun jrm/vlc-pause-video ()
+	"Toggle pausing a running vlc stream"
+	(interactive)
+	(process-send-string videoBuffer "pause\n"))
+      (global-set-key (kbd "C-x C-j v p") 'jrm/vlc-pause-video)
+
+      (defun jrm/vlc-go-foward-10-video ()
+	"Seek forward X seconds in a playing vlc stream"
+	(interactive)
+	(process-send-string videoBuffer "seek 10\n"))
+      (global-set-key (kbd "C-x C-j v f") 'jrm/vlc-go-foward-10-video)
+
+      (defun jrm/vlc-next-video ()
+	"Jump to next video in playlist"
+	(interactive)
+	(process-send-string videoBuffer "next\n"))
+      (global-set-key (kbd "C-x C-j v n") 'jrm/vlc-next-video)
+
+      (defun jrm/vlc-last-video ()
+	"Jump to previous video in playlist"
+	(interactive)
+	(process-send-string videoBuffer "prev\n"))
+      (global-set-key (kbd "C-x C-j v l") 'jrm/vlc-last-video)
+
+      (defun jrm/vlc-go-backward-10-video ()
+	"Seek forward X seconds in a playing vlc stream"
+	(interactive)
+	(process-send-string videoBuffer "seek -10\n"))
+      (global-set-key (kbd "C-x C-j v r") 'jrm/vlc-go-backward-10-video)
+
+      (defun jrm/vlc-quit-video ()
+	"Quit a running vlc stream"
+	(interactive)
+	(process-send-string videoBuffer "quit\n")
+	(process-send-string videoBuffer "exit\n")
+	(kill-buffer videoBuffer))
+      (global-set-key (kbd "C-x C-j v q") 'jrm/vlc-quit-video)
+    #+END_SRC
+
+***** Screenshots
+ I took this from Uncle Dave's config. Its a super slick screenshot function for taking both fullscreen as well as region screenshots.
+ #+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs")
+   (defun jrm/take-screenshot ()
+     "Takes a fullscreenshot of the current workspace"
+     (interactive)
+     (when window-system
+       (cl-loop for i downfrom 3 to 1 do
+		(progn
+		  (message (concat (number-to-string i) "..."))
+		  (sit-for 1)))
+       (message "Cheese!")
+       (sit-for 1)
+       (start-process "screenshot" nil "import" "-window" "root"
+		      (concat  *screenshot-dir* (current-time-string) ".png"))
+       (message "Screenshot taken!")))
+   (global-set-key (kbd "C-x C-j <C-print>") 'jrm/take-screenshot)
+
+   (defun jrm/take-screenshot-region ()
+     "Takes a screenshot of a region selected by the user"
+     (interactive)
+     (when window-system
+       (call-process "import" nil nil nil ".newScreenshot.png")
+       (call-process "convert" nil nil nil ".newScreenshot.png" "-shave" "1x1"
+		     (concat (getenv "HOME") "/Pictures/" (current-time-string) ".png"))
+       (call-process "rm" nil nil nil ".newScreenshot.png")))
+   (global-set-key (kbd "C-x C-j <print>") 'jrm/take-screenshot-region)
+ #+END_SRC
+  
+***** Lock screen with slock
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs")
+    (exwm-input-set-key (kbd "s-l") (lambda () (interactive) (start-process "" nil "/usr/bin/slock")))
+  #+END_SRC
+
+***** Interacting with Applications
+I find the default way (C-c C-q) of exwm sending keys like ctrl to an async buffer difficult. C-c C-c is much simpler for me.
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs")
+    (define-key exwm-mode-map [?\C-c ?\C-c] 'exwm-input-send-next-key)
+  #+END_SRC
+
+** Org Mode
+Load some basic minor modes by default
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs 
+  (add-hook 'org-mode-hook 'no-trailing-whitespace)
+  (add-hook 'org-mode-hook 'flyspell-mode)
+#+END_SRC
+
+*** Look and Feel
+Set Org mode source block background color to dark gray so it stands out from the typical background
+#+begin_src emacs-lisp :tangle ~/.emacs
+(custom-set-faces '(org-block ((t (:inherit shadow :background "gray12")))))
+#+end_src
+
+Show the asterisks as bullets
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package org-bullets :config (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
+#+END_SRC
+
+*** Source Blocks
+When evaluating a source code block in org mode do not prompt for input, just run it.
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (setq org-confirm-babel-evaluate nil)
+#+END_SRC
+
+For using [[https://orgmode.org/manual/Easy-templates.html][easy templates]] in newer versions of org mode.
+#+BEGIN_SRC emacs-lisp :tangle (if (version> org-version "9.2") "~/.emacs
+    (require 'org-tempo)
+#+END_SRC
+
+**** Additional Modes
+ Add some export modes for getting content out of org
+ #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+   (use-package ox-twbs)
+   (use-package ox-md)
+   (use-package ob-rust)
+   (require 'ob-clojure)
+   (use-package ob-typescript :diminish typescript-mode)
+ #+END_SRC
+
+Allow asynchronous execution of org-babel src blocks so you can keep using emacs during long running scripts
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package ob-async)
+#+END_SRC
+
+Load some languages by default
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (add-to-list 'org-src-lang-modes '("js" . "javascript")
+	       '("php" . "php"))
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((python . t)
+     (js . t)
+     (lisp . t)
+     (clojure . t)
+     (typescript . t)
+     (rust . t)
+     (sql . t)
+     (shell . t)
+     (java . t)))
+#+END_SRC
+
+I like org source blocks for typescript to use different compiler settings than what ships with ob-typescript. Not sure if there's a better way to do this, but just overwriting the function from the source with the code below using the configuration I prefer.
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (defun org-babel-execute:typescript (body params)
+    "Execute a block of Typescript code with org-babel. This function is called by `org-babel-execute-src-block'"
+    (let* ((tmp-src-file (org-babel-temp-file "ts-src-" ".ts"))
+	   (tmp-out-file (org-babel-temp-file "ts-src-" ".js"))
+	   (cmdline (cdr (assoc :cmdline params)))
+	   (cmdline (if cmdline (concat " " cmdline) ""))
+	   (jsexec (if (assoc :wrap params) ""
+		     (concat " ; node " (org-babel-process-file-name tmp-out-file)))))
+      (with-temp-file tmp-src-file (insert body))
+      (let ((results (org-babel-eval (format "tsc %s --lib 'ES7,DOM' -out %s %s %s"
+					     cmdline
+					     (org-babel-process-file-name tmp-out-file)
+					     (org-babel-process-file-name tmp-src-file)
+					     jsexec) ""))
+	    (jstrans (with-temp-buffer
+		       (insert-file-contents tmp-out-file)
+		       (buffer-substring-no-properties (point-min) (point-max)))))
+	(if (eq jsexec "") jstrans results))))
+#+end_src
 
 For org-babel's clojure backend use cider rather than the default slime
 #+BEGIN_SRC emacs-lisp  ~/.emacs
   (setq org-babel-clojure-backend 'cider)
 #+END_SRC
 
-****** Clojure/Quil Workflow Customization
-
-A popup HSV color picker is helpful for quick prototyping/sketching
+*** Org Capture
+Customize org capture to my liking
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (defun convert-range-360 (val)
-    "Converts a value from a 0-1 range to 0-360 range. Used for calculating hue."
-    (* (/ (- val 0) (- 1 0))
-       (+ (- 360 0) 0)))
-
-
-  (defun jrm/insert-color-hsb ()
-    "Select a color and insert its hue/saturation/brightness[lumenosity] format."
-    (interactive "*")
-    (let ((buf (current-buffer)))
-      (custom-set-variables '(list-colors-sort (quote hsv)))
-      (list-colors-display
-       nil nil `(lambda (name)
-		  (interactive)
-		  (quit-window)
-		  (with-current-buffer ,buf
-
-		    (setq hsb (apply 'color-rgb-to-hsl (color-name-to-rgb name)))
-		    (setq hue (convert-range-360 (nth 0 hsb)))
-		    (setq sat (* 100 (nth 1 hsb)))
-
-		    (insert (format "%s" hue 100) " " (format "%s" sat) " " (format "%s" 100.0))
-		    )))))
-  (global-set-key (kbd "C-x C-j H")  'jrm/insert-color-hsb)
+  (global-set-key (kbd "C-c c") 'org-capture)
+  (setq org-capture-templates
+	'(("w" "Work Todo" entry (file "~/org/work/softwareadvice/SA.org")
+	   "** TODO %? :sa:\n  %i\n  %a")
+	  ("j" "JS Club Meeting Notes" entry (file "~/org/work/softwareadvice/Meetings.org")
+	   "* %<%Y-%d-%m> Neon Club Meeting Notes\n** Date\n%<%b %e %Y>\n\n** Participants\n   * \n\n** Goals\n   * Weekly Neon Club Meeting\n\n** Discussion Topics\n   - \n\n** Action Items\n\n** Decisions")
+	  ("l" "Personal Todo" entry (file "~/org/personal/personal.org")
+	   "*** TODO %? :personal:\n  %i\n  %a")
+	  ("m" "Meeting" entry (file "~/org/work/softwareadvice/Meetings.org")
+	   "** MEETING with %? :MEETING:\n  %i\n"  :clock-in t :clock-resume t)))
 #+END_SRC
 
-AFAIK the default cider repl commands don't provide an easy way to refresh quil windows, so below are some hacked together commands to do so via a temporary shell buffer.
+*** Remote Syncing
+This attempts to sync an org file on save if it detects the file is in the ~*org-dir*~ directory.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (defun jrm/start-quil-repl ()
-    "Start Quil repl from current buffer. Current buffer must be part of a Clojure/Quil project."
-    (interactive)
-    (let ((previousBuffer (current-buffer)))
-      (get-buffer-create "quil-repl")
-      (switch-to-buffer "quil-repl")
-      (shell (current-buffer))
-      (switch-to-buffer previousBuffer)
-      (process-send-string "quil-repl" "lein repl\n")
-      (process-send-string "quil-repl" "(use 'sketch.core)\n")))
-  (global-set-key (kbd "C-x C-j Q")  'jrm/start-quil-repl)
+  (defun jrm/sync-org ()
+    "Pulls latest changes to org repo locally"
+    (shell-command (concat "cd " *org-dir* " && git add -A; git commit -m \"$(date)\" && git pull origin master && git push origin master &")))
 
-  (defun jrm/reload-quil-repl ()
-    "Easy reloading of Quil frames without destroying them. Assumes repl is running in a buffer named quil-repl."
-    (interactive)
-    (let ((previousBuffer (current-buffer)))
-      (switch-to-buffer "quil-repl")
-      (process-send-string "quil-repl" "(refresh)\n")
-      (switch-to-buffer previousBuffer)))
-  (global-set-key (kbd "C-x C-j C-q")  'jrm/reload-quil-repl)
+  (defun jrm/sync-org-on-save ()
+    "Detects if is an org file and is in org directory and if so, syncs changes"
+    (if (equal major-mode 'org-mode)
+	(if (string-match-p (regexp-quote *org-dir*) (file-name-directory buffer-file-name)) (jrm/sync-org))))
 
-  (defun jrm/exit-quil-repl ()
-    "Exit running quil-repl buffer"
-    (interactive)
-    (let ((previousBuffer (current-buffer)))
-      (switch-to-buffer "quil-repl")
-      (process-send-string "quil-repl" "exit\n")
-      (process-send-string "quil-repl" "exit\n")
-      (kill-buffer "quil-repl")
-      (switch-to-buffer previousBuffer)))
-  (global-set-key (kbd "C-x C-j x")  'jrm/exit-quil-repl)
-
+  (add-hook 'after-save-hook 'jrm/sync-org-on-save)
 #+END_SRC
 
-
-***** Lisp
-Paredit for maintaining sanity while working with lisp
-#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
-(use-package paredit)
+*** TODOs
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (setq org-use-fast-todo-selection t)
+  (setq org-todo-keywords
+	'((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+      (sequence "WAITING(w@/!)" "INACTIVE(i@/!)" "|" "CANCELLED(C@/!)" "MEETING")))
+  ;; Custom colors for the keywords
+  (setq org-todo-keyword-faces
+	'(("TODO" :foreground "red" :weight bold)
+      ("NEXT" :foreground "blue" :weight bold)
+      ("DONE" :foreground "forest green" :weight bold)
+      ("WAITING" :foreground "orange" :weight bold)
+      ("INACTIVE" :foreground "magenta" :weight bold)
+      ("CANCELLED" :foregroundhttp://cachestocaches.com/2016/9/my-workflow-org-agenda/ "forest green" :weight bold)
+      ("MEETING" :foreground "forest green" :weight bold)))
+#+END_SRC
+** Shells
+By default just use bash for all shells
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (defvar my-term-shell "/bin/bash")
+  (defadvice ansi-term (before force-bash)
+    (interactive (list my-term-shell)))
+  (ad-activate 'ansi-term)
 #+END_SRC
 
-Some general settings for lisp dialects (elisp, clojure, etc).
-#+BEGIN_SRC emacs-lisp :export code ~/.emacs
-  (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
-  (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
-  (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
-  (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
-  (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
-  (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
-  (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
-  (add-hook 'clojure-mode-hook          #'enable-paredit-mode)
-#+End_SRC
-
-*** Consuming Content
-**** Mail
-Add mail alerts for new messages.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package mu4e-alert
-    :after mu4e
-    :init
-    (setq mu4e-alert-interesting-mail-query
-      (concat
-       "flag:unread"
-       " maildir:/w/INBOX "
-       ))
-    (mu4e-alert-set-default-style 'notifications)
-    (mu4e-alert-enable-mode-line-display)
-    (defun jrm/refresh-mu4e-alert-mode-line ()
-      (interactive)
-      (mu4e~proc-kill)
-      (mu4e-alert-enable-mode-line-display))
-    (run-with-timer 0 60 'jrm/refresh-mu4e-alert-mode-line))
-
+Make shells interactive (i.e. M-!, or source blocks in org)
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (setq shell-command-switch "-ic")
 #+END_SRC
 
-
-
-**** EWW
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (defun eww-new ()
-    (interactive)
-    (let ((url (read-from-minibuffer "Enter URL or keywords: ")))
-      (switch-to-buffer (generate-new-buffer "eww"))
-      (eww-mode)
-      (eww url)))
+Fixes emacs and osx path issues.
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
+  (use-package exec-path-from-shell
+    :config
+    (when (memq window-system '(mac ns x))
+      (exec-path-from-shell-initialize)))
 #+END_SRC
 
-**** Elfeed
+** Consuming Content
+*** Elfeed
 Many thanks to [[http://pragmaticemacs.com/emacs/read-your-rss-feeds-in-emacs-with-elfeed/][pragmatic emacs' post]] for guidance on this setup.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (use-package elfeed-org
-    :config
-    (elfeed-org)
-    (setq rmh-elfeed-org-files (list "~/org/personal/elfeed.org")))
+  (use-package elfeed-org :config (elfeed-org) (setq rmh-elfeed-org-files (list "~/org/personal/elfeed.org")))
 
-  ;;shortcut functions
   (defun jrm/elfeed-show-all ()
     (interactive)
     (bookmark-maybe-load-default-file)
@@ -1477,7 +1061,6 @@ Many thanks to [[http://pragmaticemacs.com/emacs/read-your-rss-feeds-in-emacs-wi
     (interactive)
     (bookmark-maybe-load-default-file)
     (bookmark-jump "elfeed-emacs"))
-
 
   (defun jrm/elfeed-load-db-and-open ()
     "Wrapper to load the elfeed db from disk before opening"
@@ -1501,7 +1084,6 @@ Many thanks to [[http://pragmaticemacs.com/emacs/read-your-rss-feeds-in-emacs-wi
 		("q" . jrm/elfeed-save-db-and-bury)))
 
   (global-set-key (kbd "C-x e") 'jrm/elfeed-load-db-and-open)
-
 #+END_SRC
 
 Sometimes it's helpful to hide images for certain posts.
@@ -1513,123 +1095,11 @@ Sometimes it's helpful to hide images for certain posts.
   (global-set-key (kbd "C-x C-j e") 'jrm/elfeed-show-hide-images)
 #+END_SRC
 
-**** VLC/Multimedia
-Turning this off by default, but occasionally it's helpful to be able to start, play, pause and exit vlc buffers while never having to leave your current buffer. This is particularly helpful for following along with training videos.
+** Helpful Utility Functions
+Most of the functions in this section are bound to ~C-x C-j~ prefix key.
+*** Copy Entire Buffer easily
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (defvar videoBuffer "video-controller")
-
-  (defun jrm/vlc-start-video-playlist ()
-    "Start a video in VLC that can be controlled via emacs"
-    (interactive)
-    (let ((x (read-directory-name "Enter video directory:")))
-      (get-buffer-create videoBuffer)
-      (shell videoBuffer)
-      (process-send-string videoBuffer "cd ~/\n")
-      (process-send-string videoBuffer (concat "vlc -I rc " x "*.webm\n"))
-      (message "Now playing videos in directory %s." x)))
-  (global-set-key (kbd "C-x C-j v s") 'jrm/vlc-start-video-playlist)
-
-  (defun jrm/vlc-pause-video ()
-    "Toggle pausing a running vlc stream"
-    (interactive)
-    (process-send-string videoBuffer "pause\n"))
-  (global-set-key (kbd "C-x C-j v p") 'jrm/vlc-pause-video)
-
-  (defun jrm/vlc-go-foward-10-video ()
-    "Seek forward X seconds in a playing vlc stream"
-    (interactive)
-    (process-send-string videoBuffer "seek 10\n"))
-  (global-set-key (kbd "C-x C-j v f") 'jrm/vlc-go-foward-10-video)
-
-  (defun jrm/vlc-next-video ()
-    "Jump to next video in playlist"
-    (interactive)
-    (process-send-string videoBuffer "next\n"))
-  (global-set-key (kbd "C-x C-j v n") 'jrm/vlc-next-video)
-
-  (defun jrm/vlc-last-video ()
-    "Jump to previous video in playlist"
-    (interactive)
-    (process-send-string videoBuffer "prev\n"))
-  (global-set-key (kbd "C-x C-j v l") 'jrm/vlc-last-video)
-
-  (defun jrm/vlc-go-backward-10-video ()
-    "Seek forward X seconds in a playing vlc stream"
-    (interactive)
-    (process-send-string videoBuffer "seek -10\n"))
-  (global-set-key (kbd "C-x C-j v r") 'jrm/vlc-go-backward-10-video)
-
-  (defun jrm/vlc-quit-video ()
-    "Quit a running vlc stream"
-    (interactive)
-    (process-send-string videoBuffer "quit\n")
-    (process-send-string videoBuffer "exit\n")
-    (kill-buffer videoBuffer))
-  (global-set-key (kbd "C-x C-j v q") 'jrm/vlc-quit-video)
-#+END_SRC
-
-*** Misc Emacs Enhancements
-**** Smex for auto complete meta commands
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-(use-package smex
- :init
-  (smex-initialize)
-  :bind
-  ("M-x" . smex)
-  ("M-X" . smex-major-mode-commands))
-#+END_SRC
-
-**** Ido Mode
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (setq ido-enable-flex-matching nil)
-  (setq ido-create-new-buffer 'always) ;; create a buffer with specific name if it doesn't exist already
-  (setq ido-everywhere t)
-  (ido-mode 1)
-
-  (use-package ido-vertical-mode)
-  (ido-vertical-mode 1)
-  (setq ido-vertical-define-keys 'C-n-and-C-p-only)
-#+END_SRC
-
-**** Ivy/Counsel/Swiper
-Generic auto-complete with Ivy
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package ivy :demand
-    :diminish ivy-mode
-    :config
-    (setq ivy-use-virtual-buffers t
-	  ivy-count-format "%d/%d "))
-  (ivy-mode 1)
-
-  (setq ivy-use-selectable-prompt t)
-
-#+END_SRC
-
-Ivy enhanced search (swiper) and common Emacs meta commands (counsel)
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package counsel
-    :config
-    (global-set-key (kbd "M-x") 'counsel-M-x))
-
-  (use-package swiper
-    :config
-    (global-set-key (kbd "C-s") 'swiper))
-
-#+END_SRC
-
-**** GPG Pinentry
-Instead of using the display's popup, prompt for gpg creds in the minibuffer
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (setq epa-pinentry-mode 'loopback)
-#+END_SRC
-**** Fix emacs' regex
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (setq-default pcre-mode t)
-#+END_SRC
-
-**** Copy Entire Buffer easily
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-    (defun jrm/copy-all ()
+  (defun jrm/copy-all ()
     "Copy the current buffer without loosing your place"
     (interactive)
     (let ((original-position (point)))
@@ -1637,81 +1107,106 @@ Instead of using the display's popup, prompt for gpg creds in the minibuffer
       (kill-ring-save 0 0 t)
       (goto-char original-position)
       (message "Buffer contents yanked.")))
-
   (global-set-key (kbd "C-x C-j C-c") 'jrm/copy-all)
-
 #+END_SRC
 
-**** Company for auto-complete
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (add-hook 'after-init-hook 'global-company-mode)
-#+END_SRC
+*** Quickly Change Font Sizes
+I find myself need specific font sizes for different scenarios, i.e. projecting, screen-sharing on conference calls, etc. So, binding these to a quick way to toggle through them. 
 
-**** Change questions to accept single letter answers
-#+BEGIN_SRC emacs-lisp  ~/.emacs
-  (defalias 'yes-or-no-p 'y-or-n-)
-#+END_SRC
-
-**** Highlight line
-Helpful for finding the cursor when jumping around
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (global-hl-line-mode +1)
-#+END_SRC
-**** Which key
-Some quick help for when I get stuck in the middle of a command
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package which-key :config (which-key-mode))
-#+END_SRC
-**** Ace Window
+/Note: there might be a better way to handle this but things like M-+/M-- won't zoom things like line numbers, etc./
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (use-package ace-window
-    :config
-    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
-  (global-set-key (kbd "C-x o") 'ace-window)
-#+END_SRC
-
-**** Keyboard layout
-Function for quickly swapping around meta and super keys which is necessary from time to time on certain keyboards.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (defun jrm/toggle-super-meta ()
-    "Toggles the super and meta keys on current keyboard"
+  (defvar jrm/screens-alist '((?1 "small" (lambda () (set-face-attribute 'default nil :height 110) 'default))
+			      (?2 "medium" (lambda () (set-face-attribute 'default nil :height 120) 'proj))
+			      (?3 "large" (lambda () (set-face-attribute 'default nil :height 140) 'proj))
+			      (?4 "xtra-large" (lambda () (set-face-attribute 'default nil :height 160) 'projLg)))
+    "List that associates number letters to descriptions and actions.")
+  (defun jrm/adjust-font-size ()
+    "Lets the user choose the the font size and takes the corresponding action.
+  Returns whatever the action returns."
     (interactive)
-    (if (get 'jrm/toggle-super-meta 'state)
-	(progn
-	  (setq x-super-keysym 'super)
-	  (setq x-meta-keysym 'meta)
-	  (put 'jrm/toggle-super-meta 'state nil))
-      (progn
-	(setq x-super-keysym 'meta)
-	(setq x-meta-keysym 'super)
-	(put 'jrm/toggle-super-meta 'state t))))
+    (let ((choice (read-char-choice
+		   (mapconcat (lambda (item) (format "%c: %s" (car item) (cadr item)))
+			      jrm/screens-alist "; ")
+		   (mapcar #'car jrm/screens-alist))))
+      (funcall (nth 2 (assoc choice jrm/screens-alist)))))
+  (global-set-key (kbd "C-x C-j p")  'jrm/adjust-font-size)
 #+END_SRC
-**** Buffer Misc
-When killing a buffer always pick the current buffer by default
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (defun kill-current-buffer ()
-    "Kills the current buffer."
+
+*** Copy current file path
+Lifted from (http://ergoemacs.org/emacs/emacs_copy_file_path.html)
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (defun jrm/copy-file-path (&optional *dir-path-only-p)
+    "Copy the current buffer's file path or dired path to `kill-ring'.
+  Result is full path."
+    (interactive "P")
+    (let ((-fpath
+	   (if (equal major-mode 'dired-mode)
+	       (expand-file-name default-directory)
+	     (if (buffer-file-name)
+		 (buffer-file-name)
+	       (user-error "Current buffer is not associated with a file.")))))
+      (kill-new
+       (if *dir-path-only-p
+	   (progn
+	     (message "Directory path copied: 「%s」" (file-name-directory -fpath))
+	     (file-name-directory -fpath))
+	 (progn (message "File path copied: 「%s」" -fpath) -fpath )))))
+#+END_SRC
+
+*** Basic debugging
+A bit of helpful debugging for a few modes
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (defun jrm/insert-debug-log ()
+    "Inserts logging based on mode"
     (interactive)
-    (kill-buffer (current-buffer)))
-  (global-set-key (kbd "C-x k") 'kill-current-buffer)
+    (when (or (equal major-mode 'js-mode) (equal major-mode 'typescript-mode) (equal major-mode 'ng2-ts-mode))
+      (insert "console.log(\"\");")
+      (backward-char 3))
+    (when (equal major-mode 'clojure-mode)
+      (insert "(println (format \"%s\" ))")
+      (backward-char 2))
+    (when (equal major-mode 'emacs-lisp-mode)
+      (insert "(message (format \"%s\" ))")
+      (backward-char 2)))
+
+  (global-set-key (kbd "C-x C-j d") 'jrm/insert-debug-log)
 #+END_SRC
 
-Prevent async shell command buffers from popping-up:
-#+BEGIN_SRC emacs-lisp 
-  (add-to-list 'display-buffer-alist
-    '("\\*Async Shell Command\\*.*" display-buffer-no-window))
+*** JS Playground
+I also like to use org mode's code evaluation capabilities for tinkering around with different languages. Here's a bit of elisp to automate the manual part of that process:
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+(defun jrm/js-playground()
+  "Creates an org buffer for fiddling around with JS code. Uses org so that results can be evaluated."
+  (interactive)
+  (get-buffer-create "js-playground")
+  (switch-to-buffer "js-playground")
+  (org-mode)
+  (goto-char 1)
+  (insert "#+BEGIN_SRC js\n\n#+END_SRC\n")
+  (goto-char 16))
+(global-set-key (kbd "C-x C-j C-j") 'jrm/js-playground)
 #+END_SRC
 
-**** Final pieces
-Load up some slightly more private info from a seperate file so I can keep the main settings public.
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (defun load-x ()
-    "Load the secrets from [undisclosed] (a la JDATE)"
-    (interactive)
-    (load "~/src/undisclosed/load-x.el"))
-
-#+END_SRC
-
+** Final Pieces
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (provide '.emacs)
 #+END_SRC
+
+
+
+* ---------------------------------------
+* ---------------------------------------
+* ---------------------------------------
+* ---------------------------------------
+* ---------------------------------------
+* ---------------------------------------
+* DONE Disable mouse mode and whitespace mode
+* TODO Bring in custom configs for osx and linux
+* TODO Test test test
+  - todo C-c C-t
+  - capture templates
+* TODO Get new screenshot
+* TODO visual line mode
+* TODO symbols in ts mode!
+* DONE mac scratch configs
+* DONE toc
