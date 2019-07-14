@@ -13,11 +13,15 @@ Some of the code blocks pertain to the OS and will be tangled automatically. The
 Define some configurations like directory paths.
 #+NAME: config
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (defvar *home-dir* (getenv "HOME"))
-  (defvar *dotemacs-dir* (concat *home-dir* "/src/dotemacs/"))
-  (defvar *node-dir* (concat *home-dir* "/.nvm/versions/node/v9.11.1/bin/"))
-  (defvar *org-dir* (concat *home-dir* "/org/"))
-  (defvar *screenshot-dir* (concat *home-dir* "/Pictures/")) ; used only for x11 desktops
+  (defvar *home-dir*              (getenv "HOME"))
+  (defvar *dotemacs-dir*          (concat *home-dir* "/src/dotemacs/"))
+  (defvar *node-dir*              (concat *home-dir* "/.nvm/versions/node/v9.11.1/bin/"))
+  (defvar *org-dir*               (concat *home-dir* "/org/"))
+
+  ;; x11 desktop specific
+  (defvar *screenshot-dir*        (concat *home-dir* "/Pictures/"))
+  (defvar *amixer-path*           (concat "/usr/bin/amixer"))
+
 #+END_SRC
 
 * Configuration
@@ -246,7 +250,7 @@ Some quick help for when I get stuck in the middle of a command
    (put 'narrow-to-region 'disabled nil)
  #+END_SRC
 
-I'm accustomed to being able to highlight a region then replace it with the next keystroke, (i.e. a letter, return, backspace, etc.).
+Replace region with next keystroke.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (delete-selection-mode 1)
 #+END_SRC
@@ -767,9 +771,9 @@ With EXWM it can act as a complete desktop environment.
 Fortunately EXWM also has support for multiple monitors.
 #+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs")
   (require 'exwm-randr)
-  (setq exwm-randr-workspace-output-plist '(0 "eDP-1" 1 "DP-2-2"))
+  (setq exwm-randr-workspace-output-plist '(0 "eDP1" 1 "DP1-2" 3 "DP1-2"))
   (add-hook 'exwm-randr-screen-change-hook
-	    (lambda () (start-process-shell-command "xrandr" nil "xrandr --output eDP-1 --mode 2048x1152 --right-of DP-2-2 --auto")))
+	    (lambda () (start-process-shell-command "xrandr" nil "xrandr --output eDP1 --mode 2048x1152; xrandr --output eDP1 --mode 2048x1152 --right-of DP1-2 --auto")))
   (exwm-randr-enable)
 #+END_SRC
 
@@ -778,8 +782,12 @@ Simple script for waking up second monitor after reattaching
   (defun jrm/wake-second-monitor ()
       "Turns second monitor off and back on to wake it up. Helpful for exwm + X11 + multiple monitors."
     (interactive)
-    (shell-command "xrandr --output DP-2-2 --off && xrandr --output DP-2-2 --auto"))
+    (shell-command "xrandr --output DP1-2 --off && xrandr --output DP1-2 --auto"))
   (global-set-key (kbd "C-x C-j m") 'jrm/wake-second-monitor)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs")
+  (add-hook 'dashboard-mode-hook (lambda () (shell-command "xrandr --output eDP1 --mode 2048x1152")))
 #+END_SRC
 
 **** Applications
@@ -841,6 +849,55 @@ Occasionally it's helpful to be able to start, play, pause and exit vlc buffers 
 	(kill-buffer videoBuffer))
       (global-set-key (kbd "C-x C-j v q") 'jrm/vlc-quit-video)
     #+END_SRC
+***** Audio Keys
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (defun jrm/volume-increase ()
+    "Bump up the volume by 5%"
+    (interactive)
+    (with-temp-buffer (shell-command "/usr/bin/amixer set Master 5%+" t))
+    (message "%s" (shell-command-to-string "/usr/bin/amixer get Master")))
+  (global-set-key (kbd "<XF86AudioRaiseVolume>") 'jrm/volume-increase)
+
+
+  (defun jrm/volume-decrease ()
+    "Bump down the volume by 5%"
+    (interactive)
+    (with-temp-buffer (shell-command "/usr/bin/amixer set Master 5%-" t))
+    (message "%s" (shell-command-to-string "/usr/bin/amixer get Master")))
+  (global-set-key (kbd "<XF86AudioLowerVolume>") 'jrm/volume-decrease)
+
+  (defun jrm/volume-mute-toggle ()
+    "Toggle volume mute on/off"
+    (interactive)
+    (with-temp-buffer (shell-command "/usr/bin/amixer set Master toggle" t))
+    (message "%s" (shell-command-to-string "/usr/bin/amixer get Master")))
+  (global-set-key (kbd "<XF86AudioMute>") 'jrm/volume-mute-toggle)
+
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+  (defun jrm/log-volume () "Send the audio status to the message buffer"
+	 (message "%s" (shell-command-to-string (concat *amixer-path* " get Master"))))
+
+  (defun jrm/volume-increase () "Bump up the volume by 5%"
+    (interactive)
+    (with-temp-buffer (shell-command (concat *amixer-path* " set Master 5%+") t))
+    (jrm/log-volume))
+  (global-set-key (kbd "<XF86AudioRaiseVolume>") 'jrm/volume-increase)
+
+  (defun jrm/volume-decrease () "Bump down the volume by 5%"
+    (interactive)
+    (with-temp-buffer (shell-command (concat *amixer-path* " set Master 5%-") t))
+    (jrm/log-volume))
+  (global-set-key (kbd "<XF86AudioLowerVolume>") 'jrm/volume-decrease)
+
+  (defun jrm/volume-mute-toggle () "Toggle volume mute on/off"
+    (interactive)
+    (with-temp-buffer (shell-command (concat *amixer-path* " set Master toggle") t))
+    (jrm/log-volume))
+  (global-set-key (kbd "<XF86AudioMute>") 'jrm/volume-mute-toggle)
+#+END_SRC
+
 
 ***** Screenshots
  I took this from Uncle Dave's config. Its a super slick screenshot function for taking both fullscreen as well as region screenshots.
@@ -876,7 +933,7 @@ Occasionally it's helpful to be able to start, play, pause and exit vlc buffers 
     (exwm-input-set-key (kbd "s-l") (lambda () (interactive) (start-process "" nil "/usr/bin/slock")))
   #+END_SRC
 
-***** Interacting with Applications
+***** Interacting with GUI Applications
 I find the default way (C-c C-q) of exwm sending keys like ctrl to an async buffer difficult. C-c C-c is much simpler for me.
 #+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs")
     (define-key exwm-mode-map [?\C-c ?\C-c] 'exwm-input-send-next-key)
