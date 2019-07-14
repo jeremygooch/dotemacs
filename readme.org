@@ -73,13 +73,13 @@ When killing a buffer always pick the current buffer by default
 #+END_SRC
 
 Prevent async shell command buffers from popping-up:
-#+BEGIN_SRC emacs-lisp 
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (add-to-list 'display-buffer-alist
     '("\\*Async Shell Command\\*.*" display-buffer-no-window))
 #+END_SRC
 
 Fix emacs' regex
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (setq-default pcre-mode t)
 #+END_SRC
 
@@ -125,7 +125,6 @@ Ignore certain directories by default for grep
 #+END_SRC
 
 *** IBuffer
-
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (global-set-key (kbd "C-x C-b") 'ibuffer)
   (setq ibuffer-saved-filter-groups
@@ -275,12 +274,12 @@ Turn on linum mode for almost everything.
 **** Lisps
 ***** General Settings
 Paredit for maintaining sanity while working with lisp
-#+BEGIN_SRC emacs-lisp :exports code ~/.emacs
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
 (use-package paredit)
 #+END_SRC
 
 Some general settings for lisp dialects (elisp, clojure, etc).
-#+BEGIN_SRC emacs-lisp :export code ~/.emacs
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
   (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
   (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
@@ -298,7 +297,7 @@ Make evaluating elisp buffers even quicker
 #+END_SRC
 ***** Clojure Development
 Clojure with Cider for interactive Clojure development
-#+BEGIN_SRC emacs-lisp :export code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package clojure-mode
     :config
     (add-to-list 'auto-mode-alist '("\\.edn$" . clojure-mode))
@@ -381,7 +380,7 @@ Some basic code folding
 #+END_SRC
 
 Check for ts lint errors
-#+BEGIN_SRC emacs-lisp  ~/.emacs
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (flycheck-add-mode 'typescript-tslint 'ng2-ts-mode)
   (flycheck-add-mode 'typescript-tide 'ng2-ts-mode)
 #+END_SRC
@@ -908,8 +907,8 @@ When evaluating a source code block in org mode do not prompt for input, just ru
 #+END_SRC
 
 For using [[https://orgmode.org/manual/Easy-templates.html][easy templates]] in newer versions of org mode.
-#+BEGIN_SRC emacs-lisp :tangle (if (version> org-version "9.2") "~/.emacs
-    (require 'org-tempo)
+#+BEGIN_SRC emacs-lisp :tangle (if (not (version<= org-version "9.2")) "~/.emacs")
+  (require 'org-tempo)
 #+END_SRC
 
 **** Additional Modes
