@@ -352,6 +352,10 @@ Some basic code folding
     :hook ((ng2-ts-mode . yafolding-mode)
 	   (js-mode . yafolding-mode)
 	   (fundamental-mode . yafolding-mode)))
+
+
+  (use-package js2-mode)
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 #+END_SRC
 
 ***** Angular/TS Development
