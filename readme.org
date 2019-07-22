@@ -200,13 +200,8 @@ Generic auto-complete with Ivy which
 
    (use-package swiper
      :config
-     (global-set-key (kbd "C-s") 'swiper))
+     (global-set-key (kbd "C-s") 'swiper-isearch))
  #+END_SRC
-
-To make swiper quicker, disable global visual line mode.
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (global-visual-line-mode nil)
-#+END_SRC
 
 **** Company mode
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
@@ -629,6 +624,11 @@ I prefer to see trailing whitespace but not for every mode (e.g. org, elfeed, et
     (add-hook 'slack-message-buffer-mode-hook     'no-trailing-whitespace)
     (add-hook 'mu4e:view-mode-hook                'no-trailing-whitespace)
     (add-hook 'calendar-mode-hook                 'no-trailing-whitespace))
+#+END_SRC
+
+Use visual line mode for text wrapping
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (global-visual-line-mode t)
 #+END_SRC
 
 *** Dashboard
