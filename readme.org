@@ -360,11 +360,12 @@ Use js2 mode rather than the built in javascript mode.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package js2-mode
     :init
-    (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-    (add-hook 'js2-mode-hook #'setup-tide-mode)
-    ;; configure javascript-tide checker to run after your default javascript checker
-    (flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append))
+    (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode)))
 
+
+  ;; (add-hook 'js2-mode-hook #'setup-tide-mode)
+  ;;   ;; configure javascript-tide checker to run after your default javascript checker
+  ;;   (flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append)
 #+END_SRC
 
 Use tern and company-tern for better js parsing. Tern can be installed with can be installed with ~sudo npm install -g tern~.
@@ -411,7 +412,7 @@ For Tide integration, use the local tsserver and fallback to the default one ins
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (let* ((package-root (locate-dominating-file default-directory "package.json"))
 	 (path (and package-root
-		    (expand-file-name "node_modules/typescript/bin/tsserver"
+		    (expand-file-name "/home/jrm3/.nvm/versions/node/v10.8.0/bin/node"
 				      (expand-file-name package-root)))))
     (when (and path (file-exists-p path))
       (make-local-variable 'tide-tsserver-executable)
