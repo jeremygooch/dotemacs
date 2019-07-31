@@ -345,6 +345,8 @@ A popup HSV color picker is helpful for quick prototyping/sketching
 #+END_SRC
 
 **** ECMAScript
+Tern is a require package and can be installed with ~sudo npm install -g tern~
+
 ***** General Settings
 Some basic code folding
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
@@ -352,11 +354,26 @@ Some basic code folding
     :hook ((ng2-ts-mode . yafolding-mode)
 	   (js-mode . yafolding-mode)
 	   (fundamental-mode . yafolding-mode)))
-
-
-  (use-package js2-mode)
-  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 #+END_SRC
+
+Use js2 mode rather than the built in javascript mode.
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package js2-mode
+    :init
+    (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+    (add-hook 'js2-mode-hook #'setup-tide-mode)
+    ;; configure javascript-tide checker to run after your default javascript checker
+    (flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append))
+
+#+END_SRC
+
+Use tern and company-tern for better js parsing. Tern can be installed with can be installed with ~sudo npm install -g tern~.
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package company-tern
+    :init
+    (add-hook 'js2-mode-hook (lambda () (tern-mode) (company-mode))))
+#+END_SRC
+
 
 ***** Angular/TS Development
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
@@ -1217,7 +1234,7 @@ A bit of helpful debugging for a few modes
   (defun jrm/insert-debug-log ()
     "Inserts logging based on mode"
     (interactive)
-    (when (or (equal major-mode 'js-mode) (equal major-mode 'typescript-mode) (equal major-mode 'ng2-ts-mode))
+    (when (or (equal major-mode 'js-mode) (equal major-mode 'js2-mode) (equal major-mode 'typescript-mode) (equal major-mode 'ng2-ts-mode))
       (insert "console.log(\"\");")
       (backward-char 3))
     (when (equal major-mode 'clojure-mode)
