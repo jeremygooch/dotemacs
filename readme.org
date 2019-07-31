@@ -6,24 +6,30 @@ This is my personal emacs configuration written in a literate-programming style.
 Some of the code blocks pertain to the OS and will be tangled automatically. There are several blocks for Linux that pertain to running emacs as a window manager. These blocks can be found in [[X Window Manager][this section]].
 
 *** Global Configs
-Define some configurations like directory paths.
+Define some configurations like directory paths to a sample config file. After this file is created, copy it to .emacs-config in your home directory.
 #+NAME: config
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs-config-SAMPLE
   (defvar *home-dir*              (getenv "HOME"))
   (defvar *dotemacs-dir*          (concat *home-dir* "/src/dotemacs/"))
   (defvar *node-dir*              (concat *home-dir* "/.nvm/versions/node/v9.11.1/bin/"))
   (defvar *org-dir*               (concat *home-dir* "/org/"))
 
   ;; x11 desktop specific
-  (defvar *screenshot-dir*        (concat *home-dir* "/Pictures/"))
+  (defvar *screenshot-dir*        (concat *home-dir* "/Pictures/")) ; used only for x11 desktops
   (defvar *amixer-path*           (concat "/usr/bin/amixer"))
-
 #+END_SRC
 
 * Configuration
 #+TOC: headlines 2
 
 ** Initialization
+Load the config if it exists, otherwise load the sample
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (if (file-exists-p "~/.emacs-config")
+      (load-file "~/.emacs-config")
+    (load-file "~/.emacs-config-SAMPLE"))
+#+END_SRC
+
 *** Package Sources
 Setting up basic repositories and [[https://github.com/jwiegley/use-package][use-package]].
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
@@ -32,7 +38,7 @@ Setting up basic repositories and [[https://github.com/jwiegley/use-package][use
   (setq package-enable-at-startup nil)
   (setq package-archives '(("marmalade"  . "http://marmalade-repo.org/packages/")
 			   ("melpa-stable" . "http://stable.melpa.org/packages/")
-			   ("gnu" . "https://elpa.gnu.org/packages/")
+			   ("gnu" . "http://elpa.gnu.org/packages/")
 			   ("org" . "https://orgmode.org/elpa/")
 			   ("melpa" . "https://melpa.org/packages/")))
 
@@ -194,13 +200,8 @@ Generic auto-complete with Ivy which
 
    (use-package swiper
      :config
-     (global-set-key (kbd "C-s") 'swiper))
+     (global-set-key (kbd "C-s") 'swiper-isearch))
  #+END_SRC
-
-To make swiper quicker, disable global visual line mode.
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (global-visual-line-mode nil)
-#+END_SRC
 
 **** Company mode
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
@@ -604,11 +605,7 @@ Magit for version control
   (use-package magit
     :config
     (global-set-key (kbd "C-x g") 'magit-status)
-    (add-hook 'magit-status-sections-hook 'magit-insert-recent-commits)
-    (add-hook 'magit-status-sections-hook 'magit-insert-stashes)
-    (add-hook 'magit-status-sections-hook 'magit-insert-upstream-branch-header)
-    (add-hook 'magit-status-sections-hook 'magit-insert-head-branch-header)
-    (add-hook 'magit-status-sections-hook 'magit-insert-tags-header))
+    (add-hook 'magit-status-sections-hook 'magit-insert-stashes))
 #+END_SRC
 
 ** Theme/UI
@@ -645,6 +642,11 @@ I prefer to see trailing whitespace but not for every mode (e.g. org, elfeed, et
     (add-hook 'slack-message-buffer-mode-hook     'no-trailing-whitespace)
     (add-hook 'mu4e:view-mode-hook                'no-trailing-whitespace)
     (add-hook 'calendar-mode-hook                 'no-trailing-whitespace))
+#+END_SRC
+
+Use visual line mode for text wrapping
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (global-visual-line-mode t)
 #+END_SRC
 
 *** Dashboard
@@ -712,7 +714,7 @@ Assign keyboard shortcut to more closely match the [[EXWM][exwm]] shortcuts.
 
   ;; Autohide the top panel if necessary
   (setq ns-auto-hide-menu-bar t)
-  (set-frame-parameter nil 'alpha '(100 . 90))
+  ;; (set-frame-parameter nil 'alpha '(100 . 100))
   (toggle-frame-maximized)
 
   (set-face-attribute 'default nil :height 120)
