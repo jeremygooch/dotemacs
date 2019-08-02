@@ -36,7 +36,8 @@ Setting up basic repositories and [[https://github.com/jwiegley/use-package][use
   (package-initialize)
   (require 'package)
   (setq package-enable-at-startup nil)
-  (setq package-archives '(("marmalade"  . "http://marmalade-repo.org/packages/")
+  (setq package-archives '(
+			   ;; ("marmalade"  . "http://marmalade-repo.org/packages/")
 			   ("melpa-stable" . "http://stable.melpa.org/packages/")
 			   ("gnu" . "http://elpa.gnu.org/packages/")
 			   ("org" . "https://orgmode.org/elpa/")
@@ -708,13 +709,12 @@ Assign keyboard shortcut to more closely match the [[EXWM][exwm]] shortcuts.
   (global-set-key (kbd "s-2") 'other-frame)
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle (if (not (string-equal system-type "gnu/linux")) "~/.emacs")
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
   (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
   (add-to-list 'default-frame-alist '(ns-appearance . dark))
 
   ;; Autohide the top panel if necessary
   (setq ns-auto-hide-menu-bar t)
-  ;; (set-frame-parameter nil 'alpha '(100 . 100))
   (toggle-frame-maximized)
 
   (set-face-attribute 'default nil :height 120)
