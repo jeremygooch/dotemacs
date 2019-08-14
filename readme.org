@@ -1095,6 +1095,12 @@ This attempts to sync an org file on save if it detects the file is in the ~*org
       ("CANCELLED" :foregroundhttp://cachestocaches.com/2016/9/my-workflow-org-agenda/ "forest green" :weight bold)
       ("MEETING" :foreground "forest green" :weight bold)))
 #+END_SRC
+*** Org Export
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (custom-set-variables
+   '(org-export-backends '(ascii html icalendar latex md odt)))
+#+END_SRC
+
 ** Shells
 By default just use bash for all shells
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
