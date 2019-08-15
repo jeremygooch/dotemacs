@@ -91,6 +91,11 @@ Fix emacs' regex
   (setq-default pcre-mode t)
 #+END_SRC
 
+Use aspell for Mac (aspell can be installed with brew)
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
+(setq ispell-program-name "/usr/local/bin/aspell")
+#+END_SRC
+
 *** Dired
 Some basic Dired setup
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
