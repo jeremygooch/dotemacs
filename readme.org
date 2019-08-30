@@ -6,13 +6,13 @@ This is my personal emacs configuration written in a literate-programming style.
 Some of the code blocks pertain to the OS and will be tangled automatically. There are several blocks for Linux that pertain to running emacs as a window manager. These blocks can be found in [[X Window Manager][this section]].
 
 *** Global Configs
-Define some configurations like directory paths to a sample config file. After this file is created, copy it to .emacs-config in your home directory.
 #+NAME: config
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs-config-SAMPLE
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs-config
   (defvar *home-dir*              (getenv "HOME"))
   (defvar *dotemacs-dir*          (concat *home-dir* "/src/dotemacs/"))
-  (defvar *node-dir*              (concat *home-dir* "/.nvm/versions/node/v9.11.1/bin/"))
+  (defvar *node-dir*              (concat *home-dir* "/.nvm/versions/node/v10.8.0/bin/"))
   (defvar *org-dir*               (concat *home-dir* "/org/"))
+  (defvar *tsserver*              (concat *home-dir* "/src/TypeScript/lib/tsserver.js"))
 
   ;; x11 desktop specific
   (defvar *screenshot-dir*        (concat *home-dir* "/Pictures/")) ; used only for x11 desktops
@@ -26,8 +26,7 @@ Define some configurations like directory paths to a sample config file. After t
 Load the config if it exists, otherwise load the sample
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (if (file-exists-p "~/.emacs-config")
-      (load-file "~/.emacs-config")
-    (load-file "~/.emacs-config-SAMPLE"))
+      (load-file "~/.emacs-config"))
 #+END_SRC
 
 *** Package Sources
@@ -383,6 +382,7 @@ Use tern and company-tern for better js parsing. Tern can be installed with can 
   (setq exec-path (append exec-path '(*node-dir*)))
   (custom-set-variables
    '(flycheck-typescript-tslint-executable (concat *node-dir* "tslint"))
+   '(tide-tsserver-executable *tsserver*)
    '(tide-node-executable (concat *node-dir* "node")))
   (use-package ng2-mode)
   (use-package flycheck :diminish flycheck-mode)
@@ -414,7 +414,7 @@ For Tide integration, use the local tsserver and fallback to the default one ins
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (let* ((package-root (locate-dominating-file default-directory "package.json"))
 	 (path (and package-root
-		    (expand-file-name "/home/jrm3/.nvm/versions/node/v10.8.0/bin/node"
+		    (expand-file-name "node_modules/typescript/bin/tsserver"
 				      (expand-file-name package-root)))))
     (when (and path (file-exists-p path))
       (make-local-variable 'tide-tsserver-executable)
@@ -1077,6 +1077,12 @@ This attempts to sync an org file on save if it detects the file is in the ~*org
 	(if (string-match-p (regexp-quote *org-dir*) (file-name-directory buffer-file-name)) (jrm/sync-org))))
 
   (add-hook 'after-save-hook 'jrm/sync-org-on-save)
+#+END_SRC
+
+*** LaTex
+Use xelatex for more latex options like fontspec
+#+BEGIN_SRC elisp :tangle ~/.emacs
+(setq org-latex-compiler "xelatex")
 #+END_SRC
 
 *** TODOs
