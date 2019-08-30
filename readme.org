@@ -90,6 +90,11 @@ Fix emacs' regex
   (setq-default pcre-mode t)
 #+END_SRC
 
+Use aspell for Mac (aspell can be installed with brew)
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
+(setq ispell-program-name "/usr/local/bin/aspell")
+#+END_SRC
+
 *** Dired
 Some basic Dired setup
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
@@ -1101,6 +1106,12 @@ Use xelatex for more latex options like fontspec
       ("CANCELLED" :foregroundhttp://cachestocaches.com/2016/9/my-workflow-org-agenda/ "forest green" :weight bold)
       ("MEETING" :foreground "forest green" :weight bold)))
 #+END_SRC
+*** Org Export
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (custom-set-variables
+   '(org-export-backends '(ascii html icalendar latex md odt)))
+#+END_SRC
+
 ** Shells
 By default just use bash for all shells
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
@@ -1127,7 +1138,7 @@ Fixes emacs and osx path issues.
 *** Elfeed
 Many thanks to [[http://pragmaticemacs.com/emacs/read-your-rss-feeds-in-emacs-with-elfeed/][pragmatic emacs' post]] for guidance on this setup.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (use-package elfeed-org :config (elfeed-org) (setq rmh-elfeed-org-files (list "~/org/personal/elfeed.org")))
+  (use-package elfeed-org :config (elfeed-org) (setq rmh-elfeed-org-files (list (concat *org-dir* "personal/elfeed.org"))))
 
   (defun jrm/elfeed-show-all ()
     (interactive)
