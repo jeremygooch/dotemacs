@@ -426,6 +426,18 @@ For Tide integration, use the local tsserver and fallback to the default one ins
       (setq tide-tsserver-executable path)))
 #+END_SRC
 
+Some unicode glyphs that I like
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (add-hook 'typescript-mode-hook (lambda ()
+     "Beautify typescript symbols Symbol"
+     (push '(">=" . ?≥) prettify-symbols-alist)
+     (push '("===" . ?≡) prettify-symbols-alist)
+     (push '("!==" . ?≠) prettify-symbols-alist)
+     (push '("&&" . ?∧) prettify-symbols-alist)
+     (push '("||" . ?∥) prettify-symbols-alist)
+     (prettify-symbols-mode)))
+#+END_SRC
+
 ***** Destructured Imports
 Provide a way to stack imports as there is currently no option using linters
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs 
