@@ -431,6 +431,7 @@ Some unicode glyphs that I like
   (add-hook 'typescript-mode-hook (lambda ()
      "Beautify typescript symbols Symbol"
      (push '(">=" . ?≥) prettify-symbols-alist)
+     (push '("==" . ?≔) prettify-symbols-alist)
      (push '("===" . ?≡) prettify-symbols-alist)
      (push '("!==" . ?≠) prettify-symbols-alist)
      (push '("&&" . ?∧) prettify-symbols-alist)
