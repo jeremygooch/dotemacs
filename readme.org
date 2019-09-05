@@ -381,6 +381,23 @@ Use tern and company-tern for better js parsing. Tern can be installed with can 
     (add-hook 'js2-mode-hook (lambda () (tern-mode) (company-mode))))
 #+END_SRC
 
+Setup ECMA unicode glyphs
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (defun jrm/ecma-prettify-symbols ()
+    "Adds common ECMA symobls to prettify-symbols-alist."
+    (push '(">=" . ?≥) prettify-symbols-alist)
+    (push '("<=" . ?≤) prettify-symbols-alist)
+    (push '("===" . ?≡) prettify-symbols-alist)
+    (push '("!=" . ?≠) prettify-symbols-alist)
+    (push '("!==" . ?≢) prettify-symbols-alist)
+    (push '("&&" . ?∧) prettify-symbols-alist)
+    (push '("||" . ?∥) prettify-symbols-alist)
+    (prettify-symbols-mode))
+
+  (add-hook 'js2-mode-hook 'jrm/ecma-prettify-symbols)
+  (add-hook 'js-mode-hook 'jrm/ecma-prettify-symbols)
+#+END_SRC
+
 
 ***** Angular/TS Development
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
@@ -409,14 +426,19 @@ Use tern and company-tern for better js parsing. Tern can be installed with can 
     (setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil :IndentStyle 2)))
 #+END_SRC
 
+Enable typescript frameworks for just typescript and prototype
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (setq typescript-enabled-frameworks '(typescript prototype))
+#+END_SRC
+
 Check for ts lint errors
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (flycheck-add-mode 'typescript-tslint 'ng2-ts-mode)
   (flycheck-add-mode 'typescript-tide 'ng2-ts-mode)
 #+END_SRC
 
-For Tide integration, use the local tsserver and fallback to the default one installed with tide
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+For Tide integration, use the local tsserver and fallback to the default one installed with tide. Disabled for now.
+#+BEGIN_SRC emacs-lisp ~/.emacs
   (let* ((package-root (locate-dominating-file default-directory "package.json"))
 	 (path (and package-root
 		    (expand-file-name "node_modules/typescript/bin/tsserver"
@@ -424,21 +446,12 @@ For Tide integration, use the local tsserver and fallback to the default one ins
     (when (and path (file-exists-p path))
       (make-local-variable 'tide-tsserver-executable)
       (setq tide-tsserver-executable path)))
+  ;; (setq tide-tsserver-executable *tsserver*)
 #+END_SRC
 
-Some unicode glyphs that I like
+Add ECMA unicode glyphs that I like
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (add-hook 'typescript-mode-hook (lambda ()
-     "Beautify typescript symbols Symbol"
-     (push '(">=" . ?≥) prettify-symbols-alist)
-     (push '("<=" . ?≤) prettify-symbols-alist)
-     (push '("==" . ?≔) prettify-symbols-alist)
-     (push '("===" . ?≡) prettify-symbols-alist)
-     (push '("!=" . ?≠) prettify-symbols-alist)
-     (push '("!==" . ?≢) prettify-symbols-alist)
-     (push '("&&" . ?∧) prettify-symbols-alist)
-     (push '("||" . ?∥) prettify-symbols-alist)
-     (prettify-symbols-mode)))
+  (add-hook 'typescript-mode-hook 'jrm/ecma-prettify-symbols)
 #+END_SRC
 
 ***** Destructured Imports
