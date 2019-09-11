@@ -386,6 +386,7 @@ Setup ECMA unicode glyphs
   (defun jrm/ecma-prettify-symbols ()
     "Adds common ECMA symobls to prettify-symbols-alist."
     (push '(">=" . ?≥) prettify-symbols-alist)
+    (push '("=>" . ?⇒) prettify-symbols-alist)
     (push '("<=" . ?≤) prettify-symbols-alist)
     (push '("===" . ?≡) prettify-symbols-alist)
     (push '("!=" . ?≠) prettify-symbols-alist)
