@@ -1016,6 +1016,7 @@ For using [[https://orgmode.org/manual/Easy-templates.html][easy templates]] in 
  #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
    (use-package ox-twbs)
    (use-package ob-rust)
+   (use-package ob-restclient)
    (require 'ob-clojure)
    (use-package ob-typescript :diminish typescript-mode)
  #+END_SRC
