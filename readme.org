@@ -374,13 +374,6 @@ Use js2 mode rather than the built in javascript mode.
   ;;   (flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append)
 #+END_SRC
 
-Use tern and company-tern for better js parsing. Tern can be installed with can be installed with ~sudo npm install -g tern~.
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (use-package company-tern
-    :init
-    (add-hook 'js2-mode-hook (lambda () (tern-mode) (company-mode))))
-#+END_SRC
-
 Setup ECMA unicode glyphs
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (defun jrm/ecma-prettify-symbols ()
@@ -398,6 +391,33 @@ Setup ECMA unicode glyphs
   (add-hook 'js-mode-hook 'jrm/ecma-prettify-symbols)
 #+END_SRC
 
+***** Tern Server Setup
+[[https://ternjs.net/doc/manual.html][Tern]] is a great general js development package. Setup a global standard configuration. This can be overwritten on a project level by creating a ~.tern-project~ file.
+#+BEGIN_SRC json :tangle ~/.tern-config
+{
+  "ecmaVersion": 2018,
+  "libs": [
+    "ecmascript",
+    "browser"
+  ],
+  "plugins": {
+    "modules": {},
+    "es_modules": {},
+    "node": {},
+    "doc_comment": {
+      "fullDocs": true,
+      "strong": true
+    }
+  }
+}
+#+END_SRC
+
+Use tern and company-tern for better js parsing. Tern can be installed with can be installed with ~sudo npm install -g tern~.
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package company-tern
+    :init
+    (add-hook 'js2-mode-hook (lambda () (tern-mode) (company-mode))))
+#+END_SRC
 
 ***** Angular/TS Development
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
@@ -447,6 +467,16 @@ For Tide integration, use the local tsserver and fallback to the default one ins
       (make-local-variable 'tide-tsserver-executable)
       (setq tide-tsserver-executable path)))
   ;; (setq tide-tsserver-executable *tsserver*)
+#+END_SRC
+
+Add prettier support. Assumes prettier is installed globally.
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+(defun prettier-before-save ()
+  "Add this to .emacs to run refmt on the current buffer when saving:
+ (add-hook 'before-save-hook 'prettier-before-save)."
+  (interactive)
+  (when (member major-mode '(js-mode js2-mode)) (prettier)))
+(add-hook 'before-save-hook 'prettier-before-save)
 #+END_SRC
 
 Add ECMA unicode glyphs that I like
