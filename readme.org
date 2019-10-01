@@ -631,7 +631,10 @@ Defining custom indentation based on project paths and setting them to functions
 #+END_SRC
 **** HTML/CSS
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (use-package sass-mode :config (setq exec-path (cons (expand-file-name "/usr/bin/sass") exec-path)))
+  (use-package sass-mode
+    :config
+    (setq exec-path (cons (expand-file-name "/usr/bin/sass") exec-path))
+    (add-to-list 'auto-mode-alist '("\\.scss\\'" . sass-mode)))
   (add-hook 'sgml-mode-hook (lambda () (set (make-local-variable 'sgml-basic-offset) 4) (sgml-guess-indent)))
 
   (use-package web-mode
@@ -646,7 +649,6 @@ Defining custom indentation based on project paths and setting them to functions
     (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
     (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
     (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))
     (add-to-list 'auto-mode-alist '("\\.hbs\\'" . web-mode)))
 #+END_SRC
 
@@ -666,7 +668,12 @@ Various modes helpful for development
   (use-package restclient)
   (use-package groovy-mode)
   (use-package go-mode)
-  (use-package emmet-mode :config (add-hook 'sgml-mode-hook 'emmet-mode) (add-hook 'css-mode-hook  'emmet-mode))
+  (use-package emmet-mode
+    :config
+    (add-hook 'sgml-mode-hook 'emmet-mode)
+    (add-hook 'css-mode-hook 'emmet-mode)
+    (add-hook 'web-mode-hook 'emmet-mode)
+    (add-hook 'sass-mode-hook 'emmet-mode))
 #+END_SRC
 
 **** Version Control
