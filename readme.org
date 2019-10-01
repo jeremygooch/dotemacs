@@ -1067,6 +1067,12 @@ For using [[https://orgmode.org/manual/Easy-templates.html][easy templates]] in 
   (require 'org-tempo)
 #+END_SRC
 
+Set the node environment
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (setq org-babel-js-cmd (concat *node-dir* "node"))
+
+#+END_SRC
+
 **** Additional Modes
  Add some export modes for getting content out of org
  #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
