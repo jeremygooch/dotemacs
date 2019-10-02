@@ -499,28 +499,36 @@ Provide a way to stack imports as there is currently no option using linters
     (if (or (equal major-mode 'typescript-mode) (equal major-mode 'ng2-ts-mode))
 	(jrm/stack-imports-by-regexp)))
 
-
   (defun jrm/filter-list (@predicate @sequence)
     "Return a new list such that *predicate is true on all members of *sequence.
-  Lifted from http://ergoemacs.org/emacs/elisp_filter_list.html"
+    Lifted from http://ergoemacs.org/emacs/elisp_filter_list.html"
     (delete "e3824ad41f2ec1ed"
 	    (mapcar (lambda ($x) (if (funcall @predicate $x) $x "e3824ad41f2ec1ed")) @sequence)))
 
-  (defun formatLineByStacking (list)
+  (defun isAlias (word) (if (member (downcase word) '("as")) t))
+
+  (defun formatLineByStacking (list lastWord)
     "Stacks a list of ts/js imports via string matching"
     (when list
-      (let ((word (car list)))
-	(if (> (length (jrm/filter-list '(lambda (x) (string-match-p x word)) '("'" "\"" ";"))) 0)
+      (let ((word (car list))
+	    (nextWord (car (cdr list))))
+	(if (> (length (jrm/filter-list '(lambda (x) (string-match x word)) '("'" "\"" ";"))) 0)
 	    (insert word)
-	  (if (or (member (downcase word) '("import" "from"))
-		  (string-match-p "}" word))
-	      (insert word " ")
-	    (if (string-match-p "{" word) (insert word "\n")
-	      (if (string-match-p "," word) (insert word "\n")
+	  (if (or (member (downcase word) '("import" "from" "as"))
+		  (string-match "}" word)
+		  (isAlias nextWord))
+	      (if (isAlias nextWord)
+		  (insert "  " word " ")
+		(insert word " "))
+	    (if (string-match "{" word) (insert word "\n")
+	      (if (string-match "," word)
+		  (if (isAlias lastWord)
+		      (insert word "\n")
+		    (insert "  " word "\n"))
 		(if (member word '("" " " ","))
 		    (insert "")
-		  (insert word ",\n")))))))
-      (formatLineByStacking (cdr list))))
+		  (insert "  " word ",\n")))))))
+      (formatLineByStacking (cdr list) (car list))))
 
   (defun jrm/stack-imports-by-regexp ()
     "Stack the imports based on regexp"
@@ -531,7 +539,7 @@ Provide a way to stack imports as there is currently no option using linters
       (let ((line (split-string (buffer-substring-no-properties (line-beginning-position) (line-end-position)) " ")))
 	(beginning-of-line)
 	(kill-line)
-	(formatLineByStacking line)
+	(formatLineByStacking line "")
 	(indent-region (point-min) (point-max))))
     (goto-char origPos))
 
