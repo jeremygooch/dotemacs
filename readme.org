@@ -279,24 +279,25 @@ Turn on linum mode for almost everything.
 
 *** Programming
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (use-package lsp-mode
-    :hook (ng2-ts-mode . lsp)
-    :hook (typescript-mode . lsp)
-    :hook (html-mode . lsp)
-    :hook (scss-mode . lsp)
-    :hook (css-mode . lsp)
-    :hook (web-mode . lsp)
-    :commands lsp)
+	(use-package lsp-mode
+		:hook (ng2-ts-mode . lsp)
+		:hook (typescript-mode . lsp)
+		:hook (html-mode . lsp)
+		:hook (scss-mode . lsp)
+		:hook (sass-mode . lsp)
+		:hook (css-mode . lsp)
+		:hook (web-mode . lsp)
+		:commands lsp)
 
-  ;; optionally
-  (use-package lsp-ui :commands lsp-ui-mode)
-  (use-package company-lsp :commands company-lsp)
-  (push 'company-lsp company-backends)
-  (use-package helm-lsp :commands helm-lsp-workspace-symbol)
-  (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
-  ;; optionally if you want to use debugger
-  (use-package dap-mode)
-  ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
+	;; optionally
+	(use-package lsp-ui :commands lsp-ui-mode)
+	(use-package company-lsp :commands company-lsp)
+	(push 'company-lsp company-backends)
+	(use-package helm-lsp :commands helm-lsp-workspace-symbol)
+	(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+	;; optionally if you want to use debugger
+	(use-package dap-mode)
+	;; (use-package dap-LANGUAGE) to load the dap adapter for your language
 #+END_SRC
 
 **** Lisps
