@@ -138,32 +138,32 @@ Ignore certain directories by default for grep
 
 *** IBuffer
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (global-set-key (kbd "C-x C-b") 'ibuffer)
-  (setq ibuffer-saved-filter-groups
+	(global-set-key (kbd "C-x C-b") 'ibuffer)
+	(setq ibuffer-saved-filter-groups
 	(quote (("default"
 		 ("dired" (mode . dired-mode))
 		 ("org" (mode . org-mode))
 		 ("shell" (mode . shell-mode))
 		 ("git" (name . "^magit\*"))
 		 ("Slack" (or (mode . slack-mode)
-			      (name . "^\\*Slack.*$")))
+						(name . "^\\*Slack.*$")))
 		 ("email" (name . "^\\*mu4e-.*\\*$"))
-		 ("javascript" (or (mode . javascript-mode)
-				   (name . "^.*.js$")
-				   (name . "^.*.ts")
-				   (name . "^.*.json$")))
+		 ("ecmascript" (or (mode . javascript-mode)
+					 (name . "^.*.js$")
+					 (name . "^.*.ts")
+					 (name . "^.*.json$")))
 		 ("markup" (or (mode . web-mode)
-			       (name . "^.*.tpl")
-			       (name . "^.*.mst")
-			       (name . "^.*.html")))
+						 (name . "^.*.tpl")
+						 (name . "^.*.mst")
+						 (name . "^.*.html")))
 		 ("images" (name . "^.*png$"))
 		 ("process" (or (mode . grep-mode)
 				(name . "^\\*tramp*$")))
 		 ("emacs" (or (name . "^\\*scratch\\*$")
-			      (name . "^\\*Messages\\*$")
-			      (name . "^\\*eww\\*$")
-			      (name . "^\\*GNU Emacs\\*$")))))))
-  (add-hook 'ibuffer-mode-hook (lambda () (ibuffer-switch-to-saved-filter-groups "default")))
+						(name . "^\\*Messages\\*$")
+						(name . "^\\*eww\\*$")
+						(name . "^\\*GNU Emacs\\*$")))))))
+	(add-hook 'ibuffer-mode-hook (lambda () (ibuffer-switch-to-saved-filter-groups "default")))
 #+END_SRC
 
 *** GPG Pinentry
@@ -1391,6 +1391,12 @@ I also like to use org mode's code evaluation capabilities for tinkering around 
 #+END_SRC
 
 ** Final Pieces
+*** Remap Key sequences
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+	(global-set-key (kbd "C-x C-r") '(lambda () (interactive) (revert-buffer t (not (buffer-modified-p)) t)))
+#+END_SRC
+
+*** Last Line
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (provide '.emacs)
 #+END_SRC
