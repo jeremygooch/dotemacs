@@ -208,6 +208,17 @@ Generic auto-complete with Ivy which
      (global-set-key (kbd "C-s") 'swiper-isearch))
  #+END_SRC
 
+**** Ivy Posframe
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package ivy-posframe
+    :after (counsel)
+    :config
+    (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
+    (setq ivy-posframe-parameters '((left-fringe . 8) (right-fringe . 8)))
+    (set-face-attribute 'ivy-posframe nil :background "#1f2127")
+    (ivy-posframe-mode 1))
+#+END_SRC
+
 **** Company mode
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (use-package company :diminish company-mode
@@ -223,13 +234,6 @@ Company-mode with icons
 #+END_SRC
 
 ** Introspection
-*** M-x Enhancements: Smex for auto complete meta commands
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (use-package smex
-    :init (smex-initialize)
-    :bind ("M-x" . smex))
-#+END_SRC
-
 *** Which key
 Some quick help for when I get stuck in the middle of a command
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
@@ -306,10 +310,12 @@ Adjust the local mark ring pop key sequence, so after pressing `C-u C-SPC`, you 
 #+END_SRC
 
 **** Lisps
-***** General Settings
+**** General Settings
 Paredit for maintaining sanity while working with lisp
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-(use-package paredit)
+  (defun paredit-enable-modes () (add-hook 'emacs-lisp-mode-hook 'paredit-mode))
+
+  (use-package paredit :config (paredit-enable-modes))
 #+END_SRC
 
 Some general settings for lisp dialects (elisp, clojure, etc).
@@ -333,6 +339,7 @@ Make evaluating elisp buffers even quicker
 Clojure with Cider for interactive Clojure development
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package clojure-mode
+    :defer
     :config
     (add-to-list 'auto-mode-alist '("\\.edn$" . clojure-mode))
     (add-to-list 'auto-mode-alist '("\\.boot$" . clojure-mode))
@@ -342,15 +349,12 @@ Clojure with Cider for interactive Clojure development
   (use-package eldoc :diminish eldoc-mode)
 
   (use-package cider
+    :defer
     :config
     (add-hook 'cider-repl-mode-hook #'eldoc-mode)
     (setq cider-repl-pop-to-buffer-on-connect t) ;; go to the repl when done connecting
     (setq cider-show-error-buffer t)
     (setq cider-auto-select-error-buffer t)) ;; jump to error message
-
-  (defun paredit-enable-modes () (add-hook 'emacs-lisp-mode-hook 'paredit-mode))
-
-  (use-package paredit :config (paredit-enable-modes))
 #+END_SRC
 
 ****** Clojure/Quil Workflow Customization
@@ -392,6 +396,7 @@ Some basic code folding
 Use js2 mode rather than the built in javascript mode.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package js2-mode
+    :defer
     :init
     (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode)))
 
@@ -685,6 +690,7 @@ Defining custom indentation based on project paths and setting them to functions
 **** PHP Development
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package php-mode
+    :defer
     :config
     (autoload 'php-mode "php-mode-improved" "Major mode for editing php code." t)
     (add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
@@ -694,11 +700,14 @@ Defining custom indentation based on project paths and setting them to functions
 **** Additional Languages
 Various modes helpful for development
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (use-package yaml-mode :config (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode)))
-  (use-package restclient)
-  (use-package groovy-mode)
-  (use-package go-mode)
+  (use-package yaml-mode
+    :defer
+    :config (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode)))
+  (use-package restclient :defer)
+  (use-package groovy-mode :defer)
+  (use-package go-mode :defer)
   (use-package emmet-mode
+    :defer
     :config
     (add-hook 'sgml-mode-hook 'emmet-mode)
     (add-hook 'css-mode-hook 'emmet-mode)
@@ -1104,7 +1113,7 @@ Set the node environment
 #+END_SRC
 
 **** Additional Modes
- Add some export modes for getting content out of org
+ Add some export modes for getting content out of org. Not using ~:defer~ here as I'm not sure it's helpful and adding it to ~ob-clojure~ throws a ~Wrong type argument: stringp, :defer~ error.
  #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
    (use-package ox-twbs)
    (use-package ob-rust)
@@ -1246,7 +1255,9 @@ Fixes emacs and osx path issues.
 *** Elfeed
 Many thanks to [[http://pragmaticemacs.com/emacs/read-your-rss-feeds-in-emacs-with-elfeed/][pragmatic emacs' post]] for guidance on this setup.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (use-package elfeed-org :config (elfeed-org) (setq rmh-elfeed-org-files (list (concat *org-dir* "personal/elfeed.org"))))
+  (use-package elfeed-org
+    :defer
+    :config (elfeed-org) (setq rmh-elfeed-org-files (list (concat *org-dir* "personal/elfeed.org"))))
 
   (defun jrm/elfeed-show-all ()
     (interactive)
@@ -1279,6 +1290,7 @@ Many thanks to [[http://pragmaticemacs.com/emacs/read-your-rss-feeds-in-emacs-wi
     (quit-window))
 
   (use-package elfeed
+    :defer
     :bind (:map elfeed-search-mode-map
 		("A" . jrm/elfeed-show-all)
 		("E" . jrm/elfeed-show-emacs)
