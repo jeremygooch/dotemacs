@@ -175,7 +175,7 @@ Instead of using the display's popup, prompt for gpg creds in the minibuffer
 *** General Auto Completion
 **** Ido Mode
 Ido is great for lots of stuff including fuzzy matching
- #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+ #+BEGIN_SRC emacs-lisp
    (setq ido-enable-flex-matching nil)
    (setq ido-create-new-buffer 'always) ;; create a buffer with specific name if it doesn't exist already
    (setq ido-everywhere t)
@@ -1176,13 +1176,22 @@ Customize org capture to my liking
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (global-set-key (kbd "C-c c") 'org-capture)
   (setq org-capture-templates
-	'(("w" "Work Todo" entry (file "~/org/work/softwareadvice/SA.org")
+	'((" " "TODOs ==============================" entry (file "") "")
+	  ("w" "Work Todo" entry (file "~/org/work/softwareadvice/SA.org")
 	   "** TODO %? :sa:\n  %i\n  %a")
-	  ("j" "JS Club Meeting Notes" entry (file "~/org/work/softwareadvice/Meetings.org")
-	   "* %<%Y-%d-%m> Neon Club Meeting Notes\n** Date\n%<%b %e %Y>\n\n** Participants\n   * \n\n** Goals\n   * Weekly Neon Club Meeting\n\n** Discussion Topics\n   - \n\n** Action Items\n\n** Decisions")
-	  ("l" "Personal Todo" entry (file "~/org/personal/personal.org")
+	  ("l" "Personal Todo\n" entry (file "~/org/personal/personal.org")
 	   "*** TODO %? :personal:\n  %i\n  %a")
-	  ("m" "Meeting" entry (file "~/org/work/softwareadvice/Meetings.org")
+	  (" " "PROGRAMMING SNIPPETS ===============" entry (file "") "")
+	  ("j" "JS Snippet" entry (file "~/org/personal/research/development/js/Javascript-snippets.org")
+	   "* \n #+BEGIN_SRC js\n%?\n#+END_SRC\n\n[Date: %<%Y-%d-%m>]" :prepend t)
+	  ("t" "TS Snippet" entry (file "~/org/personal/research/development/js/Javascript-snippets.org")
+	   "* \n #+BEGIN_SRC typescript\n%?\n#+END_SRC\n\n[Date: %<%Y-%d-%m>]" :prepend t)
+	  ("p" "Python Snippet" entry (file "~/org/personal/research/development/js/Javascript-snippets.org")
+	   "* \n #+BEGIN_SRC python\n%?\n#+END_SRC\n\n[Date: %<%Y-%d-%m>]" :prepend t)
+	  ("e" "eLisp Snippet\n" entry (file "~/org/personal/research/development/js/Javascript-snippets.org")
+	   "* \n #+BEGIN_SRC emacs-lisp\n%?\n#+END_SRC\n\n[Date: %<%Y-%d-%m>]" :prepend t)
+	  (" " "MEETINGS ===========================" entry (file "") "")
+	  ("m" "Meeting\n" entry (file "~/org/work/softwareadvice/Meetings.org")
 	   "** MEETING with %? :MEETING:\n  %i\n"  :clock-in t :clock-resume t)))
 #+END_SRC
 
@@ -1256,7 +1265,6 @@ Fixes emacs and osx path issues.
 Many thanks to [[http://pragmaticemacs.com/emacs/read-your-rss-feeds-in-emacs-with-elfeed/][pragmatic emacs' post]] for guidance on this setup.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package elfeed-org
-    :defer
     :config (elfeed-org) (setq rmh-elfeed-org-files (list (concat *org-dir* "personal/elfeed.org"))))
 
   (defun jrm/elfeed-show-all ()
@@ -1387,20 +1395,6 @@ A bit of helpful debugging for a few modes
   (global-set-key (kbd "C-x C-j d") 'jrm/insert-debug-log)
 #+END_SRC
 
-*** JS Playground
-I also like to use org mode's code evaluation capabilities for tinkering around with different languages. Here's a bit of elisp to automate the manual part of that process:
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-(defun jrm/js-playground()
-  "Creates an org buffer for fiddling around with JS code. Uses org so that results can be evaluated."
-  (interactive)
-  (get-buffer-create "js-playground")
-  (switch-to-buffer "js-playground")
-  (org-mode)
-  (goto-char 1)
-  (insert "#+BEGIN_SRC js\n\n#+END_SRC\n")
-  (goto-char 16))
-(global-set-key (kbd "C-x C-j C-j") 'jrm/js-playground)
-#+END_SRC
 
 ** Final Pieces
 *** Remap Key sequences
