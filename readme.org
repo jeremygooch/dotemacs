@@ -41,13 +41,22 @@ Setting up basic repositories and [[https://github.com/jwiegley/use-package][use
 			   ("gnu" . "http://elpa.gnu.org/packages/")
 			   ("org" . "https://orgmode.org/elpa/")
 			   ("melpa" . "https://melpa.org/packages/")))
+#+END_SRC
 
+*** use-package Setup
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (unless (package-installed-p 'use-package)
     (package-refresh-contents)
     (package-install 'use-package))
 
   (require 'use-package-ensure)
   (setq use-package-always-ensure t)
+#+END_SRC
+
+Allow use-package to install missing system packages
+#+BEGIN_SRC emacs-lisp
+(use-package use-package-ensure-system-package
+  :ensure t)
 #+END_SRC
 
 *** Personal Information
@@ -1237,7 +1246,11 @@ Use xelatex for more latex options like fontspec
   (custom-set-variables
    '(org-export-backends '(ascii html icalendar latex md odt)))
 #+END_SRC
-
+*** Markdown
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package grip-mode
+    :ensure-system-package (grip . "pip install grip"))
+#+END_SRC
 ** Shells
 By default just use bash for all shells
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
