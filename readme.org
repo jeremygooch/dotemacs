@@ -210,7 +210,8 @@ Generic auto-complete with Ivy which
  #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
    (use-package counsel
      :config
-     (global-set-key (kbd "M-x") 'counsel-M-x))
+     (global-set-key (kbd "M-x") 'counsel-M-x)
+     (global-set-key (kbd "M-SPC") 'counsel-git))
 
    (use-package swiper
      :config
@@ -218,7 +219,7 @@ Generic auto-complete with Ivy which
  #+END_SRC
 
 **** Ivy Posframe
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp
   (use-package ivy-posframe
     :after (counsel)
     :config
