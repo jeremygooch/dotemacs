@@ -319,7 +319,6 @@ Adjust the local mark ring pop key sequence, so after pressing `C-u C-SPC`, you 
 #+END_SRC
 
 **** Lisps
-**** General Settings
 Paredit for maintaining sanity while working with lisp
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (defun paredit-enable-modes () (add-hook 'emacs-lisp-mode-hook 'paredit-mode))
