@@ -433,6 +433,11 @@ Setup ECMA unicode glyphs
   (add-hook 'js-mode-hook 'jrm/ecma-prettify-symbols)
 #+END_SRC
 
+Web Beautify for unminifying assets
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package web-beautify)
+#+END_SRC
+
 ***** Tern Server Setup
 [[https://ternjs.net/doc/manual.html][Tern]] is a great general js development package. Setup a global standard configuration. This can be overwritten on a project level by creating a ~.tern-project~ file.
 #+BEGIN_SRC json :tangle ~/.tern-config
