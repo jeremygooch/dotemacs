@@ -181,27 +181,30 @@ Instead of using the display's popup, prompt for gpg creds in the minibuffer
   (setq epa-pinentry-mode 'loopback)
 #+END_SRC
 
-*** General Auto Completion
-**** Ido Mode
-Ido is great for lots of stuff including fuzzy matching
- #+BEGIN_SRC emacs-lisp
-   (setq ido-enable-flex-matching nil)
-   (setq ido-create-new-buffer 'always) ;; create a buffer with specific name if it doesn't exist already
-   (setq ido-everywhere t)
-   (ido-mode 1)
-   (use-package ido-vertical-mode
-     :config (ido-vertical-mode 1))
-   (setq ido-vertical-define-keys 'C-n-and-C-p-only)
- #+END_SRC
+*** Company mode
+#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
+  (use-package company :diminish company-mode
+    :init (add-hook 'after-init-hook 'global-company-mode))
+#+END_SRC
 
-**** Ivy/Counsel/Swiper
+Company-mode with icons
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+(use-package company-box
+  :hook (company-mode . company-box-mode)
+  :diminish company-box-mode)
+(setq company-idle-delay 0.2)
+#+END_SRC
+
+** Introspection
+*** Ivy/Counsel/Swiper
 Generic auto-complete with Ivy which 
  #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
    (use-package ivy :demand
      :diminish ivy-mode
      :config
      (setq ivy-use-virtual-buffers t
-	   ivy-count-format "%d/%d "))
+	   ivy-count-format "%d/%d ")
+     (global-set-key (kbd "C-x b") 'ivy-switch-buffer))
    (ivy-mode 1)
    (setq ivy-use-selectable-prompt t)
  #+END_SRC
@@ -217,37 +220,13 @@ Generic auto-complete with Ivy which
      (global-set-key (kbd "C-s") 'swiper-isearch))
  #+END_SRC
 
-**** Ivy Posframe
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (use-package ivy-posframe
-    :after (counsel)
-    :config
-    (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
-    (setq ivy-posframe-parameters '((left-fringe . 8) (right-fringe . 8)))
-    (set-face-attribute 'ivy-posframe nil :background "#1f2127")
-    (ivy-posframe-mode 1))
-#+END_SRC
-
-**** Company mode
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package company :diminish company-mode
-    :init (add-hook 'after-init-hook 'global-company-mode))
-#+END_SRC
-
-Company-mode with icons
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-(use-package company-box
-  :hook (company-mode . company-box-mode)
-  :diminish company-box-mode)
-(setq company-idle-delay 0.2)
-#+END_SRC
-
-** Introspection
 *** Which key
 Some quick help for when I get stuck in the middle of a command
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package which-key :config (which-key-mode))
 #+END_SRC
+
+
 
 ** File Editing/Navigation
 *** General Settings
@@ -297,25 +276,32 @@ Adjust the local mark ring pop key sequence, so after pressing `C-u C-SPC`, you 
 
 *** Programming
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-	(use-package lsp-mode
-		:hook (ng2-ts-mode . lsp)
-		:hook (typescript-mode . lsp)
-		:hook (html-mode . lsp)
-		:hook (scss-mode . lsp)
-		:hook (sass-mode . lsp)
-		:hook (css-mode . lsp)
-		:hook (web-mode . lsp)
-		:commands lsp)
+  (use-package lsp-mode
+	  :hook (ng2-ts-mode . lsp)
+	  :hook (typescript-mode . lsp)
+	  :hook (html-mode . lsp)
+	  :hook (scss-mode . lsp)
+	  :hook (sass-mode . lsp)
+	  :hook (css-mode . lsp)
+	  :hook (web-mode . lsp)
+	  :hook (clojure-mode . lsp)
+	  :commands lsp
+	  :config
+	  (dolist (m '(clojure-mode
+		       clojurec-mode
+		       clojurescript-mode
+		       clojurex-mode))
+	    (add-to-list 'lsp-language-id-configuration `(,m . "clojure"))))
 
-	;; optionally
-	(use-package lsp-ui :commands lsp-ui-mode)
-	(use-package company-lsp :commands company-lsp)
-	(push 'company-lsp company-backends)
-	(use-package helm-lsp :commands helm-lsp-workspace-symbol)
-	(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
-	;; optionally if you want to use debugger
-	(use-package dap-mode)
-	;; (use-package dap-LANGUAGE) to load the dap adapter for your language
+  ;; optionally
+  (use-package lsp-ui :commands lsp-ui-mode)
+  (use-package company-lsp :commands company-lsp)
+  (push 'company-lsp company-backends)
+  (use-package helm-lsp :commands helm-lsp-workspace-symbol)
+  (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+  ;; optionally if you want to use debugger
+  (use-package dap-mode)
+  ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
 #+END_SRC
 
 **** Lisps
@@ -911,7 +897,6 @@ With EXWM it can act as a complete desktop environment.
     :ensure nil
     :config
     (exwm-config-default)
-    (exwm-config-ido)
     (global-set-key (kbd "C-x O")  'exwm-workspace-switch-to-buffer))
 #+END_SRC
 ***** Multiple Monitor Support
