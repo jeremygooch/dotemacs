@@ -213,12 +213,16 @@ Generic auto-complete with Ivy which
  #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
    (use-package counsel
      :config
-     (global-set-key (kbd "M-x") 'counsel-M-x))
+     (global-set-key (kbd "M-x") 'counsel-M-x)
+     (global-set-key (kbd "M-SPC") 'counsel-git))
 
    (use-package swiper
      :config
      (global-set-key (kbd "C-s") 'swiper-isearch))
  #+END_SRC
+
+
+** Introspection
 
 *** Which key
 Some quick help for when I get stuck in the middle of a command
@@ -305,7 +309,6 @@ Adjust the local mark ring pop key sequence, so after pressing `C-u C-SPC`, you 
 #+END_SRC
 
 **** Lisps
-**** General Settings
 Paredit for maintaining sanity while working with lisp
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (defun paredit-enable-modes () (add-hook 'emacs-lisp-mode-hook 'paredit-mode))
@@ -417,6 +420,11 @@ Setup ECMA unicode glyphs
 
   (add-hook 'js2-mode-hook 'jrm/ecma-prettify-symbols)
   (add-hook 'js-mode-hook 'jrm/ecma-prettify-symbols)
+#+END_SRC
+
+Web Beautify for unminifying assets
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package web-beautify)
 #+END_SRC
 
 ***** Tern Server Setup
