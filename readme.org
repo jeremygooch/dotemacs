@@ -1102,6 +1102,8 @@ Setup an easy way to jump to an org headline using org-goto =C-c C-j=
 #+BEGIN_SRC elisp :tangle ~/.emacs
   (setq org-goto-interface 'outline-path-completion
 	org-goto-max-level 10)
+
+  (setq org-outline-path-complete-in-steps nil)
 #+END_SRC
 *** Source Blocks
 When evaluating a source code block in org mode do not prompt for input, just run it.
