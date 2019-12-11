@@ -104,6 +104,11 @@ Use aspell for Mac (aspell can be installed with brew)
 (setq ispell-program-name "/usr/local/bin/aspell")
 #+END_SRC
 
+Silence alarms
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+(setq ring-bell-function 'ignore)
+#+END_SRC
+
 *** Dired
 Some basic Dired setup
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
@@ -214,7 +219,7 @@ Generic auto-complete with Ivy which
    (use-package counsel
      :config
      (global-set-key (kbd "M-x") 'counsel-M-x)
-     (global-set-key (kbd "M-SPC") 'counsel-git))
+     (global-set-key (kbd "C-M-SPC") 'counsel-git))
 
    (use-package swiper
      :config
