@@ -10,7 +10,7 @@ Some of the code blocks pertain to the OS and will be tangled automatically. The
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs-config
   (defvar *home-dir*              (getenv "HOME"))
   (defvar *dotemacs-dir*          (concat *home-dir* "/src/dotemacs/"))
-  (defvar *node-dir*              (concat *home-dir* "/.nvm/versions/node/v10.11.0/bin/"))
+  (defvar *node-dir*              (concat *home-dir* "/.nvm/versions/node/v10.8.0/bin/"))
   (defvar *org-dir*               (concat *home-dir* "/org/"))
   (defvar *tsserver*              (concat *home-dir* "/src/TypeScript/lib/tsserver.js"))
 
