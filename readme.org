@@ -36,11 +36,12 @@ Setting up basic repositories and [[https://github.com/jwiegley/use-package][use
   (require 'package)
   (setq package-enable-at-startup nil)
   (setq package-archives '(
+			   ("gnu" . "http://elpa.gnu.org/packages/")
+			   ("melpa" . "https://melpa.org/packages/")
 			   ("marmalade"  . "http://marmalade-repo.org/packages/")
 			   ("melpa-stable" . "http://stable.melpa.org/packages/")
-			   ("gnu" . "http://elpa.gnu.org/packages/")
-			   ("org" . "https://orgmode.org/elpa/")
-			   ("melpa" . "https://melpa.org/packages/")))
+			   ;; ("org" . "https://orgmode.org/elpa/")
+			   ))
 #+END_SRC
 
 *** use-package Setup
