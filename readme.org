@@ -1413,7 +1413,7 @@ A bit of helpful debugging for a few modes
 ** Final Pieces
 *** Remap Key sequences
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-	(global-set-key (kbd "C-x C-r") '(lambda () (interactive) (revert-buffer t (not (buffer-modified-p)) t)))
+  (global-set-key (kbd "S-u") '(lambda () (interactive) (revert-buffer t (not (buffer-modified-p)) t)))
 #+END_SRC
 
 *** Last Line
