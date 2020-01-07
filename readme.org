@@ -1254,7 +1254,7 @@ Use xelatex for more latex options like fontspec
    '(org-export-backends '(ascii html icalendar latex md odt)))
 #+END_SRC
 *** Markdown
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp
   (use-package grip-mode
     :ensure-system-package (grip . "pip install grip"))
 #+END_SRC
