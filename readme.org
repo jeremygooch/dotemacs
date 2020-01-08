@@ -1217,16 +1217,17 @@ Customize org capture to my liking
 *** Remote Syncing
 This attempts to sync an org file on save if it detects the file is in the ~*org-dir*~ directory.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-    (defun jrm/git-auto-sync ()
-      "Automatically stages, commits, pulls, and pushes the current branch's upstream settings. Commit message is current timestamp. Depends on Magit."
-      (interactive)
-      (if (string-match-p (regexp-quote *org-dir*) (file-name-directory buffer-file-name))
-      (magit-stage-modified)
-      (magit-run-git-with-editor "commit" "-m" (format-time-string "%a %d %b %Y %H:%M:%S %Z"))
-      (magit-run-git-async "pull")
-      (magit-run-git-async "push")))
+  (defun jrm/git-auto-sync ()
+    "Automatically stages, commits, pulls, and pushes the current branch's upstream settings. Commit message is current timestamp. Depends on Magit."
+    (interactive)
+    (if (string-match-p (regexp-quote *org-dir*) (file-name-directory buffer-file-name))
+	(progn 
+	  (magit-stage-modified)
+	  (magit-run-git-with-editor "commit" "-m" (format-time-string "%a %d %b %Y %H:%M:%S %Z"))
+	  (magit-run-git-async "pull")
+	  (magit-run-git-async "push"))))
 
-    (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook 'jrm/git-auto-sync nil t)))
+  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook 'jrm/git-auto-sync nil t)))
 #+END_SRC
 
 *** LaTex
