@@ -465,7 +465,7 @@ Use tern and company-tern for better js parsing. Tern can be installed with can 
   (setq exec-path (append exec-path '(*node-dir*)))
   (custom-set-variables
    '(flycheck-typescript-tslint-executable (concat *node-dir* "tslint"))
-   '(tide-tsserver-executable *tsserver*)
+   '(tide-tsserver-executable "/home/jeremy/src/Typescript/lib/tsserver.js")
    '(tide-node-executable (concat *node-dir* "node")))
   (use-package ng2-mode)
   (use-package flycheck :diminish flycheck-mode)
@@ -578,7 +578,7 @@ Provide a way to stack imports as there is currently no option using linters
 	(indent-region (point-min) (point-max))))
     (goto-char origPos))
 
-  (add-hook 'before-save-hook 'jrm/stack-imports)
+  (remove-hook 'before-save-hook 'jrm/stack-imports)
 #+END_SRC
 
 By stacking imports the actual code gets pushed pretty far down in a view, so provide a way to fold them out of the view. Depends on yafolding.
