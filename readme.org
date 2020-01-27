@@ -1210,7 +1210,7 @@ Customize org capture to my liking
 	  ("t" "TS Snippet\n" entry (file "~/org/personal/research/development/js/Javascript-snippets.org")
 	   "* \n #+BEGIN_SRC typescript\n%?\n#+END_SRC\n\n[Date: %<%Y-%d-%m>]" :prepend t)
 	  (" " "MEETINGS ===========================" entry (file "") "")
-	  ("m" "Meeting\n" entry (file "~/org/work/softwareadvice/Meetings.org")
+	  ("m" "Meeting\n" entry (file "~/org/work/IBM/Meetings.org")
 	   "** MEETING with %? :MEETING:\n  %i\n"  :clock-in t :clock-resume t)))
 #+END_SRC
 
