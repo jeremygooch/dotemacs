@@ -313,6 +313,15 @@ Adjust the local mark ring pop key sequence, so after pressing `C-u C-SPC`, you 
   ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
 #+END_SRC
 
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (setq lsp-html-server-command (quote
+				 ("/home/jeremy/.nvm/versions/node/v10.8.0/bin/html-languageserver" "--stdio")))
+  (setq lsp-clients-angular-language-server-command (quote
+      ("node" "/home/jeremy/.nvm/versions/node/v10.8.0/lib/node_modules/@angular/language-server" "--ngProbeLocations" "/home/jeremy/.nvm/versions/node/v10.8.0/lib/node_modules" "--tsProbeLocations" "/usr/lib/node_modules" "--stdio")))
+
+  (setq grep-find-ignored-directories (quote ("SCCS" "RCS" "CVS" "MCVS" ".src" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "node_modules" "vendor" "dist" "coverage")))
+#+END_SRC
+
 **** Lisps
 Paredit for maintaining sanity while working with lisp
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
@@ -667,10 +676,15 @@ Defining custom indentation based on project paths and setting them to functions
       (if (string-match-p "neon/" proj-dir)
 	  (jrm/neon-code-style))))
 
-  (add-hook 'typescript-mode-hook 'jrm/develop-environment)
-  (add-hook 'lua-mode-hook 'jrm/develop-environment)
-  (add-hook 'web-mode-hook 'jrm/develop-environment)
+  (add-hook 'typescript-mode-hook 'jrm/neon-code-style)
+  (add-hook 'lua-mode-hook 'jrm/neon-code-style)
+  (add-hook 'web-mode-hook 'jrm/neon-code-style)
   (add-hook 'json-mode-hook 'jrm/neon-code-style)
+
+  ;; (add-hook 'typescript-mode-hook 'jrm/develop-environment)
+  ;; (add-hook 'lua-mode-hook 'jrm/develop-environment)
+  ;; (add-hook 'web-mode-hook 'jrm/develop-environment)
+  ;; (add-hook 'json-mode-hook 'jrm/neon-code-style)
 #+END_SRC
 **** HTML/CSS
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
@@ -1413,7 +1427,7 @@ A bit of helpful debugging for a few modes
     "Inserts logging based on mode"
     (interactive)
     (when (or (equal major-mode 'js-mode) (equal major-mode 'js2-mode) (equal major-mode 'typescript-mode) (equal major-mode 'ng2-ts-mode))
-      (insert "console.log(\"\");")
+      (insert "console.log(``);")
       (backward-char 3))
     (when (equal major-mode 'clojure-mode)
       (insert "(println (format \"%s\" ))")
