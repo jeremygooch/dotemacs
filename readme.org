@@ -6,7 +6,7 @@ Some of the code blocks pertain to the OS and will be tangled automatically. The
 
 *** Global Configs
 #+NAME: config
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs-config
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (defvar *home-dir*              (getenv "HOME"))
   (defvar *dotemacs-dir*          (concat *home-dir* "/src/dotemacs/"))
   (defvar *node-dir*              (concat *home-dir* "/.nvm/versions/node/v10.8.0/bin/"))
@@ -1236,22 +1236,28 @@ Use xelatex for more latex options like fontspec
 (setq org-latex-compiler "xelatex")
 #+END_SRC
 
-*** TODOs
+*** TODOs/Agenda
+Setup standard todo keywords
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (setq org-use-fast-todo-selection t)
   (setq org-todo-keywords
-	'((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-      (sequence "WAITING(w@/!)" "INACTIVE(i@/!)" "|" "CANCELLED(C@/!)" "MEETING")))
+	'((sequence "TODO(t!)" "|" "DONE(d)")
+      (sequence "WAITING(w@/!)" "INACTIVE(i@/!)" "|" "CANCELLED(C@/!)")))
   ;; Custom colors for the keywords
   (setq org-todo-keyword-faces
 	'(("TODO" :foreground "red" :weight bold)
-      ("NEXT" :foreground "blue" :weight bold)
       ("DONE" :foreground "forest green" :weight bold)
       ("WAITING" :foreground "orange" :weight bold)
       ("INACTIVE" :foreground "magenta" :weight bold)
-      ("CANCELLED" :foregroundhttp://cachestocaches.com/2016/9/my-workflow-org-agenda/ "forest green" :weight bold)
-      ("MEETING" :foreground "forest green" :weight bold)))
+      ("CANCELLED" :foreground "forest blue" :weight bold)))
 #+END_SRC
+
+File locations for org agenda
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (global-set-key (kbd "C-c a") 'org-agenda)
+  (setq org-agenda-files (list "~/org/work/IBM/"))
+#+END_SRC
+
 *** Org Export
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (custom-set-variables
