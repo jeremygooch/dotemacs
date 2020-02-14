@@ -291,13 +291,14 @@ Adjust the local mark ring pop key sequence, so after pressing `C-u C-SPC`, you 
 	  :hook (web-mode . lsp)
 	  :hook (clojure-mode . lsp)
 	  :commands lsp
+	  :bind (("M-." . lsp-find-definition))
 	  :config
 	  (dolist (m '(clojure-mode
 		       clojurec-mode
 		       clojurescript-mode
 		       clojurex-mode))
-	    (add-to-list 'lsp-language-id-configuration `(,m . "clojure"))))
-
+	    (add-to-list 'lsp-language-id-configuration `(,m . "clojure"))
+	    (setq company-lsp-cache-candidates t)))
   ;; optionally
   (use-package lsp-ui :commands lsp-ui-mode)
   (use-package company-lsp :commands company-lsp)
@@ -408,10 +409,6 @@ Use js2 mode rather than the built in javascript mode.
     :init
     (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode)))
 
-
-  ;; (add-hook 'js2-mode-hook #'setup-tide-mode)
-  ;;   ;; configure javascript-tide checker to run after your default javascript checker
-  ;;   (flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append)
 #+END_SRC
 
 Setup ECMA unicode glyphs
@@ -469,27 +466,10 @@ Use tern and company-tern for better js parsing. Tern can be installed with can 
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (setq exec-path (append exec-path '(*node-dir*)))
   (custom-set-variables
-   '(flycheck-typescript-tslint-executable (concat *node-dir* "tslint"))
-   '(tide-tsserver-executable "/home/jeremy/src/Typescript/lib/tsserver.js")
-   '(tide-node-executable (concat *node-dir* "node")))
+   '(flycheck-typescript-tslint-executable "/home/jeremy/src/cb-consume-ui/node_modules/tslint/bin/tslint"))
   (use-package ng2-mode)
   (use-package flycheck :diminish flycheck-mode)
-  (use-package tide :diminish tide-mode
-    :config
-    (defun setup-tide-mode ()
-      (interactive)
-      (tide-setup)
-      (flycheck-mode +1)
-      (setq flycheck-check-syntax-automatically '(save mode-enabled))
-      (eldoc-mode +1)
-      (tide-hl-identifier-mode +1)
-      ;; company is an optional dependency.
-      (company-mode +1))
-    (setq company-tooltip-align-annotations t)
-    ;; formats the buffer before saving
-    ;; (add-hook 'before-save-hook 'tide-format-before-save)
-    (add-hook 'typescript-mode-hook #'setup-tide-mode)
-    (setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil :IndentStyle 2)))
+
 #+END_SRC
 
 Enable typescript frameworks for just typescript and prototype
@@ -500,19 +480,6 @@ Enable typescript frameworks for just typescript and prototype
 Check for ts lint errors
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (flycheck-add-mode 'typescript-tslint 'ng2-ts-mode)
-  (flycheck-add-mode 'typescript-tide 'ng2-ts-mode)
-#+END_SRC
-
-For Tide integration, use the local tsserver and fallback to the default one installed with tide. Disabled for now.
-#+BEGIN_SRC emacs-lisp ~/.emacs
-  (let* ((package-root (locate-dominating-file default-directory "package.json"))
-	 (path (and package-root
-		    (expand-file-name "node_modules/typescript/bin/tsserver"
-				      (expand-file-name package-root)))))
-    (when (and path (file-exists-p path))
-      (make-local-variable 'tide-tsserver-executable)
-      (setq tide-tsserver-executable path)))
-  ;; (setq tide-tsserver-executable *tsserver*)
 #+END_SRC
 
 Add prettier support. Assumes prettier is installed globally.
