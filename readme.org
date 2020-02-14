@@ -24,10 +24,6 @@ Some of the code blocks pertain to the OS and will be tangled automatically. The
 
 ** Initialization
 Load the config if it exists, otherwise load the sample
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (if (file-exists-p "~/.emacs-config")
-      (load-file "~/.emacs-config"))
-#+END_SRC
 
 *** Package Sources
 Setting up basic repositories and [[https://github.com/jwiegley/use-package][use-package]].
@@ -953,7 +949,7 @@ Simple script for waking up second monitor after reattaching
   (global-set-key (kbd "C-x C-j m") 'jrm/wake-second-monitor)
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs")
+#+BEGIN_SRC emacs-lisp
   (add-hook 'dashboard-mode-hook (lambda () (shell-command "xrandr --output eDP1 --mode 2048x1152")))
 #+END_SRC
 
