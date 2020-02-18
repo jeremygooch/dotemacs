@@ -143,7 +143,7 @@ Ignore certain directories by default for grep
   (custom-set-variables
    '(grep-find-ignored-directories
      (quote
-      ("SCCS" "RCS" "CVS" "MCVS" ".src" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "node_modules" "vendor"))))
+      ("SCCS" "RCS" "CVS" "MCVS" ".src" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "node_modules" "vendor" "dist" "coverage" "e2e"))))
 #+END_SRC
 
 *** IBuffer
