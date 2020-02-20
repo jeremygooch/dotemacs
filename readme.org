@@ -1224,6 +1224,11 @@ emacsclient -ne "(make-capture-frame)"
 
 #+END_SRC
 
+Helpful for bridging org and jira.
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package ox-jira)
+#+END_SRC
+
 *** Remote Syncing
 This attempts to sync an org file on save if it detects the file is in the ~*org-dir*~ directory.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
