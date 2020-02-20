@@ -1199,7 +1199,7 @@ emacsclient -ne "(make-capture-frame)"
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (server-star)t
+  (server-start)
 
   (defadvice org-capture-finalize 
       (after delete-capture-frame activate)
