@@ -310,6 +310,15 @@ Adjust the local mark ring pop key sequence, so after pressing `C-u C-SPC`, you 
   ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
 #+END_SRC
 
+Lsp Mode Performance adjustments (see https://github.com/emacs-lsp/lsp-mode#performance).
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (setq gc-cons-threshold 100000000)
+  (setq read-process-output-max (* 1024 1024))
+#+END_SRC
+
+
+
+
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (setq lsp-html-server-command (quote
 				 ("/home/jeremy/.nvm/versions/node/v10.8.0/bin/html-languageserver" "--stdio")))
@@ -464,7 +473,7 @@ Use tern and company-tern for better js parsing. Tern can be installed with can 
 
 ***** Angular/TS Development
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (setq exec-path (append exec-path '(*node-dir*)))
+  ;; (setq exec-path (append exec-path '(*node-dir*)))
   (custom-set-variables
    '(flycheck-typescript-tslint-executable "/home/jeremy/src/cb-consume-ui/node_modules/tslint/bin/tslint"))
   (use-package ng2-mode)
@@ -1102,7 +1111,7 @@ When evaluating a source code block in org mode do not prompt for input, just ru
 #+END_SRC
 
 For using [[https://orgmode.org/manual/Easy-templates.html][easy templates]] in newer versions of org mode.
-#+BEGIN_SRC emacs-lisp :tangle (if (not (version<= org-version "9.2")) "~/.emacs")
+#+BEGIN_SRC emacs-lisp :tangle
   (require 'org-tempo)
 #+END_SRC
 
