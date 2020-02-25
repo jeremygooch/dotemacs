@@ -1309,7 +1309,7 @@ Make shells interactive (i.e. M-!, or source blocks in org)
 #+END_SRC
 
 Fixes emacs and osx path issues.
-#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
+#+BEGIN_SRC emacs-lisp
   (use-package exec-path-from-shell
     :config
     (when (memq window-system '(mac ns x))
