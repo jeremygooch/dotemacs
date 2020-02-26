@@ -782,6 +782,18 @@ Helpful for finding the cursor when jumping around
   (global-hl-line-mode +1)
 #+END_SRC
 
+*** Ivy Posframe
+    #+begin_src emacs-lisp :tangle ~/.emacs
+      (use-package ivy-posframe
+	:config
+	(setq ivy-posframe-display-functions-alist
+	      '((swiper          . ivy-posframe-display-at-frame-bottom-left)
+		(complete-symbol . ivy-posframe-display-at-point)
+		(counsel-M-x     . ivy-posframe-display-at-frame-center)
+		(t               . ivy-posframe-display)))
+	(ivy-posframe-mode 1))
+    #+end_src
+
 *** Modeline
 Clean up modeline with diminish
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
@@ -819,12 +831,6 @@ Display the current time and battery indicator
 #+END_SRC
 
 *** Frames
-Assign keyboard shortcut to more closely match the [[EXWM][exwm]] shortcuts.
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "s-1") 'other-frame)
-  (global-set-key (kbd "s-2") 'other-frame)
-#+END_SRC
-
 #+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
   (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
   (add-to-list 'default-frame-alist '(ns-appearance . dark))
