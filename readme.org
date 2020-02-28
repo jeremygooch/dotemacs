@@ -765,6 +765,31 @@ Use visual line mode for text wrapping
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (global-visual-line-mode t)
 #+END_SRC
+*** Custom Colors
+**** Shells
+  #+begin_src emacs-lisp
+    ;; function to switch background color
+    (defun buffer-background-switch ()
+      (interactive)
+      (setq buffer-face-mode-face `(:background "#0a1310" :foreground "#218352"))
+      (custom-set-faces '(comint-highlight-prompt ((t (:inherit minibuffer-prompt :foreground "#2cc46c")))))
+      (buffer-face-mode 1))
+
+    (add-hook 'shell-mode-hook 'buffer-background-switch)
+    (add-hook 'eshell-mode-hook 'buffer-background-switch)
+  #+end_src
+
+**** Org Mode
+Set Org mode source block background color to dark gray so it stands out from the typical background
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (custom-set-faces '(org-block ((t (:inherit shadow :background "gray12")))))
+#+end_src
+
+Show the asterisks as bullets
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package org-bullets :config (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
+#+END_SRC
+
 
 *** Dashboard
 I like a nice big splash screen and I'm partial to the meditating GNU logo.
@@ -1089,17 +1114,6 @@ Load some basic minor modes by default
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs 
   (add-hook 'org-mode-hook 'no-trailing-whitespace)
   (add-hook 'org-mode-hook 'flyspell-mode)
-#+END_SRC
-
-*** Look and Feel
-Set Org mode source block background color to dark gray so it stands out from the typical background
-#+begin_src emacs-lisp :tangle ~/.emacs
-(custom-set-faces '(org-block ((t (:inherit shadow :background "gray12")))))
-#+end_src
-
-Show the asterisks as bullets
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (use-package org-bullets :config (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
 #+END_SRC
 
 *** Navigation
