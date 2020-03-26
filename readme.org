@@ -137,14 +137,15 @@ It's nice to be able to tab through directories in dired, and I'm a sucker for e
   (use-package tramp :config (setq tramp-default-method "scp"))
 #+END_SRC
 
-*** Grep
-Ignore certain directories by default for grep
+*** RipGrep
+Use ripgrep by default
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (custom-set-variables
-   '(grep-find-ignored-directories
-     (quote
-      ("SCCS" "RCS" "CVS" "MCVS" ".src" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "node_modules" "vendor" "dist" "coverage" "e2e"))))
+  (use-package rg
+    :config
+    (rg-define-search work
+      :flags ("--hidden -g '!e2e/'")))
 #+END_SRC
+
 
 *** IBuffer
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
@@ -222,9 +223,6 @@ Generic auto-complete with Ivy which
      (global-set-key (kbd "C-s") 'swiper-isearch))
  #+END_SRC
 
-
-** Introspection
-
 *** Which key
 Some quick help for when I get stuck in the middle of a command
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
@@ -280,7 +278,7 @@ Adjust the local mark ring pop key sequence, so after pressing `C-u C-SPC`, you 
 #+END_SRC
 
 *** Programming
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
 	  :hook (ng2-ts-mode . lsp)
 	  :hook (typescript-mode . lsp)
@@ -1131,10 +1129,14 @@ When evaluating a source code block in org mode do not prompt for input, just ru
   (setq org-confirm-babel-evaluate nil)
 #+END_SRC
 
-Stylistic preferences for using the pre-v9 version of org mode (E.g. [[https://orgmode.org/manual/Easy-templates.html][easy templates]] and how to split the source window when editing)
+Stylistic preferences for using the pre-v9 version of org mode (E.g. [[https://orgmode.org/manual/Easy-templates.html][easy templates]] and how to split the source window when editing, make the source blocks full width.)
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (require 'org-tempo)
   (setq org-src-window-setup 'other-window)
+  (custom-set-faces
+   '(org-block ((t (:inherit shadow :extend t :background "gray12"))))
+   '(org-block-begin-line ((t (:extend t :background "#3d4a41" :foreground "#9eac8c" :height 0.9))))
+   '(org-block-end-line ((t (:extend t :background "#3d4a41" :foreground "#9eac8c" :height 0.9)))))
 #+END_SRC
 
 Set the node environment
