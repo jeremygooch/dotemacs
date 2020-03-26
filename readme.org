@@ -1131,15 +1131,15 @@ When evaluating a source code block in org mode do not prompt for input, just ru
   (setq org-confirm-babel-evaluate nil)
 #+END_SRC
 
-For using [[https://orgmode.org/manual/Easy-templates.html][easy templates]] in newer versions of org mode.
-#+BEGIN_SRC emacs-lisp :tangle
+Stylistic preferences for using the pre-v9 version of org mode (E.g. [[https://orgmode.org/manual/Easy-templates.html][easy templates]] and how to split the source window when editing)
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (require 'org-tempo)
+  (setq org-src-window-setup 'other-window)
 #+END_SRC
 
 Set the node environment
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (setq org-babel-js-cmd (concat *node-dir* "node"))
-
 #+END_SRC
 
 **** Additional Modes
