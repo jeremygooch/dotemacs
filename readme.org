@@ -337,7 +337,8 @@ Lsp Mode Performance adjustments (see https://github.com/emacs-lsp/lsp-mode#perf
   ;; formats the buffer before saving
   (defun jrm/tide-format-before-save ()
     "Use tide and tslint to fix buffer after saving"
-    (tide-organize-imports)
+    (condition-case nil (tide-organize-imports) (error nil)) ;; times out frequently so trap errors
+
     (async-shell-command (concat "~/src/cb-consume-ui/node_modules/tslint/bin/tslint --fix " (expand-file-name buffer-file-name))))
   (add-hook 'before-save-hook 'jrm/tide-format-before-save)
 
