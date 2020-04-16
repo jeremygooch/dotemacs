@@ -209,6 +209,9 @@ Generic auto-complete with Ivy which
      (global-set-key (kbd "C-x b") 'ivy-switch-buffer))
    (ivy-mode 1)
    (setq ivy-use-selectable-prompt t)
+
+   (use-package ivy-prescient
+     :config (ivy-prescient-mode))
  #+END_SRC
 
  Ivy enhanced search (swiper) and common Emacs meta commands (counsel)
@@ -326,9 +329,6 @@ Lsp Mode Performance adjustments (see https://github.com/emacs-lsp/lsp-mode#perf
     (setq flycheck-check-syntax-automatically '(save mode-enabled))
     (eldoc-mode +1)
     (tide-hl-identifier-mode +1)
-    ;; company is an optional dependency. You have to
-    ;; install it separately via package-install
-    ;; `M-x package-install [ret] company`
     (company-mode +1))
 
   ;; aligns annotation to the right hand side
@@ -337,11 +337,13 @@ Lsp Mode Performance adjustments (see https://github.com/emacs-lsp/lsp-mode#perf
   ;; formats the buffer before saving
   (defun jrm/tide-format-before-save ()
     "Use tide and tslint to fix buffer after saving"
-    (condition-case nil (tide-organize-imports) (error nil)) ;; times out frequently so trap errors
+    (if (or (equal major-mode 'typescript-mode) (equal major-mode 'ng2-ts-mode))
+	(progn
+	  ;; times out frequently so trap errors
+	  (condition-case nil (tide-organize-imports) (error nil))
+	  (async-shell-command (concat "~/src/cb-consume-ui/node_modules/tslint/bin/tslint --fix " (expand-file-name buffer-file-name))))))
 
-    (async-shell-command (concat "~/src/cb-consume-ui/node_modules/tslint/bin/tslint --fix " (expand-file-name buffer-file-name))))
   (add-hook 'before-save-hook 'jrm/tide-format-before-save)
-
   (add-hook 'typescript-mode-hook #'setup-tide-mode)
   (add-hook 'ng2-ts-mode-hook #'setup-tide-mode)
 
