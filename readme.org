@@ -356,8 +356,12 @@ For obvious reasons it is helpful to be able to toggle formatting the buffer bef
     "Toggle running the tslint command before saving a buffer"
     (interactive)
     (if (string-match-p (regexp-quote "tslint-before-save") (format "%s" (symbol-value 'before-save-hook)))
-	(remove-hook 'before-save-hook 'jrm/tslint-before-save)
-      (add-hook 'before-save-hook 'jrm/tslint-before-save)))
+	(progn
+	  (remove-hook 'before-save-hook 'jrm/tslint-before-save)
+	  (message "Removed Lint Before Save Hook"))
+      (progn
+	(add-hook 'before-save-hook 'jrm/tslint-before-save)
+	(message "Added Lint Before Save Hook"))))
 #+end_src
 
 
