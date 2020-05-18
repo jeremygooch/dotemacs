@@ -335,29 +335,45 @@ Lsp Mode Performance adjustments (see https://github.com/emacs-lsp/lsp-mode#perf
   (setq company-tooltip-align-annotations t)
 
   ;; formats the buffer before saving
-  (defun jrm/tide-format-before-save ()
+  (defun jrm/tslint-before-save ()
     "Use tide and tslint to fix buffer after saving"
     (if (or (equal major-mode 'typescript-mode) (equal major-mode 'ng2-ts-mode))
 	(progn
 	  ;; times out frequently so trap errors
-	  (condition-case nil (tide-organize-imports) (error nil))
+	  ;; (condition-case nil (tide-organize-imports) (error nil))
 	  (async-shell-command (concat "~/src/cb-consume-ui/node_modules/tslint/bin/tslint --fix " (expand-file-name buffer-file-name))))))
 
-  (add-hook 'before-save-hook 'jrm/tide-format-before-save)
+  (add-hook 'before-save-hook 'jrm/tslint-before-save)
   (add-hook 'typescript-mode-hook #'setup-tide-mode)
   (add-hook 'ng2-ts-mode-hook #'setup-tide-mode)
+  (add-hook 'typescript-mode-hook 'yafolding-mode)
 
+#+end_src
+
+For obvious reasons it is helpful to be able to toggle formatting the buffer before saving
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (defun jrm/toggle-lint-before-save ()
+    "Toggle running the tslint command before saving a buffer"
+    (interactive)
+    (if (string-match-p (regexp-quote "tslint-before-save") (format "%s" (symbol-value 'before-save-hook)))
+	(remove-hook 'before-save-hook 'jrm/tslint-before-save)
+      (add-hook 'before-save-hook 'jrm/tslint-before-save)))
 #+end_src
 
 
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (setq lsp-html-server-command (quote
 				 ("/home/jeremy/.nvm/versions/node/v10.8.0/bin/html-languageserver" "--stdio")))
+
   (setq lsp-clients-angular-language-server-command (quote
       ("node" "/home/jeremy/.nvm/versions/node/v10.8.0/lib/node_modules/@angular/language-server" "--ngProbeLocations" "/home/jeremy/.nvm/versions/node/v10.8.0/lib/node_modules" "--tsProbeLocations" "/usr/lib/node_modules" "--stdio")))
 
   (setq grep-find-ignored-directories (quote ("SCCS" "RCS" "CVS" "MCVS" ".src" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "node_modules" "vendor" "dist" "coverage")))
 #+END_SRC
+
+***** TODO Pick tide or lsp mode
+
+      - State "TODO"       from              [2020-04-28 Tue 19:57]
 
 **** Lisps
 Paredit for maintaining sanity while working with lisp
