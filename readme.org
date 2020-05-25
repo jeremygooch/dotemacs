@@ -285,6 +285,8 @@ Adjust the local mark ring pop key sequence, so after pressing `C-u C-SPC`, you 
   (use-package lsp-mode
 	  :hook (ng2-ts-mode . lsp)
 	  :hook (typescript-mode . lsp)
+	  :hook (javascript-mode . lsp)
+	  :hook (js2-mode . lsp)
 	  :hook (html-mode . lsp)
 	  :hook (scss-mode . lsp)
 	  :hook (sass-mode . lsp)
@@ -867,7 +869,7 @@ Helpful for finding the cursor when jumping around
 		(complete-symbol . ivy-posframe-display-at-point)
 		(counsel-M-x     . ivy-posframe-display-at-frame-center)
 		(t               . ivy-posframe-display)))
-	(ivy-posframe-mode 1)
+	(ivy-posframe-mode 0)
 	(custom-set-faces '(ivy-posframe ((t (:inherit default :background "black"))))))
     #+end_src
 
