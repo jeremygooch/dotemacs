@@ -281,7 +281,7 @@ Adjust the local mark ring pop key sequence, so after pressing `C-u C-SPC`, you 
 #+END_SRC
 
 *** Programming
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package lsp-mode
 	  :hook (ng2-ts-mode . lsp)
 	  :hook (typescript-mode . lsp)
@@ -319,7 +319,7 @@ Lsp Mode Performance adjustments (see https://github.com/emacs-lsp/lsp-mode#perf
   (setq read-process-output-max (* 1024 1024))
 #+END_SRC
 
-#+begin_src emacs-lisp :tangle ~/.emacs
+#+begin_src emacs-lisp
   (use-package tide
     :config
     (setq tide-node-executable "/home/jeremy/.nvm/versions/node/v10.8.0/bin/node"))
@@ -376,10 +376,6 @@ For obvious reasons it is helpful to be able to toggle formatting the buffer bef
 
   (setq grep-find-ignored-directories (quote ("SCCS" "RCS" "CVS" "MCVS" ".src" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "node_modules" "vendor" "dist" "coverage")))
 #+END_SRC
-
-***** TODO Pick tide or lsp mode
-
-      - State "TODO"       from              [2020-04-28 Tue 19:57]
 
 **** Lisps
 Paredit for maintaining sanity while working with lisp
