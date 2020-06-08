@@ -480,7 +480,6 @@ Setup ECMA unicode glyphs
     (push '("!=" . ?≠) prettify-symbols-alist)
     (push '("!==" . ?≢) prettify-symbols-alist)
     (push '("&&" . ?∧) prettify-symbols-alist)
-    (push '("||" . ?∥) prettify-symbols-alist)
     (prettify-symbols-mode))
 
   (add-hook 'js2-mode-hook 'jrm/ecma-prettify-symbols)
@@ -591,6 +590,7 @@ Defining custom indentation based on project paths and setting them to functions
   (add-hook 'lua-mode-hook 'jrm/neon-code-style)
   (add-hook 'web-mode-hook 'jrm/neon-code-style)
   (add-hook 'json-mode-hook 'jrm/neon-code-style)
+  (add-hook 'js2-mode-hook 'jrm/neon-code-style)
 
   ;; (add-hook 'typescript-mode-hook 'jrm/develop-environment)
   ;; (add-hook 'lua-mode-hook 'jrm/develop-environment)
@@ -824,6 +824,7 @@ Because linux runs exwm we shouldn't turn the mouse off completely.
   (add-hook 'org-src-mode-hook                    'disable-mouse-mode)
   (add-hook 'org-mode-hook                        'disable-mouse-mode)
   (add-hook 'javascript-mode-hook                 'disable-mouse-mode)
+  (add-hook 'rjsx-mode-hook                       'disable-mouse-mode)
   (add-hook 'text-mode-hook                       'disable-mouse-mode)
   (add-hook 'web-mode-hook                        'disable-mouse-mode)
   (add-hook 'dired-mode-hook                      'disable-mouse-mode)
@@ -1269,7 +1270,7 @@ By default just use bash for all shells
 
 Make shells interactive (i.e. M-!, or source blocks in org)
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (setq shell-command-switch "-ic")
+  (setq shell-command-switch "-c")
 #+END_SRC
 
 Fixes emacs and osx path issues.
@@ -1358,7 +1359,8 @@ I find myself need specific font sizes for different scenarios, i.e. projecting,
 
 /Note: there might be a better way to handle this but things like M-+/M-- won't zoom things like line numbers, etc./
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (defvar jrm/screens-alist '((?1 "small" (lambda () (set-face-attribute 'default nil :height 110) 'default))
+  (defvar jrm/screens-alist '((?0 "xsmall" (lambda () (set-face-attribute 'default nil :height 70) 'default))
+			      (?1 "small" (lambda () (set-face-attribute 'default nil :height 110) 'default))
 			      (?2 "medium" (lambda () (set-face-attribute 'default nil :height 120) 'proj))
 			      (?3 "large" (lambda () (set-face-attribute 'default nil :height 140) 'proj))
 			      (?4 "xtra-large" (lambda () (set-face-attribute 'default nil :height 160) 'projLg)))
@@ -1402,7 +1404,7 @@ A bit of helpful debugging for a few modes
   (defun jrm/insert-debug-log ()
     "Inserts logging based on mode"
     (interactive)
-    (when (or (equal major-mode 'js-mode) (equal major-mode 'js2-mode) (equal major-mode 'typescript-mode) (equal major-mode 'ng2-ts-mode))
+    (when (or (equal major-mode 'js-mode) (equal major-mode 'js2-mode) (equal major-mode 'typescript-mode) (equal major-mode 'ng2-ts-mode) (equal major-mode 'rjsx-mode))
       (insert "console.log(``);")
       (backward-char 3))
     (when (equal major-mode 'clojure-mode)
