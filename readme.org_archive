@@ -1,0 +1,40 @@
+#    -*- mode: org -*-
+
+
+Archived entries from file /home/jrm3/src/dotemacs/readme.org
+
+
+* Tern Server Setup
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2020-06-16 Tue 08:45
+  :ARCHIVE_FILE: ~/src/dotemacs/readme.org
+  :ARCHIVE_OLPATH: Configuration/File Editing/Navigation/Programming/ECMAScript
+  :ARCHIVE_CATEGORY: readme
+  :END:
+[[https://ternjs.net/doc/manual.html][Tern]] is a great general js development package. Setup a global standard configuration. This can be overwritten on a project level by creating a ~.tern-project~ file.
+#+BEGIN_SRC json
+{
+  "ecmaVersion": 2018,
+  "libs": [
+    "ecmascript",
+    "browser"
+  ],
+  "plugins": {
+    "modules": {},
+    "es_modules": {},
+    "node": {},
+    "doc_comment": {
+      "fullDocs": true,
+      "strong": true
+    }
+  }
+}
+#+END_SRC
+
+Use tern and company-tern for better js parsing. Tern can be installed with can be installed with ~sudo npm install -g tern~.
+#+BEGIN_SRC emacs-lisp
+  (use-package company-tern
+    :init
+    (add-hook 'js2-mode-hook (lambda () (tern-mode) (company-mode))))
+#+END_SRC
+

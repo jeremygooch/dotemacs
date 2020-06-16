@@ -491,35 +491,7 @@ Web Beautify for unminifying assets
   (use-package web-beautify)
 #+END_SRC
 
-***** Tern Server Setup
-[[https://ternjs.net/doc/manual.html][Tern]] is a great general js development package. Setup a global standard configuration. This can be overwritten on a project level by creating a ~.tern-project~ file.
-#+BEGIN_SRC json :tangle ~/.tern-config
-{
-  "ecmaVersion": 2018,
-  "libs": [
-    "ecmascript",
-    "browser"
-  ],
-  "plugins": {
-    "modules": {},
-    "es_modules": {},
-    "node": {},
-    "doc_comment": {
-      "fullDocs": true,
-      "strong": true
-    }
-  }
-}
-#+END_SRC
-
-Use tern and company-tern for better js parsing. Tern can be installed with can be installed with ~sudo npm install -g tern~.
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (use-package company-tern
-    :init
-    (add-hook 'js2-mode-hook (lambda () (tern-mode) (company-mode))))
-#+END_SRC
-
-***** Angular/TS Development
+***** Angular/React/TS Development
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   ;; (setq exec-path (append exec-path '(*node-dir*)))
   (custom-set-variables
@@ -538,6 +510,12 @@ Check for ts lint errors
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (flycheck-add-mode 'typescript-tslint 'ng2-ts-mode)
 #+END_SRC
+
+Rjsx for JSX
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (use-package rjsx-mode
+    :config (add-to-list 'auto-mode-alist '("src/elfeed-web-react/.*\\.js\\'" . rjsx-mode)))
+#+end_src
 
 Add prettier support. Assumes prettier is installed globally.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
