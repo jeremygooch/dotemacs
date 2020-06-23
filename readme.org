@@ -19,6 +19,10 @@ Some of the code blocks pertain to the OS and will be tangled automatically. The
   (defvar *amixer-path*           (concat "/usr/bin/amixer"))
 #+END_SRC
 
+*** Load Utilities
+    #+begin_src emacs-lisp :tangle ~/.emacs
+      (load "~/.emacs.d/jrm-util.el")
+    #+end_src
 * Configuration
 #+TOC: headlines 2
 
@@ -244,6 +248,7 @@ Some quick help for when I get stuck in the middle of a command
     '(delete-old-versions t))
 
    (make-directory "~/.emacs.d/autosaves/" t)
+   (setq create-lockfiles nil)
  #+END_SRC
 
  Disable the narrow-to-region message
@@ -1395,6 +1400,24 @@ A bit of helpful debugging for a few modes
   (global-set-key (kbd "C-x C-j d") 'jrm/insert-debug-log)
 #+END_SRC
 
+*** Async Shell Command 
+     #+begin_src emacs-lisp :tangle ~/.emacs.d/jrm-util.el
+       (defun jrm/async-callback-run-callback (process signal cb)
+	 (interactive)
+	 (when (memq (process-status process) '(exit signal))
+	   (cb)
+	   (shell-command-sentinel process signal)))
+
+       (defun jrm/async-callback (cmd cb)
+	 (let* ((output-buffer (generate-new-buffer "*Custom Shell Command*"))
+		(proc (progn
+			(async-shell-command cmd output-buffer)
+			(get-buffer-process output-buffer))))
+	   (if (process-live-p proc)
+	       (set-process-sentinel proc cb #'jrm/async-callback-run-callback)
+	     (message "No process running."))))
+
+      #+end_src
 
 ** Final Pieces
 *** Remap Key sequences
