@@ -538,42 +538,51 @@ Add ECMA unicode glyphs that I like
 
 ***** Indentation
 Defining custom indentation based on project paths and setting them to functions that I can call as needed. 
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+#+begin_src emacs-lisp :tangle ~/.emacs
   (defun jrm/setup-indent (n)
     (setq indent-tabs-mode nil)
     (setq-local c-basic-offset n)
     (setq-local javascript-indent-level n)
     (setq-local js-indent-level n)
     (setq-local typescript-indent-level n)
-    (setq-local web-mode-markup-indent-offset 2)
-    (setq-local web-mode-css-indent-offset 2)
+    (setq-local web-mode-markup-indent-offset n)
+    (setq-local web-mode-css-indent-offset n)
     (setq-local web-mode-code-indent-offset n)
-    (setq-local css-indent-offset 2))
+    (setq-local css-indent-offset n))
 
-  (defun jrm/neon-code-style ()
+  (defun jrm/two-space-code-style ()
     "indent 2 spaces width"
     (interactive)
-    (message "Using Neon coding style")
+    (message "Using 2 spaces coding style")
     (jrm/setup-indent 2))
 
-  (defun jrm/personal-code-style ()
+  (defun jrm/four-space-code-style ()
     "indent 4 spaces width"
     (interactive)
-    (message "Using personal coding style")
+    (message "Using 4 spaces coding style")
     (jrm/setup-indent 4))
 
-  (defun jrm/develop-environment ()
-    "if 'neon' is in the path, set the indentation accordingly"
-    (let ((proj-dir (file-name-directory (buffer-file-name))))
-      (if (string-match-p "neon/" proj-dir)
-	  (jrm/neon-code-style))))
+  ;; (defun jrm/develop-environment ()
+  ;;   "if 'neon' is in the path, set the indentation accordingly"
+  ;;   (let ((proj-dir (file-name-directory (buffer-file-name))))
+  ;;     (if (string-match-p "neon/" proj-dir)
+  ;; 	  (jrm/neon-code-style))))
+#+end_src
 
-  (add-hook 'typescript-mode-hook 'jrm/neon-code-style)
-  (add-hook 'lua-mode-hook 'jrm/neon-code-style)
-  (add-hook 'web-mode-hook 'jrm/neon-code-style)
-  (add-hook 'json-mode-hook 'jrm/neon-code-style)
-  (add-hook 'js2-mode-hook 'jrm/neon-code-style)
+#+begin_src emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
+  (add-hook 'typescript-mode-hook 'jrm/four-space-code-style)
+  (add-hook 'lua-mode-hook 'jrm/four-space-code-style)
+  (add-hook 'web-mode-hook 'jrm/four-space-code-style)
+  (add-hook 'json-mode-hook 'jrm/four-space-code-style)
+  (add-hook 'js2-mode-hook 'jrm/four-space-code-style)
+#+end_src
 
+#+begin_src emacs-lisp :tangle (if (not (string-equal system-type "darwin")) "~/.emacs")
+  (add-hook 'typescript-mode-hook 'jrm/two-space-code-style)
+  (add-hook 'lua-mode-hook 'jrm/two-space-code-style)
+  (add-hook 'web-mode-hook 'jrm/two-space-code-style)
+  (add-hook 'json-mode-hook 'jrm/two-space-code-style)
+  (add-hook 'js2-mode-hook 'jrm/two-space-code-style)
   ;; (add-hook 'typescript-mode-hook 'jrm/develop-environment)
   ;; (add-hook 'lua-mode-hook 'jrm/develop-environment)
   ;; (add-hook 'web-mode-hook 'jrm/develop-environment)
