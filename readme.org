@@ -469,6 +469,8 @@ Use js2 mode rather than the built in javascript mode.
     :init
     (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode)))
 
+  (bind-keys*
+   ("M-." . lsp-find-definition))
 #+END_SRC
 
 Setup ECMA unicode glyphs
