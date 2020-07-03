@@ -13,10 +13,6 @@ Some of the code blocks pertain to the OS and will be tangled automatically. The
   (defvar *org-dir*               (concat *home-dir* "/org/"))
 
   (defvar *tsserver*              (concat *home-dir* "/src/TypeScript/lib/tsserver.js"))
-
-  ;; x11 desktop specific
-  (defvar *screenshot-dir*        (concat *home-dir* "/Pictures/")) ; used only for x11 desktops
-  (defvar *amixer-path*           (concat "/usr/bin/amixer"))
 #+END_SRC
 
 *** Load Utilities
@@ -374,12 +370,13 @@ For obvious reasons it is helpful to be able to toggle formatting the buffer bef
 
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (setq lsp-html-server-command (quote
-				 ("/home/jeremy/.nvm/versions/node/v10.8.0/bin/html-languageserver" "--stdio")))
+				 ((concat *node-dir* "html-languageserver") "--stdio")))
 
   (setq lsp-clients-angular-language-server-command (quote
       ("node" "/home/jeremy/.nvm/versions/node/v10.8.0/lib/node_modules/@angular/language-server" "--ngProbeLocations" "/home/jeremy/.nvm/versions/node/v10.8.0/lib/node_modules" "--tsProbeLocations" "/usr/lib/node_modules" "--stdio")))
 
   (setq grep-find-ignored-directories (quote ("SCCS" "RCS" "CVS" "MCVS" ".src" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "node_modules" "vendor" "dist" "coverage")))
+
 #+END_SRC
 
 **** Lisps
@@ -431,7 +428,7 @@ Clojure with Cider for interactive Clojure development
 
 ****** Clojure/Quil Workflow Customization
 A popup HSV color picker is helpful for quick prototyping/sketching
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp
   (defun convert-range-360 (val)
     "Converts a value from a 0-1 range to 0-360 range. Used for calculating hue."
     (* (/ (- val 0) (- 1 0)) (+ (- 360 0) 0)))
@@ -635,9 +632,9 @@ Various modes helpful for development
 Magit for version control
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (setenv "PATH" (concat (getenv "PATH") ":/usr/local/git/bin"))
-  (setenv "PATH" (concat (getenv "PATH") ":/home/jeremy/.nvm/versions/node/v10.8.0/bin"))
+  (setenv "PATH" (concat (getenv "PATH") (concat ":" *node-dir*)))
   (setq exec-path (append exec-path '("/usr/local/git/bin")))
-  (setq exec-path (append exec-path '("home/jeremy/.nvm/versions/node/v10.8.0/bin")))
+  (setq exec-path (append exec-path (list *node-dir*)))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
@@ -944,7 +941,7 @@ Occasionally it's helpful to be able to start, play, pause and exit vlc buffers 
       (global-set-key (kbd "C-x C-j v q") 'jrm/vlc-quit-video)
     #+END_SRC
 ***** Audio Keys
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp
   (defun jrm/volume-increase ()
     "Bump up the volume by 5%"
     (interactive)
