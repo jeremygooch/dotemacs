@@ -100,6 +100,10 @@ Use aspell for Mac (aspell can be installed with brew)
 (setq ispell-program-name "/usr/local/bin/aspell")
 #+END_SRC
 
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
+  (setq exec-path (append exec-path '("/usr/local/bin")))
+#+END_SRC
+
 Silence alarms
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (setq ring-bell-function 'ignore)
