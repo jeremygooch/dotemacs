@@ -102,6 +102,9 @@ Use aspell for Mac (aspell can be installed with brew)
 
 #+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
   (setq exec-path (append exec-path '("/usr/local/bin")))
+  (use-package exec-path-from-shell
+    :init
+    (exec-path-from-shell-initialize))
 #+END_SRC
 
 Silence alarms
@@ -552,6 +555,7 @@ Defining custom indentation based on project paths and setting them to functions
     (setq-local web-mode-markup-indent-offset n)
     (setq-local web-mode-css-indent-offset n)
     (setq-local web-mode-code-indent-offset n)
+    (setq-local sass-indent-offset n)
     (setq-local css-indent-offset n))
 
   (defun jrm/two-space-code-style ()
@@ -579,6 +583,8 @@ Defining custom indentation based on project paths and setting them to functions
   (add-hook 'web-mode-hook 'jrm/four-space-code-style)
   (add-hook 'json-mode-hook 'jrm/four-space-code-style)
   (add-hook 'js2-mode-hook 'jrm/four-space-code-style)
+  (add-hook 'sass-mode-hook 'jrm/four-space-code-style)
+  (add-hook 'scss-mode-hook 'jrm/four-space-code-style)
 #+end_src
 
 #+begin_src emacs-lisp :tangle (if (not (string-equal system-type "darwin")) "~/.emacs")
@@ -596,9 +602,8 @@ Defining custom indentation based on project paths and setting them to functions
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package sass-mode
     :config
-    (setq exec-path (cons (expand-file-name "/usr/bin/sass") exec-path))
-    (add-to-list 'auto-mode-alist '("\\.scss\\'" . sass-mode)))
-  (add-hook 'sgml-mode-hook (lambda () (set (make-local-variable 'sgml-basic-offset) 4) (sgml-guess-indent)))
+    (setq exec-path (cons (expand-file-name (concat *node-dir* "sass")) exec-path))
+    (add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode)))
 
   (use-package web-mode
     :config
