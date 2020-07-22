@@ -13,10 +13,6 @@ Some of the code blocks pertain to the OS and will be tangled automatically. The
   (defvar *org-dir*               (concat *home-dir* "/org/"))
 
   (defvar *tsserver*              (concat *home-dir* "/src/TypeScript/lib/tsserver.js"))
-
-  ;; x11 desktop specific
-  (defvar *screenshot-dir*        (concat *home-dir* "/Pictures/")) ; used only for x11 desktops
-  (defvar *amixer-path*           (concat "/usr/bin/amixer"))
 #+END_SRC
 
 *** Load Utilities
@@ -102,6 +98,13 @@ Fix emacs' regex
 Use aspell for Mac (aspell can be installed with brew)
 #+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
 (setq ispell-program-name "/usr/local/bin/aspell")
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
+  (setq exec-path (append exec-path '("/usr/local/bin")))
+  (use-package exec-path-from-shell
+    :init
+    (exec-path-from-shell-initialize))
 #+END_SRC
 
 Silence alarms
@@ -374,12 +377,13 @@ For obvious reasons it is helpful to be able to toggle formatting the buffer bef
 
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (setq lsp-html-server-command (quote
-				 ("/home/jeremy/.nvm/versions/node/v10.8.0/bin/html-languageserver" "--stdio")))
+				 ((concat *node-dir* "html-languageserver") "--stdio")))
 
   (setq lsp-clients-angular-language-server-command (quote
       ("node" "/home/jeremy/.nvm/versions/node/v10.8.0/lib/node_modules/@angular/language-server" "--ngProbeLocations" "/home/jeremy/.nvm/versions/node/v10.8.0/lib/node_modules" "--tsProbeLocations" "/usr/lib/node_modules" "--stdio")))
 
   (setq grep-find-ignored-directories (quote ("SCCS" "RCS" "CVS" "MCVS" ".src" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "node_modules" "vendor" "dist" "coverage")))
+
 #+END_SRC
 
 **** Lisps
@@ -431,7 +435,7 @@ Clojure with Cider for interactive Clojure development
 
 ****** Clojure/Quil Workflow Customization
 A popup HSV color picker is helpful for quick prototyping/sketching
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp
   (defun convert-range-360 (val)
     "Converts a value from a 0-1 range to 0-360 range. Used for calculating hue."
     (* (/ (- val 0) (- 1 0)) (+ (- 360 0) 0)))
@@ -473,6 +477,8 @@ Use js2 mode rather than the built in javascript mode.
     (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
     (add-to-list 'auto-mode-alist '("\\.mjs\\'" . js2-mode)))
 
+  (bind-keys*
+   ("M-." . lsp-find-definition))
 #+END_SRC
 
 Setup ECMA unicode glyphs
@@ -540,42 +546,54 @@ Add ECMA unicode glyphs that I like
 
 ***** Indentation
 Defining custom indentation based on project paths and setting them to functions that I can call as needed. 
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+#+begin_src emacs-lisp :tangle ~/.emacs
   (defun jrm/setup-indent (n)
     (setq indent-tabs-mode nil)
     (setq-local c-basic-offset n)
     (setq-local javascript-indent-level n)
     (setq-local js-indent-level n)
     (setq-local typescript-indent-level n)
-    (setq-local web-mode-markup-indent-offset 2)
-    (setq-local web-mode-css-indent-offset 2)
+    (setq-local web-mode-markup-indent-offset n)
+    (setq-local web-mode-css-indent-offset n)
     (setq-local web-mode-code-indent-offset n)
-    (setq-local css-indent-offset 2))
+    (setq-local sass-indent-offset n)
+    (setq-local css-indent-offset n))
 
-  (defun jrm/neon-code-style ()
+  (defun jrm/two-space-code-style ()
     "indent 2 spaces width"
     (interactive)
-    (message "Using Neon coding style")
+    (message "Using 2 spaces coding style")
     (jrm/setup-indent 2))
 
-  (defun jrm/personal-code-style ()
+  (defun jrm/four-space-code-style ()
     "indent 4 spaces width"
     (interactive)
-    (message "Using personal coding style")
+    (message "Using 4 spaces coding style")
     (jrm/setup-indent 4))
 
-  (defun jrm/develop-environment ()
-    "if 'neon' is in the path, set the indentation accordingly"
-    (let ((proj-dir (file-name-directory (buffer-file-name))))
-      (if (string-match-p "neon/" proj-dir)
-	  (jrm/neon-code-style))))
+  ;; (defun jrm/develop-environment ()
+  ;;   "if 'neon' is in the path, set the indentation accordingly"
+  ;;   (let ((proj-dir (file-name-directory (buffer-file-name))))
+  ;;     (if (string-match-p "neon/" proj-dir)
+  ;; 	  (jrm/neon-code-style))))
+#+end_src
 
-  (add-hook 'typescript-mode-hook 'jrm/neon-code-style)
-  (add-hook 'lua-mode-hook 'jrm/neon-code-style)
-  (add-hook 'web-mode-hook 'jrm/neon-code-style)
-  (add-hook 'json-mode-hook 'jrm/neon-code-style)
-  (add-hook 'js2-mode-hook 'jrm/neon-code-style)
+#+begin_src emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
+  (add-hook 'typescript-mode-hook 'jrm/four-space-code-style)
+  (add-hook 'lua-mode-hook 'jrm/four-space-code-style)
+  (add-hook 'web-mode-hook 'jrm/four-space-code-style)
+  (add-hook 'json-mode-hook 'jrm/four-space-code-style)
+  (add-hook 'js2-mode-hook 'jrm/four-space-code-style)
+  (add-hook 'sass-mode-hook 'jrm/four-space-code-style)
+  (add-hook 'scss-mode-hook 'jrm/four-space-code-style)
+#+end_src
 
+#+begin_src emacs-lisp :tangle (if (not (string-equal system-type "darwin")) "~/.emacs")
+  (add-hook 'typescript-mode-hook 'jrm/two-space-code-style)
+  (add-hook 'lua-mode-hook 'jrm/two-space-code-style)
+  (add-hook 'web-mode-hook 'jrm/two-space-code-style)
+  (add-hook 'json-mode-hook 'jrm/two-space-code-style)
+  (add-hook 'js2-mode-hook 'jrm/two-space-code-style)
   ;; (add-hook 'typescript-mode-hook 'jrm/develop-environment)
   ;; (add-hook 'lua-mode-hook 'jrm/develop-environment)
   ;; (add-hook 'web-mode-hook 'jrm/develop-environment)
@@ -585,9 +603,8 @@ Defining custom indentation based on project paths and setting them to functions
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package sass-mode
     :config
-    (setq exec-path (cons (expand-file-name "/usr/bin/sass") exec-path))
-    (add-to-list 'auto-mode-alist '("\\.scss\\'" . sass-mode)))
-  (add-hook 'sgml-mode-hook (lambda () (set (make-local-variable 'sgml-basic-offset) 4) (sgml-guess-indent)))
+    (setq exec-path (cons (expand-file-name (concat *node-dir* "sass")) exec-path))
+    (add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode)))
 
   (use-package web-mode
     :config
@@ -636,9 +653,9 @@ Various modes helpful for development
 Magit for version control
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (setenv "PATH" (concat (getenv "PATH") ":/usr/local/git/bin"))
-  (setenv "PATH" (concat (getenv "PATH") ":/home/jeremy/.nvm/versions/node/v10.8.0/bin"))
+  (setenv "PATH" (concat (getenv "PATH") (concat ":" *node-dir*)))
   (setq exec-path (append exec-path '("/usr/local/git/bin")))
-  (setq exec-path (append exec-path '("home/jeremy/.nvm/versions/node/v10.8.0/bin")))
+  (setq exec-path (append exec-path (list *node-dir*)))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
@@ -945,7 +962,7 @@ Occasionally it's helpful to be able to start, play, pause and exit vlc buffers 
       (global-set-key (kbd "C-x C-j v q") 'jrm/vlc-quit-video)
     #+END_SRC
 ***** Audio Keys
-#+BEGIN_SRC emacs-lisp :exports code :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp
   (defun jrm/volume-increase ()
     "Bump up the volume by 5%"
     (interactive)
