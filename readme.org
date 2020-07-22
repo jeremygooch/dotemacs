@@ -470,7 +470,8 @@ Use js2 mode rather than the built in javascript mode.
   (use-package js2-mode
     :defer
     :init
-    (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode)))
+    (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+    (add-to-list 'auto-mode-alist '("\\.mjs\\'" . js2-mode)))
 
 #+END_SRC
 
