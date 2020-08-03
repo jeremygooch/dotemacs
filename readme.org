@@ -807,6 +807,9 @@ Display the current time and battery indicator
   (set-face-attribute 'default nil :height 120)
 #+END_SRC
 
+#+begin_src emacs-lisp :tangle ~/.emacs
+(global-set-key (kbd "<f9>") 'other-frame)
+#+end_src
 *** Mouse
 We'll need to turn off the mouse from time to time
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
