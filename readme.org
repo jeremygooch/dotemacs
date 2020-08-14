@@ -362,6 +362,12 @@ Lsp Mode Performance adjustments (see https://github.com/emacs-lsp/lsp-mode#perf
 
 For obvious reasons it is helpful to be able to toggle formatting the buffer before saving
 #+begin_src emacs-lisp :tangle ~/.emacs
+  (defun jrm/tslint-before-save ()
+    "Use tide and tslint to fix buffer after saving"
+    (if (or (equal major-mode 'typescript-mode) (equal major-mode 'ng2-ts-mode))
+	(progn
+	  (async-shell-command (concat (vc-root-dir) "node_modules/eslint/bin/eslint.js --fix " (expand-file-name buffer-file-name))))))
+
   (defun jrm/toggle-lint-before-save ()
     "Toggle running the tslint command before saving a buffer"
     (interactive)
@@ -1066,6 +1072,10 @@ Load some basic minor modes by default
   (add-hook 'org-mode-hook 'flyspell-mode)
 #+END_SRC
 
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (setq org-hide-emphasis-markers t)
+#+end_src
+
 *** Navigation
 Setup an easy way to jump to an org headline using org-goto =C-c C-j=
 #+BEGIN_SRC elisp :tangle ~/.emacs
@@ -1372,7 +1382,8 @@ I find myself need specific font sizes for different scenarios, i.e. projecting,
 			      (?1 "small" (lambda () (set-face-attribute 'default nil :height 110) 'default))
 			      (?2 "medium" (lambda () (set-face-attribute 'default nil :height 120) 'proj))
 			      (?3 "large" (lambda () (set-face-attribute 'default nil :height 140) 'proj))
-			      (?4 "xtra-large" (lambda () (set-face-attribute 'default nil :height 160) 'projLg)))
+			      (?4 "xtra-large" (lambda () (set-face-attribute 'default nil :height 160) 'projLg))
+			      (?5 "xxtra-large" (lambda () (set-face-attribute 'default nil :height 190) 'projLg)))
     "List that associates number letters to descriptions and actions.")
   (defun jrm/adjust-font-size ()
     "Lets the user choose the the font size and takes the corresponding action.
