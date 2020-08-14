@@ -386,6 +386,11 @@ For obvious reasons it is helpful to be able to toggle formatting the buffer bef
 
 #+END_SRC
 
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (use-package expand-region
+    :bind (("C-=" . er/expand-region)))
+
+#+end_src
 **** Lisps
 Paredit for maintaining sanity while working with lisp
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
