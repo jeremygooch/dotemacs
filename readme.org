@@ -593,7 +593,7 @@ Defining custom indentation based on project paths and setting them to functions
   (add-hook 'typescript-mode-hook 'jrm/four-space-code-style)
   (add-hook 'lua-mode-hook 'jrm/four-space-code-style)
   (add-hook 'web-mode-hook 'jrm/four-space-code-style)
-  (add-hook 'json-mode-hook 'jrm/four-space-code-style)
+  (add-hook 'js-mode-hook 'jrm/four-space-code-style)
   (add-hook 'js2-mode-hook 'jrm/four-space-code-style)
   (add-hook 'sass-mode-hook 'jrm/four-space-code-style)
   (add-hook 'scss-mode-hook 'jrm/four-space-code-style)
@@ -1386,7 +1386,8 @@ I find myself need specific font sizes for different scenarios, i.e. projecting,
 			      (?2 "medium" (lambda () (set-face-attribute 'default nil :height 120) 'proj))
 			      (?3 "large" (lambda () (set-face-attribute 'default nil :height 140) 'proj))
 			      (?4 "xtra-large" (lambda () (set-face-attribute 'default nil :height 160) 'projLg))
-			      (?5 "xxtra-large" (lambda () (set-face-attribute 'default nil :height 190) 'projLg)))
+			      (?5 "xxtra-large" (lambda () (set-face-attribute 'default nil :height 190) 'projLg))
+			      (?6 "xxxtra-large" (lambda () (set-face-attribute 'default nil :height 210) 'projLg)))
     "List that associates number letters to descriptions and actions.")
   (defun jrm/adjust-font-size ()
     "Lets the user choose the the font size and takes the corresponding action.
