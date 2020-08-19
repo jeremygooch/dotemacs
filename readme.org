@@ -1074,6 +1074,9 @@ Load some basic minor modes by default
 
 #+begin_src emacs-lisp :tangle ~/.emacs
   (setq org-hide-emphasis-markers t)
+  ;; Copy the visible text (without formatting marks) by default
+  (define-key org-mode-map (kbd "M-w") 'org-copy-visible)
+  (define-key org-mode-map (kbd "M-W") 'kill-ring-save)
 #+end_src
 
 *** Navigation
