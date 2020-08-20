@@ -232,6 +232,35 @@ Generic auto-complete with Ivy which
      :config
      (global-set-key (kbd "C-s") 'swiper-isearch))
  #+END_SRC
+**** Hack-around for poorly shared plugins
+     #+begin_src emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
+       (setq counsel-find-file-ignore-regexp "\\(aurelia_project\\|node_modules\\|coverage-jest\\)")
+       (defun jrm/counsel-find-all-hack ()
+	 "Hackaround for poorly shared plugins"
+	 (interactive)
+	 (counsel-file-jump "" (vc-root-dir)))
+       (global-set-key (kbd "C-M-SPC") 'jrm/counsel-find-all-hack)
+
+       (defun ignored-file-background ()
+	 (interactive)
+	 (setq buffer-face-mode-face `(:background "#342828"))
+	 (buffer-face-mode 1))
+       (define-minor-mode ignored-file-mode
+	 "Mode for files that are ignored in VC"
+	 :lighter " IGNORED-FILE")
+       (add-hook 'ignored-file-mode-hook 'ignored-file-background)
+       (defun jrm/set-ignored-mode () ""
+	      (let ((ignored (shell-command-to-string (concat "git check-ignore " (buffer-file-name)))))
+		(if (not (string-empty-p ignored))
+		    (ignored-file-mode))))
+
+       (add-hook 'js2-mode-hook 'jrm/set-ignored-mode)
+       (add-hook 'ng2-ts-mode-hook 'jrm/set-ignored-mode)
+       (add-hook 'ng2-html-mode-hook 'jrm/set-ignored-mode)
+       (add-hook 'css-mode-hook 'jrm/set-ignored-mode)
+       (add-hook 'scss-mode-hook 'jrm/set-ignored-mode)
+       (add-hook 'web-mode-hook 'jrm/set-ignored-mode)
+     #+end_src
 
 *** Which key
 Some quick help for when I get stuck in the middle of a command
