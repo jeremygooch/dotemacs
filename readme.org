@@ -234,7 +234,7 @@ Generic auto-complete with Ivy which
  #+END_SRC
 **** Hack-around for poorly shared plugins
      #+begin_src emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
-       (setq counsel-find-file-ignore-regexp "\\(aurelia_project\\|node_modules\\|coverage-jest\\)")
+       (setq counsel-find-file-ignore-regexp "\\(aurelia_project\\|node_modules\\|dist\\|coverage-jest\\)")
        (defun jrm/counsel-find-all-hack ()
 	 "Hackaround for poorly shared plugins"
 	 (interactive)
