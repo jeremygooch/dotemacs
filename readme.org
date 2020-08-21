@@ -303,7 +303,7 @@ Easier paragraph jumping
 Avy is great for speed-of-thought navigation
  #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
    (use-package avy)
-   (global-set-key (kbd "M-s") 'avy-goto-char)
+   (global-set-key (kbd "M-s") 'avy-goto-char-timer)
    (global-set-key (kbd "C-c SPC") 'avy-goto-line)
  #+END_SRC
 
