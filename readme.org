@@ -1202,7 +1202,7 @@ Customize org capture to my liking
   (global-set-key (kbd "C-c c") 'org-capture)
   (setq org-capture-templates
 	'((" " "TODOs ==============================" entry (file "") "")
-	  ("w" "Work Todo" entry (file+headline "~/org/work/TeachForward/teachforward.org" "TeachForward")
+	  ("w" "Work Todo" entry (file+headline "~/org/work/TeachForward/teachforward.org" "Todos")
 	   "** IMMEDIATE TODO %? :tf:\n  %i\n  %a")
 	  ("l" "Personal Todo\n" entry (file "~/org/personal/personal.org")
 	   "*** TODO %? :personal:\n  %i\n  %a")
