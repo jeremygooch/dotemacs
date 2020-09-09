@@ -1202,8 +1202,8 @@ Customize org capture to my liking
   (global-set-key (kbd "C-c c") 'org-capture)
   (setq org-capture-templates
 	'((" " "TODOs ==============================" entry (file "") "")
-	  ("w" "Work Todo" entry (file+headline "~/org/work/IBM/notes.org" "Misc TODOs")
-	   "** TODO %? :ibm:\n  %i\n  %a")
+	  ("w" "Work Todo" entry (file+headline "~/org/work/TeachForward/teachforward.org" "TeachForward")
+	   "** IMMEDIATE TODO %? :tf:\n  %i\n  %a")
 	  ("l" "Personal Todo\n" entry (file "~/org/personal/personal.org")
 	   "*** TODO %? :personal:\n  %i\n  %a")
 	  (" " "PROGRAMMING SNIPPETS ===============" entry (file "") "")
@@ -1212,7 +1212,7 @@ Customize org capture to my liking
 	  ("t" "TS Snippet\n" entry (file "~/org/personal/research/development/js/Javascript-snippets.org")
 	   "* \n #+BEGIN_SRC typescript\n%?\n#+END_SRC\n\n[Date: %<%Y-%d-%m>]" :prepend t)
 	  (" " "MEETINGS ===========================" entry (file "") "")
-	  ("m" "Meeting\n" entry (file "~/org/work/IBM/Meetings.org")
+	  ("m" "Meeting\n" entry (file+headline "~/org/work/TeachForward/teachforward.org" "Meetings")
 	   "** MEETING with %? :MEETING:\n  %i\n"  :clock-in t :clock-resume t)))
 
 #+END_SRC
@@ -1283,21 +1283,21 @@ Setup standard todo keywords
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (setq org-use-fast-todo-selection t)
   (setq org-todo-keywords
-	'((sequence "TODO(t!)" "|" "DONE(d)")
-      (sequence "WAITING(w@/!)" "INACTIVE(i@/!)" "|" "CANCELLED(C@/!)")))
+	'((sequence "IMMEDIATE TODO(t!)" "|" "DONE(d!)")
+      (sequence "WORKFLOW TODO(w@/!)" "SOON(s@/!)" "|" "SOMEDAY(S@/!)")))
   ;; Custom colors for the keywords
   (setq org-todo-keyword-faces
-	'(("TODO" :foreground "red" :weight bold)
+	'(("IMMEDIATE TODO" :foreground "red" :weight bold)
       ("DONE" :foreground "forest green" :weight bold)
-      ("WAITING" :foreground "orange" :weight bold)
-      ("INACTIVE" :foreground "magenta" :weight bold)
-      ("CANCELLED" :foreground "forest blue" :weight bold)))
+      ("WORKFLOW TODO" :foreground "#61afef" :weight bold)
+      ("SOON" :foreground "#da8548" :weight bold)
+      ("SOMEDAY" :foreground "#9963ad" :weight bold)))
 #+END_SRC
 
 File locations for org agenda
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (global-set-key (kbd "C-c a") 'org-agenda)
-  (setq org-agenda-files (list "~/org/work/IBM/"))
+  (setq org-agenda-files (list "~/org/work/TeachForward/"))
 #+END_SRC
 
 *** Org Export
