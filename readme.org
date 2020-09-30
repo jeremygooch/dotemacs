@@ -293,6 +293,11 @@ Replace region with next keystroke.
   (delete-selection-mode 1)
 #+END_SRC
 
+Disable bidirectional editing for performance issues when opening large files.
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (setq bidi-paragraph-direction 'left-to-right)
+#+end_src
+
 *** In-file Navigation
 Easier paragraph jumping
  #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
