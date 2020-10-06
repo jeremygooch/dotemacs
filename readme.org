@@ -323,6 +323,27 @@ Adjust the local mark ring pop key sequence, so after pressing `C-u C-SPC`, you 
 #+END_SRC
 
 *** Programming
+For obvious reasons it is helpful to be able to toggle formatting the buffer before saving
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (defun jrm/tslint-before-save ()
+    "Use tide and tslint to fix buffer after saving"
+    (if (or (equal major-mode 'typescript-mode) (equal major-mode 'ng2-ts-mode) (equal major-mode 'js2-mode))
+	(progn
+	  (async-shell-command (concat (vc-root-dir) "node_modules/eslint/bin/eslint.js --fix " (expand-file-name buffer-file-name))))))
+
+  (defun jrm/toggle-lint-before-save ()
+    "Toggle running the tslint command before saving a buffer"
+    (interactive)
+    (if (string-match-p (regexp-quote "tslint-before-save") (format "%s" (symbol-value 'before-save-hook)))
+	(progn
+	  (remove-hook 'before-save-hook 'jrm/tslint-before-save)
+	  (message "Removed Lint Before Save Hook"))
+      (progn
+	(add-hook 'before-save-hook 'jrm/tslint-before-save)
+	(message "Added Lint Before Save Hook"))))
+#+end_src
+
+**** LSP
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package lsp-mode
 	  :hook (ng2-ts-mode . lsp)
@@ -363,76 +384,14 @@ Lsp Mode Performance adjustments (see https://github.com/emacs-lsp/lsp-mode#perf
   (setq read-process-output-max (* 1024 1024))
 #+END_SRC
 
-#+begin_src emacs-lisp
-  (use-package tide
-    :config
-    (setq tide-node-executable "/home/jeremy/.nvm/versions/node/v10.8.0/bin/node"))
-
-  (defun setup-tide-mode ()
-    (interactive)
-    (tide-setup)
-    (flycheck-mode +1)
-    (setq flycheck-check-syntax-automatically '(save mode-enabled))
-    (eldoc-mode +1)
-    (tide-hl-identifier-mode +1)
-    (company-mode +1))
-
-  ;; aligns annotation to the right hand side
-  (setq company-tooltip-align-annotations t)
-
-  ;; formats the buffer before saving
-  (defun jrm/tslint-before-save ()
-    "Use tide and tslint to fix buffer after saving"
-    (if (or (equal major-mode 'typescript-mode) (equal major-mode 'ng2-ts-mode))
-	(progn
-	  ;; times out frequently so trap errors
-	  ;; (condition-case nil (tide-organize-imports) (error nil))
-	  (async-shell-command (concat "~/src/cb-consume-ui/node_modules/tslint/bin/tslint --fix " (expand-file-name buffer-file-name))))))
-
-  (add-hook 'before-save-hook 'jrm/tslint-before-save)
-  (add-hook 'typescript-mode-hook #'setup-tide-mode)
-  (add-hook 'ng2-ts-mode-hook #'setup-tide-mode)
-  (add-hook 'typescript-mode-hook 'yafolding-mode)
-
-#+end_src
-
-For obvious reasons it is helpful to be able to toggle formatting the buffer before saving
-#+begin_src emacs-lisp :tangle ~/.emacs
-  (defun jrm/tslint-before-save ()
-    "Use tide and tslint to fix buffer after saving"
-    (if (or (equal major-mode 'typescript-mode) (equal major-mode 'ng2-ts-mode))
-	(progn
-	  (async-shell-command (concat (vc-root-dir) "node_modules/eslint/bin/eslint.js --fix " (expand-file-name buffer-file-name))))))
-
-  (defun jrm/toggle-lint-before-save ()
-    "Toggle running the tslint command before saving a buffer"
-    (interactive)
-    (if (string-match-p (regexp-quote "tslint-before-save") (format "%s" (symbol-value 'before-save-hook)))
-	(progn
-	  (remove-hook 'before-save-hook 'jrm/tslint-before-save)
-	  (message "Removed Lint Before Save Hook"))
-      (progn
-	(add-hook 'before-save-hook 'jrm/tslint-before-save)
-	(message "Added Lint Before Save Hook"))))
-#+end_src
-
-
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (setq lsp-html-server-command (quote
 				 ((concat *node-dir* "html-languageserver") "--stdio")))
 
   (setq lsp-clients-angular-language-server-command (quote
       ("node" "/home/jeremy/.nvm/versions/node/v10.8.0/lib/node_modules/@angular/language-server" "--ngProbeLocations" "/home/jeremy/.nvm/versions/node/v10.8.0/lib/node_modules" "--tsProbeLocations" "/usr/lib/node_modules" "--stdio")))
-
-  (setq grep-find-ignored-directories (quote ("SCCS" "RCS" "CVS" "MCVS" ".src" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "node_modules" "vendor" "dist" "coverage")))
-
 #+END_SRC
 
-#+begin_src emacs-lisp :tangle ~/.emacs
-  (use-package expand-region
-    :bind (("C-=" . er/expand-region)))
-
-#+end_src
 **** Lisps
 Paredit for maintaining sanity while working with lisp
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
@@ -1402,7 +1361,7 @@ Sometimes it's helpful to hide images for certain posts.
   (global-set-key (kbd "C-x C-j e") 'jrm/elfeed-show-hide-images)
 #+END_SRC
 
-** Helpful Utility Functions
+** Helpful Utility Functions and settings
 Most of the functions in this section are bound to ~C-x C-j~ prefix key.
 *** Copy Entire Buffer easily
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
@@ -1465,7 +1424,7 @@ Lifted from (http://ergoemacs.org/emacs/emacs_copy_file_path.html)
 
 *** Basic debugging
 A bit of helpful debugging for a few modes
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+#+BEGIN_SRC emacs-lisp
   (defun jrm/insert-debug-log ()
     "Inserts logging based on mode"
     (interactive)
@@ -1500,6 +1459,12 @@ A bit of helpful debugging for a few modes
 	     (message "No process running."))))
 
       #+end_src
+
+*** Grep customizations
+For various reasons ripgrep does not work with all the projects I need so customizing grep to my liking
+#+begin_src emacs-lisp :tangle ~/.emacs
+(setq grep-find-ignored-directories (quote ("SCCS" "RCS" "CVS" "MCVS" ".src" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "node_modules" "vendor" "dist" "coverage")))
+#+end_src
 
 ** Final Pieces
 *** Remap Key sequences
