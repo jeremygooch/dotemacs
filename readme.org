@@ -337,6 +337,8 @@ Adjust the local mark ring pop key sequence, so after pressing `C-u C-SPC`, you 
 	  :hook (clojure-mode . lsp)
 	  :commands lsp
 	  :bind (("M-." . lsp-find-definition))
+	  :bind (("M-n" . forward-paragraph))
+	  :bind (("M-p" . backward-paragraph))
 	  :config
 	  (dolist (m '(clojure-mode
 		       clojurec-mode
@@ -1121,6 +1123,11 @@ Setup an easy way to jump to an org headline using org-goto =C-c C-j=
 
   (setq org-outline-path-complete-in-steps nil)
 #+END_SRC
+
+#+begin_src elisp :tangle ~/.emacs
+  (global-set-key (kbd "C-o") 'other-window)
+#+end_src
+
 *** Source Blocks
 When evaluating a source code block in org mode do not prompt for input, just run it.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
