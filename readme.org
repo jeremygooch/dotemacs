@@ -268,8 +268,6 @@ Some quick help for when I get stuck in the middle of a command
   (use-package which-key :config (which-key-mode))
 #+END_SRC
 
-
-
 ** File Editing/Navigation
 *** General Settings
  Keep temporary and backup buffers out of current directory like a civilized human being.
@@ -298,6 +296,12 @@ Disable bidirectional editing for performance issues when opening large files.
   (setq bidi-paragraph-direction 'left-to-right)
 #+end_src
 
+*** Yasnippet
+    #+begin_src emacs-lisp :tangle ~/.emacs
+      (use-package yasnippet)
+      (use-package yasnippet-snippets
+	:config (yas-global-mode))
+    #+end_src
 *** In-file Navigation
 Easier paragraph jumping
  #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
