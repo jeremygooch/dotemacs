@@ -1089,6 +1089,8 @@ Setup an easy way to jump to an org headline using org-goto =C-c C-j=
 
 #+begin_src elisp :tangle ~/.emacs
   (global-set-key (kbd "C-o") 'other-window)
+  (define-key dired-mode-map (kbd "C-o") 'other-window)
+  (define-key grep-mode-map (kbd "C-o") 'other-window)
 #+end_src
 
 *** Source Blocks
