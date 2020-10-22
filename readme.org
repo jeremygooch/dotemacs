@@ -300,6 +300,9 @@ Disable bidirectional editing for performance issues when opening large files.
     #+begin_src emacs-lisp :tangle ~/.emacs
       (use-package yasnippet)
       (use-package yasnippet-snippets
+	:init (setq yas-snippet-dirs
+	    '("~/.emacs.d/snippets"
+	      "~/src/dotemacs/snippets"))
 	:config (yas-global-mode))
     #+end_src
 *** In-file Navigation
