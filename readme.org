@@ -352,38 +352,42 @@ For obvious reasons it is helpful to be able to toggle formatting the buffer bef
 
 **** LSP
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (use-package lsp-mode
-	  :hook (ng2-ts-mode . lsp)
-	  :hook (typescript-mode . lsp)
-	  :hook (javascript-mode . lsp)
-	  :hook (js2-mode . lsp)
-	  :hook (html-mode . lsp)
-	  :hook (scss-mode . lsp)
-	  :hook (sass-mode . lsp)
-	  :hook (css-mode . lsp)
-	  :hook (web-mode . lsp)
-	  :hook (clojure-mode . lsp)
-	  :commands lsp
-	  :bind (("M-." . lsp-find-definition))
-	  :bind (("M-n" . forward-paragraph))
-	  :bind (("M-p" . backward-paragraph))
-	  :config
-	  (dolist (m '(clojure-mode
-		       clojurec-mode
-		       clojurescript-mode
-		       clojurex-mode))
-	    (add-to-list 'lsp-language-id-configuration `(,m . "clojure"))
-	    (setq company-lsp-cache-candidates t)))
-  ;; optionally
-  (use-package lsp-ui :commands lsp-ui-mode)
-  (use-package company-lsp :commands company-lsp)
-  (push 'company-lsp company-backends)
-  (use-package helm-lsp :commands helm-lsp-workspace-symbol)
-  (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
-  ;; optionally if you want to use debugger
-  (use-package dap-mode)
-  ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
-#+END_SRC
+      (use-package lsp-mode
+	      :hook (ng2-ts-mode . lsp)
+	      :hook (typescript-mode . lsp)
+	      :hook (javascript-mode . lsp)
+	      :hook (js2-mode . lsp)
+	      :hook (html-mode . lsp)
+	      :hook (scss-mode . lsp)
+	      :hook (sass-mode . lsp)
+	      :hook (css-mode . lsp)
+	      :hook (web-mode . lsp)
+	      :hook (clojure-mode . lsp)
+	      :commands lsp
+	      :bind (("M-." . lsp-find-definition))
+	      :bind (("M-n" . forward-paragraph))
+	      :bind (("M-p" . backward-paragraph))
+	      :config
+	      (dolist (m '(clojure-mode
+			   clojurec-mode
+			   clojurescript-mode
+			   clojurex-mode))
+		(add-to-list 'lsp-language-id-configuration `(,m . "clojure"))
+		(setq company-lsp-cache-candidates t)))
+      ;; optionally
+      (use-package lsp-ui :commands lsp-ui-mode)
+      (use-package company-lsp :commands company-lsp)
+      (push 'company-lsp company-backends)
+      (use-package helm-lsp :commands helm-lsp-workspace-symbol)
+      (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+      ;; optionally if you want to use debugger
+      (use-package dap-mode)
+    ;; (global-set-key (kbd "M-p") 'backward-paragraph)
+    (define-key lsp-signature-mode-map (kbd "M-p") 'backward-paragraph)
+    (define-key lsp-signature-mode-map (kbd "M-n") 'forward-paragraph)
+  ;; (global-set-key (kbd "M-n") 'forward-paragraph)
+
+  #+END_SRC
 
 Lsp Mode Performance adjustments (see https://github.com/emacs-lsp/lsp-mode#performance).
 #+BEGIN_SRC emacs-lisp
