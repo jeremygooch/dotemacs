@@ -139,6 +139,13 @@ It's nice to be able to tab through directories in dired, and I'm a sucker for e
   (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
 #+END_SRC
 
+Allow uncompressing zip files
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (eval-after-load "dired-aux"
+     '(add-to-list 'dired-compress-file-suffixes 
+		   '("\\.zip\\'" ".zip" "unzip")))
+#+end_src
+
 *** Tramp
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package tramp :config (setq tramp-default-method "scp"))
