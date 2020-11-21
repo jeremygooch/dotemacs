@@ -738,9 +738,10 @@ Set Org mode source block background color to dark gray so it stands out from th
   (custom-set-faces '(org-block ((t (:inherit shadow :background "gray12")))))
 #+end_src
 
-Show the asterisks as bullets
+Show the asterisks as bullets and set up indentation
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package org-bullets :config (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
+  (add-hook 'org-mode-hook 'org-indent-mode)
 #+END_SRC
 
 
