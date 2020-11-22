@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: static inject
+# key: inj
+# --
+
+static inject = () => [${1:dependency}];

@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: console.log (mirror)
+# key: con
+# --
+
+console.log('$1', ${1:value});$0
