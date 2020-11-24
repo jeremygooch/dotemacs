@@ -756,9 +756,8 @@ Use visual line mode for text wrapping
 **** Org Mode
 Set Org mode source block background color to dark gray so it stands out from the typical background
 #+begin_src emacs-lisp :tangle ~/.emacs
-  (custom-set-faces '(org-block ((t (:inherit shadow :background "gray12"))))
-                    '(org-block-end-line ((t (:inherit shadow :background "#1d212b" :foreground "#4a5468"))))
-                    '(org-block-begin-line ((t (:inherit shadow :background "#1d212b" :foreground "#4a5468")))))
+  (custom-set-faces '(org-block ((t (:inherit shadow :background "gray12")))))
+
 #+end_src
 
 Show the asterisks as bullets and set up indentation
@@ -1131,6 +1130,11 @@ Stylistic preferences for using the pre-v9 version of org mode (E.g. [[https://o
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (require 'org-tempo)
   (setq org-src-window-setup 'other-window)
+
+  (custom-set-faces
+   '(org-block ((t (:inherit shadow :extend t :background "gray12"))))
+   '(org-block-begin-line ((t (:extend t :background "gray12" :foreground "#4a5468" :height 0.9))))
+   '(org-block-end-line ((t (:extend t :background "gray12" :foreground "#4a5468" :height 0.9)))))
 #+END_SRC
 
 Set the node environment
