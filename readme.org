@@ -1112,7 +1112,7 @@ Load some basic minor modes by default
   (custom-set-faces
    '(variable-pitch ((t (:family "Roboto")))))
   (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-block nil :inherit 'fixed-pitch :height 0.8)
 #+end_src
 
 *** Navigation
