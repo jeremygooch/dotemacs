@@ -1,0 +1,19 @@
+# -*- mode: snippet -*-
+# name: teachforward commit message
+# key: cmt
+# --
+
+${1:MESSAGE (Added new tab which is "Define Scoring Guide".)}
+
+Why:
+${2:WHY (To cover the requirements.)}
+
+How:
+${3:HOW (Added new component, controllers, views and its logic.)}
+
+Jira:
+PLATFORM-${4:####}
+
+Tags:
+${5:TAGS (Create Scoring Guide)}
+$0
