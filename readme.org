@@ -891,12 +891,15 @@ Show symbols by default
 
 *** X Window Manager
 This section is specific to running emacs as a tiling window manager desktop via EXWM. Source blocks here will if the OS is GNU/Linux.
+
 **** General Setup
 
 Go fullscreen and set the default font size.
 #+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs")
   (set-frame-parameter nil 'fullscreen 'fullboth)
-  (set-face-attribute 'default nil :height 110)
+  (set-face-attribute 'default nil :height 140)
+  (set-face-attribute 'default nil :font "Inconsolata-14" )
+
 #+END_SRC
 
  #+BEGIN_SRC shell
@@ -1100,8 +1103,15 @@ Load some basic minor modes by default
 #+begin_src emacs-lisp :tangle ~/.emacs
   (setq org-hide-emphasis-markers t)
   ;; Copy the visible text (without formatting marks) by default
-  (define-key org-mode-map (kbd "M-w") 'org-copy-visible)
-  (define-key org-mode-map (kbd "M-W") 'kill-ring-save)
+  ;; (define-key org-mode-map (kbd "M-w") 'org-copy-visible)
+  ;; (define-key org-mode-map (kbd "M-W") 'kill-ring-save)
+#+end_src
+*** General Styling
+#+begin_src emacs-lisp
+  (add-hook 'markdown-mode-hook (lambda () (variable-pitch-mode t)))
+  (custom-set-faces
+   '(variable-pitch ((t (:family "Roboto")))))
+  (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
 #+end_src
 
 *** Navigation
