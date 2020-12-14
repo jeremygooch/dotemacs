@@ -898,9 +898,12 @@ Go fullscreen and set the default font size.
 #+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs")
   (set-frame-parameter nil 'fullscreen 'fullboth)
   (set-face-attribute 'default nil :height 140)
-  (set-face-attribute 'default nil :font "Inconsolata-14" )
-
+  (set-face-attribute 'default nil :font "Inconsolata-14")
 #+END_SRC
+
+#+begin_src emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
+  (set-face-attribute 'default nil :font "Inconsolata-14")
+#+end_src
 
  #+BEGIN_SRC shell
    #!/bin/bash
@@ -1107,7 +1110,7 @@ Load some basic minor modes by default
   ;; (define-key org-mode-map (kbd "M-W") 'kill-ring-save)
 #+end_src
 *** General Styling
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs
   (add-hook 'markdown-mode-hook (lambda () (variable-pitch-mode t)))
   (custom-set-faces
    '(variable-pitch ((t (:family "Roboto")))))
