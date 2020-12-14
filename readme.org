@@ -1111,7 +1111,7 @@ Load some basic minor modes by default
 #+end_src
 *** General Styling
 #+begin_src emacs-lisp :tangle ~/.emacs
-  (add-hook 'markdown-mode-hook (lambda () (variable-pitch-mode t)))
+  (add-hook 'org-mode-hook (lambda () (variable-pitch-mode t)))
   (custom-set-faces
    '(variable-pitch ((t (:family "Roboto")))))
   (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
