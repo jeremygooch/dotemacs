@@ -1471,25 +1471,6 @@ Lifted from (http://ergoemacs.org/emacs/emacs_copy_file_path.html)
 	 (progn (message "File path copied: 「%s」" -fpath) -fpath )))))
 #+END_SRC
 
-*** Basic debugging
-A bit of helpful debugging for a few modes
-#+BEGIN_SRC emacs-lisp
-  (defun jrm/insert-debug-log ()
-    "Inserts logging based on mode"
-    (interactive)
-    (when (or (equal major-mode 'js-mode) (equal major-mode 'js2-mode) (equal major-mode 'typescript-mode) (equal major-mode 'ng2-ts-mode) (equal major-mode 'rjsx-mode))
-      (insert "console.log(``);")
-      (backward-char 3))
-    (when (equal major-mode 'clojure-mode)
-      (insert "(println (format \"%s\" ))")
-      (backward-char 2))
-    (when (equal major-mode 'emacs-lisp-mode)
-      (insert "(message (format \"%s\" ))")
-      (backward-char 2)))
-
-  (global-set-key (kbd "C-x C-j d") 'jrm/insert-debug-log)
-#+END_SRC
-
 *** Async Shell Command 
      #+begin_src emacs-lisp :tangle ~/.emacs.d/jrm-util.el
        (defun jrm/async-callback-run-callback (process signal cb)
