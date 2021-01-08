@@ -735,6 +735,7 @@ I prefer to see trailing whitespace but not for every mode (e.g. org, elfeed, et
     (defun no-trailing-whitespace ()
       (setq show-trailing-whitespace nil))
     (add-hook 'minibuffer-setup-hook              'no-trailing-whitespace)
+    (add-hook 'dashboard-mode-hook              'no-trailing-whitespace)
     (add-hook 'eww-mode-hook                      'no-trailing-whitespace)
     (add-hook 'shell-mode-hook                    'no-trailing-whitespace)
     (add-hook 'mu4e:view-mode-hook                'no-trailing-whitespace)
@@ -784,7 +785,7 @@ I like a nice big splash screen and I'm partial to the meditating GNU logo.
   (use-package dashboard
     :config
     (dashboard-setup-startup-hook)
-    (setq dashboard-startup-banner (concat *dotemacs-dir* "assets/gnu-meditate-scaled.png"))
+    (setq dashboard-startup-banner (concat *dotemacs-dir* "assets/lambda.png"))
     (setq dashboard-items '((recents  . 10)))
     (setq dashboard-banner-logo-title ""))
 #+END_SRC
