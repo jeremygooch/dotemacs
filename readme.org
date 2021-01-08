@@ -244,27 +244,41 @@ Generic auto-complete with Ivy which
      :config
      (global-set-key (kbd "C-s") 'swiper-isearch))
  #+END_SRC
-**** Hack-around for poorly shared plugins
+**** Colorized By Directory
+Colorizing buffer background based on file location or vc status
      #+begin_src emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
        (setq counsel-find-file-ignore-regexp "\\(aurelia_project\\|node_modules\\|dist\\|coverage-jest\\)")
        (defun jrm/counsel-find-all-hack ()
-	 "Hackaround for poorly shared plugins"
-	 (interactive)
-	 (counsel-file-jump "" (vc-root-dir)))
+         "Hackaround for poorly shared plugins"
+         (interactive)
+         (counsel-file-jump "" (vc-root-dir)))
        (global-set-key (kbd "C-M-SPC") 'jrm/counsel-find-all-hack)
 
        (defun ignored-file-background ()
-	 (interactive)
-	 (setq buffer-face-mode-face `(:background "#342828"))
-	 (buffer-face-mode 1))
+         (interactive)
+         (setq buffer-face-mode-face `(:background "#342828"))
+         (buffer-face-mode 1))
        (define-minor-mode ignored-file-mode
-	 "Mode for files that are ignored in VC"
-	 :lighter " IGNORED-FILE")
+         "Mode for files that are ignored in VC"
+         :lighter " IGNORED-FILE")
        (add-hook 'ignored-file-mode-hook 'ignored-file-background)
+
+       (defun duplicate-file-background ()
+         (interactive)
+         (setq buffer-face-mode-face `(:background "#283d44"))
+         (buffer-face-mode 1))
+       (define-minor-mode duplicate-file-mode
+         "Mode for files that are in the duplicate-repo directory"
+         :lighter " DUPLICATE-REPO-FILE")
+       (add-hook 'duplicate-file-mode-hook 'duplicate-file-background)
+
        (defun jrm/set-ignored-mode () ""
-	      (let ((ignored (shell-command-to-string (concat "git check-ignore " (buffer-file-name)))))
-		(if (not (string-empty-p ignored))
-		    (ignored-file-mode))))
+              (let ((ignored (shell-command-to-string (concat "git check-ignore " (buffer-file-name))))
+                    (duplicate-repo (cl-search "duplicate-repos" (buffer-file-name))))
+                (if (not (string-empty-p ignored))
+                    (ignored-file-mode)
+                  (if duplicate-repo
+                      (duplicate-file-mode)))))
 
        (add-hook 'js2-mode-hook 'jrm/set-ignored-mode)
        (add-hook 'ng2-ts-mode-hook 'jrm/set-ignored-mode)
@@ -407,7 +421,7 @@ Lsp Mode Performance adjustments (see https://emacs-lsp.github.io/lsp-mode/page/
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (setq gc-cons-threshold 100000000)
   (setq read-process-output-max (* 1024 1024))
-  (setq lsp-idle-delay 0.5)
+  (setq lsp-idle-delay 1)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
@@ -607,12 +621,6 @@ Defining custom indentation based on project paths and setting them to functions
     (interactive)
     (message "Using 4 spaces coding style")
     (jrm/setup-indent 4))
-
-  ;; (defun jrm/develop-environment ()
-  ;;   "if 'neon' is in the path, set the indentation accordingly"
-  ;;   (let ((proj-dir (file-name-directory (buffer-file-name))))
-  ;;     (if (string-match-p "neon/" proj-dir)
-  ;; 	  (jrm/neon-code-style))))
 #+end_src
 
 #+begin_src emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
@@ -625,7 +633,7 @@ Defining custom indentation based on project paths and setting them to functions
   (add-hook 'scss-mode-hook 'jrm/four-space-code-style)
 #+end_src
 
-#+begin_src emacs-lisp :tangle (if (not (string-equal system-type "darwin")) "~/.emacs")
+#+begin_src emacs-lisp :tangle (if (not (string-equal system-type "darwin")) "~/.emacs" "")
   (add-hook 'typescript-mode-hook 'jrm/two-space-code-style)
   (add-hook 'lua-mode-hook 'jrm/two-space-code-style)
   (add-hook 'web-mode-hook 'jrm/two-space-code-style)
@@ -861,7 +869,7 @@ We'll need to turn off the mouse from time to time
 #+END_SRC
 
 Because linux runs exwm we shouldn't turn the mouse off completely.
-#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs")
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs" "")
   (add-hook 'lisp-interaction-mode                'disable-mouse-mode)
   (add-hook 'shell-mode-hook                      'disable-mouse-mode)
   (add-hook 'org-src-mode-hook                    'disable-mouse-mode)
@@ -898,7 +906,7 @@ This section is specific to running emacs as a tiling window manager desktop via
 **** General Setup
 
 Go fullscreen and set the default font size.
-#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs")
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs" "")
   (set-frame-parameter nil 'fullscreen 'fullboth)
   (set-face-attribute 'default nil :height 140)
   (set-face-attribute 'default nil :font "Inconsolata-14")
@@ -952,12 +960,12 @@ Simple script for waking up second monitor after reattaching
 
 **** Applications
 ***** DMenu Application Launcher
-#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs")
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs" "")
   (use-package dmenu :bind ("s-SPC" . 'dmenu))
 #+END_SRC
 ***** VLC/Multimedia
 Occasionally it's helpful to be able to start, play, pause and exit vlc buffers while never having to leave your current buffer. This is particularly helpful for following along with training videos.
-    #+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs")
+    #+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs" "")
       (defvar videoBuffer "video-controller")
 
       (defun jrm/vlc-start-video-playlist ()
@@ -1035,7 +1043,7 @@ Occasionally it's helpful to be able to start, play, pause and exit vlc buffers 
 
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs")
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs" "")
   (defun jrm/log-volume () "Send the audio status to the message buffer"
 	 (message "%s" (shell-command-to-string (concat *amixer-path* " get Master"))))
 
@@ -1061,7 +1069,7 @@ Occasionally it's helpful to be able to start, play, pause and exit vlc buffers 
 
 ***** Screenshots
  I took this from Uncle Dave's config. Its a super slick screenshot function for taking both fullscreen as well as region screenshots.
- #+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs")
+ #+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs" "")
    (defun jrm/take-screenshot ()
      "Takes a fullscreenshot of the current workspace"
      (interactive)
@@ -1095,7 +1103,7 @@ Occasionally it's helpful to be able to start, play, pause and exit vlc buffers 
 
 ***** Interacting with GUI Applications
 I find the default way (C-c C-q) of exwm sending keys like ctrl to an async buffer difficult. C-c C-c is much simpler for me.
-#+BEGIN_SRC emacs-lisp :tangle
+#+BEGIN_SRC emacs-lisp
     (define-key exwm-mode-map [?\C-c ?\C-c] 'exwm-input-send-next-key)
   #+END_SRC
 
