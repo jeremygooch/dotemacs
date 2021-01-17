@@ -778,6 +778,31 @@ Show the asterisks as bullets and set up indentation
   (add-hook 'org-mode-hook 'org-indent-mode)
 #+END_SRC
 
+**** Org Tables
+I commonly use org for db management so adding a quick way to shrink tables
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (defun jrm/set-org-table-column-widths ()
+    "This adds a row after the current Org Table row with a width cookie for each column"
+    (interactive)
+    (unless (equal (format "%s" major-mode) "org-mode") (error "Not in an org mode file"))
+    (beginning-of-line)
+    (set-mark-command nil)
+    (end-of-line)
+    (kill-ring-save (region-beginning) (region-end))
+    (org-return)
+    (org-yank)
+    (beginning-of-line)
+    (set-mark-command nil)
+    (end-of-line)
+    (narrow-to-region (region-beginning) (region-end))
+    (goto-char (point-min))
+    (while (search-forward-regexp "|[[:space:]][-_.A-Za-z0-9]+[[:space:]]" nil t)
+      (replace-match "| <6> "))
+    (widen)
+    (org-table-shrink)
+    (beginning-of-line))
+
+#+end_src
 
 *** Dashboard
 I like a nice big splash screen and I'm partial to the meditating GNU logo.
