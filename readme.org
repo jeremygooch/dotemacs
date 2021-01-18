@@ -96,11 +96,11 @@ Fix emacs' regex
 #+END_SRC
 
 Use aspell for Mac (aspell can be installed with brew)
-#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs" "")
 (setq ispell-program-name "/usr/local/bin/aspell")
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs" "")
   (setq exec-path (append exec-path '("/usr/local/bin")))
   (use-package exec-path-from-shell
     :init
@@ -161,7 +161,7 @@ Use ripgrep by default
 #+END_SRC
 
 Enable searching for files in .gitignore, for work specific projects
-#+begin_src emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
+#+begin_src emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs" "")
   (setq rg-command-line-flags '("--no-ignore"))
 #+end_src
 
@@ -246,7 +246,7 @@ Generic auto-complete with Ivy which
  #+END_SRC
 **** Colorized By Directory
 Colorizing buffer background based on file location or vc status
-     #+begin_src emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
+     #+begin_src emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs" "")
        (setq counsel-find-file-ignore-regexp "\\(aurelia_project\\|node_modules\\|dist\\|coverage-jest\\)")
        (defun jrm/counsel-find-all-hack ()
          "Hackaround for poorly shared plugins"
@@ -623,7 +623,7 @@ Defining custom indentation based on project paths and setting them to functions
     (jrm/setup-indent 4))
 #+end_src
 
-#+begin_src emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
+#+begin_src emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs" "")
   (add-hook 'typescript-mode-hook 'jrm/four-space-code-style)
   (add-hook 'lua-mode-hook 'jrm/four-space-code-style)
   (add-hook 'web-mode-hook 'jrm/four-space-code-style)
@@ -870,7 +870,7 @@ Display the current time and battery indicator
 #+END_SRC
 
 *** Frames
-#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs" "")
   (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
   (add-to-list 'default-frame-alist '(ns-appearance . dark))
 
@@ -890,7 +890,7 @@ We'll need to turn off the mouse from time to time
   (use-package disable-mouse :diminish disable-mouse-mode)
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs" "")
   (global-disable-mouse-mode)
 #+END_SRC
 
@@ -938,7 +938,7 @@ Go fullscreen and set the default font size.
   (set-face-attribute 'default nil :font "Inconsolata-14")
 #+END_SRC
 
-#+begin_src emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs")
+#+begin_src emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs" "")
   (set-face-attribute 'default nil :font "Inconsolata-18")
 #+end_src
 
