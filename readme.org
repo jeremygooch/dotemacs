@@ -281,8 +281,6 @@ Colorizing buffer background based on file location or vc status
                       (duplicate-file-mode)))))
 
        (add-hook 'js2-mode-hook 'jrm/set-ignored-mode)
-       (add-hook 'ng2-ts-mode-hook 'jrm/set-ignored-mode)
-       (add-hook 'ng2-html-mode-hook 'jrm/set-ignored-mode)
        (add-hook 'css-mode-hook 'jrm/set-ignored-mode)
        (add-hook 'scss-mode-hook 'jrm/set-ignored-mode)
        (add-hook 'web-mode-hook 'jrm/set-ignored-mode)
@@ -360,7 +358,7 @@ For obvious reasons it is helpful to be able to toggle formatting the buffer bef
 #+begin_src emacs-lisp :tangle ~/.emacs
   (defun jrm/tslint-before-save ()
     "Use tide and tslint to fix buffer after saving"
-    (if (or (equal major-mode 'typescript-mode) (equal major-mode 'ng2-ts-mode) (equal major-mode 'js2-mode))
+    (if (or (equal major-mode 'typescript-mode) (equal major-mode 'js2-mode))
 	(progn
 	  (async-shell-command (concat (vc-root-dir) "node_modules/eslint/bin/eslint.js --fix " (expand-file-name buffer-file-name))))))
 
@@ -379,7 +377,6 @@ For obvious reasons it is helpful to be able to toggle formatting the buffer bef
 **** LSP
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package lsp-mode
-    :hook (ng2-ts-mode . lsp)
     :hook (typescript-mode . lsp)
     :hook (javascript-mode . lsp)
     :hook (js2-mode . lsp)
@@ -515,8 +512,7 @@ Tern is a require package and can be installed with ~sudo npm install -g tern~
 Some basic code folding
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package yafolding
-    :hook ((ng2-ts-mode . yafolding-mode)
-	   (js-mode . yafolding-mode)
+    :hook ((js-mode . yafolding-mode)
 	   (fundamental-mode . yafolding-mode)))
 #+END_SRC
 
@@ -558,8 +554,8 @@ Web Beautify for unminifying assets
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   ;; (setq exec-path (append exec-path '(*node-dir*)))
   (custom-set-variables
-   '(flycheck-typescript-tslint-executable "/home/jeremy/src/cb-consume-ui/node_modules/tslint/bin/tslint"))
-  (use-package ng2-mode)
+   '(flycheck-typescript-tslint-executable "/home/jeremy/src/cb-consume-ui/node_modules/tslint/bin/tslint")
+   '(flycheck-javascript-eslint-executable "/Users/jeremygooch/src/dashboard-ui/node_modules/eslint/bin/eslint.js"))
   (use-package flycheck :diminish flycheck-mode)
 
 #+END_SRC
@@ -567,11 +563,6 @@ Web Beautify for unminifying assets
 Enable typescript frameworks for just typescript and prototype
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (setq typescript-enabled-frameworks '(typescript prototype))
-#+END_SRC
-
-Check for ts lint errors
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (flycheck-add-mode 'typescript-tslint 'ng2-ts-mode)
 #+END_SRC
 
 Rjsx for JSX
@@ -910,7 +901,6 @@ Because linux runs exwm we shouldn't turn the mouse off completely.
   (add-hook 'special-mode-hook                    'disable-mouse-mode)
   (add-hook 'fundamental-mode-hook                'disable-mouse-mode)
   (add-hook 'groovy-mode-hook                     'disable-mouse-mode)
-  (add-hook 'ng2-ts-mode-hook                     'disable-mouse-mode)
   (add-hook 'org-agenda-mode-hook                 'disable-mouse-mode)
   (add-hook 'eshell-mode-hook                     'disable-mouse-mode)
   (add-hook 'slack-message-buffer-mode-hook       'disable-mouse-mode)
