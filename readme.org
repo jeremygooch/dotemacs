@@ -32,9 +32,9 @@ Setting up basic repositories and [[https://github.com/jwiegley/use-package][use
   (require 'package)
   (setq package-enable-at-startup nil)
   (setq package-archives '(
-			   ("marmalade"  . "http://marmalade-repo.org/packages/")
-			   ("melpa-stable" . "http://stable.melpa.org/packages/")
-			   ("gnu" . "http://elpa.gnu.org/packages/")
+			   ("marmalade"  . "https://marmalade-repo.org/packages/")
+			   ("melpa-stable" . "https://stable.melpa.org/packages/")
+			   ("gnu" . "https://elpa.gnu.org/packages/")
 			   ;; ("org" . "https://orgmode.org/elpa/")
 			   ("melpa" . "https://melpa.org/packages/")))
 #+END_SRC
@@ -577,7 +577,8 @@ Check for ts lint errors
 Rjsx for JSX
 #+begin_src emacs-lisp :tangle ~/.emacs
   (use-package rjsx-mode
-    :config (add-to-list 'auto-mode-alist '("src/elfeed-web-react/.*\\.js\\'" . rjsx-mode)))
+    :config (add-to-list 'auto-mode-alist '("src/elfeed-web-react/.*\\.js\\'" . rjsx-mode))
+    (add-to-list 'auto-mode-alist '("src/elfeed-web-react/.*\\.tsx\\'" . typescript-mode)))
 #+end_src
 
 Add prettier support. Assumes prettier is installed globally.
@@ -753,17 +754,52 @@ Use visual line mode for text wrapping
 #+END_SRC
 *** Custom Colors
 **** Shells
-  #+begin_src emacs-lisp
-    ;; function to switch background color
-    (defun buffer-background-switch ()
-      (interactive)
-      (setq buffer-face-mode-face `(:background "#0a1310" :foreground "#218352"))
-      (custom-set-faces '(comint-highlight-prompt ((t (:inherit minibuffer-prompt :foreground "#2cc46c")))))
-      (buffer-face-mode 1))
 
-    (add-hook 'shell-mode-hook 'buffer-background-switch)
-    (add-hook 'eshell-mode-hook 'buffer-background-switch)
-  #+end_src
+***** VTerm
+For some reason this isn't currently installing via melpa. 
+Ensure that =cmake= is installed.
+      #+begin_src emacs-lisp
+	(setq libvterm-directory "/tmp/emacs-libvterm")
+	(defun jrm/build-emacs-libvterm ()
+	  "Build emacs-libvterm"
+	  (message "here!")
+	  (jrm/async-callback (concat "cd " libvterm-directory " && mkdir -p build && cd build && cmake .. && make") (message "Donezo")))
+
+	;; (defun jrm/build-emacs-libvterm ()
+	;;   "Build emacs-libvterm"
+	;;   (jrm/async-callback (concat "cd " libvterm-directory " && mkdir -p build && cd build && cmake .. && make") (progn (message "done")))))
+
+	;; (defun jrm/clone-emacs-libvterm ()
+	;; ""
+	;; (magit))
+	(defun jrm/clone-emacs-libvterm ()
+	  "Clone emacs-libvterm from github"
+	  ;; (jrm/async-callback (concat "git clone https://github.com/akermu/emacs-libvterm.git" libvterm-directory))
+
+	  ;; (magit-clone-regular "https://github.com/akermu/emacs-libvterm.git" libvterm-directory nil)
+	  )
+
+	(defun xx ()
+	  (message "cypher"))
+
+
+
+	(if (not (file-exists-p libvterm-directory))
+	    (progn
+	      (message "beginning....")
+	      (jrm/async-callback (concat "git clone https://github.com/akermu/emacs-libvterm.git " libvterm-directory) (message "step 1 done"))
+
+	      ;; (jrm/clone-emacs-libvterm)
+
+
+	      ;; (advice-add (magit-clone-regular "https://github.com/akermu/emacs-libvterm.git" libvterm-directory nil) :after 'yy)
+	      ;; (advice-add 'xx :after 'yy)
+	      ;; (advice-add 'jrm/clone-emacs-libvterm :after 'jrm/build-emacs-libvterm)
+	      ;; (message "yo!")
+	      ;; (magit-clone-regular "https://github.com/akermu/emacs-libvterm.git" libvterm-directory nil)
+	      ;; (jrm/async-callback (concat "cd " libvterm-directory " && mkdir -p build && cd build && cmake .. && make") (progn (message "done")))
+	      ))
+      #+end_src
 
 **** Org Mode
 Set Org mode source block background color to dark gray so it stands out from the typical background
@@ -956,8 +992,8 @@ Load some basic minor modes by default
   (add-hook 'org-mode-hook (lambda () (variable-pitch-mode t)))
   (custom-set-faces
    '(variable-pitch ((t (:family "Roboto")))))
-  (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-block nil :inherit 'fixed-pitch :height 0.8)
+  ;; (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'org-block nil :inherit 'fixed-pitch :height 0.8)
 #+end_src
 
 *** Navigation
@@ -1273,21 +1309,22 @@ I find myself need specific font sizes for different scenarios, i.e. projecting,
 /Note: there might be a better way to handle this but things like M-+/M-- won't zoom things like line numbers, etc./
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (defvar jrm/screens-alist '((?0 "xsmall" (lambda () (set-face-attribute 'default nil :height 70) 'default))
-			      (?1 "small" (lambda () (set-face-attribute 'default nil :height 110) 'default))
-			      (?2 "medium" (lambda () (set-face-attribute 'default nil :height 120) 'proj))
-			      (?3 "large" (lambda () (set-face-attribute 'default nil :height 140) 'proj))
-			      (?4 "xtra-large" (lambda () (set-face-attribute 'default nil :height 160) 'projLg))
-			      (?5 "xxtra-large" (lambda () (set-face-attribute 'default nil :height 190) 'projLg))
-			      (?6 "xxxtra-large" (lambda () (set-face-attribute 'default nil :height 210) 'projLg)))
+                              (?1 "small" (lambda () (set-face-attribute 'default nil :height 110) 'default))
+                              (?2 "medium" (lambda () (set-face-attribute 'default nil :height 120) 'proj))
+                              (?3 "large" (lambda () (set-face-attribute 'default nil :height 140) 'proj))
+                              (?4 "xtra-large" (lambda () (set-face-attribute 'default nil :height 160) 'projLg))
+                              (?5 "xxtra-large" (lambda () (set-face-attribute 'default nil :height 190) 'projLg))
+                              (?6 "xxxtra-large" (lambda () (set-face-attribute 'default nil :height 210) 'projLg))
+                              (?7 "rediculous" (lambda () (set-face-attribute 'default nil :height 250) 'projLg)))
     "List that associates number letters to descriptions and actions.")
   (defun jrm/adjust-font-size ()
     "Lets the user choose the the font size and takes the corresponding action.
   Returns whatever the action returns."
     (interactive)
     (let ((choice (read-char-choice
-		   (mapconcat (lambda (item) (format "%c: %s" (car item) (cadr item)))
-			      jrm/screens-alist "; ")
-		   (mapcar #'car jrm/screens-alist))))
+                   (mapconcat (lambda (item) (format "%c: %s" (car item) (cadr item)))
+                              jrm/screens-alist "; ")
+                   (mapcar #'car jrm/screens-alist))))
       (funcall (nth 2 (assoc choice jrm/screens-alist)))))
   (global-set-key (kbd "C-x C-j p")  'jrm/adjust-font-size)
 #+END_SRC
