@@ -1148,7 +1148,12 @@ Setup standard todo keywords
 File locations for org agenda
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (global-set-key (kbd "C-c a") 'org-agenda)
-  (setq org-agenda-files (list "~/org/work/TeachForward/"))
+  (setq org-agenda-files (list "~/org/work/TeachForward/" "~/org/personal/"))
+
+(setq org-agenda-custom-commands
+      '(("j" "Week and Task List"
+         ((agenda "")
+          (alltodo)))))
 #+END_SRC
 
 *** Org Export
