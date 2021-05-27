@@ -1134,11 +1134,11 @@ Setup standard todo keywords
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (setq org-use-fast-todo-selection t)
   (setq org-todo-keywords
-	'((sequence "IMMEDIATE TODO(t!)" "|" "DONE(d!)")
+	'((sequence "TODO(t!)" "|" "DONE(d!)")
       (sequence "WORKFLOW TODO(w@/!)" "SOON(s@/!)" "|" "SOMEDAY(S@/!)")))
   ;; Custom colors for the keywords
   (setq org-todo-keyword-faces
-	'(("IMMEDIATE TODO" :foreground "red" :weight bold)
+	'(("TODO" :foreground "red" :weight bold)
       ("DONE" :foreground "forest green" :weight bold)
       ("WORKFLOW TODO" :foreground "#61afef" :weight bold)
       ("SOON" :foreground "#da8548" :weight bold)
@@ -1150,10 +1150,21 @@ File locations for org agenda
   (global-set-key (kbd "C-c a") 'org-agenda)
   (setq org-agenda-files (list "~/org/work/TeachForward/" "~/org/personal/"))
 
-(setq org-agenda-custom-commands
-      '(("j" "Week and Task List"
-         ((agenda "")
-          (alltodo)))))
+  (setq org-agenda-custom-commands
+        '(("j" "Personal Week and Task List"
+           ((agenda "")
+            (alltodo)
+            (search "* DONE"))
+           ((org-agenda-files '("~/org/personal"))))
+          ("w" "Work Week and Task List"
+           ((agenda "")
+            (alltodo)
+            (search "* DONE"))
+           ((org-agenda-files '("~/org/work/TeachForward"))))
+          ("A" "Personal and Work Week and Task List"
+           ((agenda "")
+            (alltodo)
+            (search "* DONE")))))
 #+END_SRC
 
 *** Org Export
