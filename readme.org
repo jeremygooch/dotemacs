@@ -417,7 +417,7 @@ For obvious reasons it is helpful to be able to toggle formatting the buffer bef
 Lsp Mode Performance adjustments (see https://emacs-lsp.github.io/lsp-mode/page/performance/).
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (setq gc-cons-threshold 100000000)
-  (setq read-process-output-max (* 1024 1024))
+  (setq read-process-output-max 3000000) ;; ~3mb
   (setq lsp-idle-delay 1)
 #+END_SRC
 
@@ -513,7 +513,9 @@ Some basic code folding
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package yafolding
     :hook ((js-mode . yafolding-mode)
-	   (fundamental-mode . yafolding-mode)))
+           (js2-mode . yafolding-mode)
+           (typescript-mode . yafolding-mode)
+           (fundamental-mode . yafolding-mode)))
 #+END_SRC
 
 Use js2 mode rather than the built in javascript mode.
@@ -1054,7 +1056,7 @@ Customize org capture to my liking
   (setq org-capture-templates
 	'((" " "TODOs ==============================" entry (file "") "")
 	  ("w" "Work Todo" entry (file+headline "~/org/work/TeachForward/teachforward.org" "Todos")
-	   "** IMMEDIATE TODO %? :tf:\n  %i\n  %a")
+	   "** TODO %? :tf:\n  %i\n  %a")
 	  ("l" "Personal Todo\n" entry (file "~/org/personal/personal.org")
 	   "*** TODO %? :personal:\n  %i\n  %a")
 	  (" " "PROGRAMMING SNIPPETS ===============" entry (file "") "")
@@ -1114,11 +1116,11 @@ This attempts to sync an org file on save if it detects the file is in the ~*org
     "Automatically stages, commits, pulls, and pushes the current branch's upstream settings. Commit message is current timestamp. Depends on Magit."
     (interactive)
     (if (string-match-p (regexp-quote *org-dir*) (file-name-directory buffer-file-name))
-	(progn 
-	  (magit-stage-modified)
-	  (magit-run-git-with-editor "commit" "-m" (format-time-string "%a %d %b %Y %H:%M:%S %Z"))
-	  (magit-run-git-async "pull")
-	  (magit-run-git-async "push"))))
+        (progn
+          (magit-stage-modified)
+          (magit-run-git-with-editor "commit" "-m" (format-time-string "%a %d %b %Y %H:%M:%S %Z"))
+          (magit-run-git-async "pull")
+          (magit-run-git-async "push"))))
 
   (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook 'jrm/git-auto-sync nil t)))
 #+END_SRC
