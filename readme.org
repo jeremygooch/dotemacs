@@ -18,6 +18,7 @@ Some of the code blocks pertain to the OS and will be tangled automatically. The
 *** Load Utilities
     #+begin_src emacs-lisp :tangle ~/.emacs
       (load "~/.emacs.d/jrm-util.el")
+      (load "~/.emacs.d/tf.el")
     #+end_src
 * Configuration
 #+TOC: headlines 2
