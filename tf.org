@@ -6,30 +6,36 @@
            (shell "local-express-shell")
            (insert "n") ;; answer stupid zsh prompt
            (comint-send-input) ;; press enter
+           (insert "nvm use 14")
+           (comint-send-input)
            (insert "cd ~/src/local-express/ && node main.js")
            (comint-send-input)
            (other-frame 1))
   #+end_src
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/tf.el
-    (defun tf/start-dashboard () "" (interactive)
-           (other-frame 1)
-           (shell "dashboard-shell")
-           (insert "n") ;; answer stupid zsh prompt
-           (comint-send-input) ;; press enter
-           (insert "cd ~/src/dashboard-ui/ && npm run kube")
-           (comint-send-input)
-           (other-frame 1))
+  (defun tf/start-dashboard () "" (interactive)
+         (other-frame 1)
+         (shell "dashboard-shell")
+         (insert "n") ;; answer stupid zsh prompt
+         (comint-send-input) ;; press enter
+         (insert "nvm use 12")
+         (comint-send-input)
+         (insert "cd ~/src/dashboard-ui/ && npm run kube")
+         (comint-send-input)
+         (other-frame 1))
   #+end_src
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/tf.el
-    (defun tf/start-review () "" (interactive)
-           (other-frame 1)
-           (shell "review-shell")
-           (insert "n") ;; answer stupid zsh prompt
-           (comint-send-input) ;; press enter
-           (insert "cd ~/src/review-ui && npm run build:watch")
-           (comint-send-input)
-           (other-frame 1))
+  (defun tf/start-review () "" (interactive)
+         (other-frame 1)
+         (shell "review-shell")
+         (insert "n") ;; answer stupid zsh prompt
+         (comint-send-input) ;; press enter
+         (insert "nvm use 14")
+         (comint-send-input)
+         (insert "cd ~/src/review-ui && npm run build:watch")
+         (comint-send-input)
+         (other-frame 1))
   #+end_src
 
