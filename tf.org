@@ -25,7 +25,7 @@
 #+begin_src emacs-lisp :tangle ~/.emacs.d/tf.el
     (defun tf/start-review () "" (interactive)
            (other-frame 1)
-           (shell "dashboard-shell")
+           (shell "review-shell")
            (insert "n") ;; answer stupid zsh prompt
            (comint-send-input) ;; press enter
            (insert "cd ~/src/review-ui && npm run build:watch")
