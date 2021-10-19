@@ -439,7 +439,7 @@ Dap is used for debugging in browser(s). More information at: https://emacs-lsp.
 #+end_src
 
 ***** DAP NodeJS
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs
   (require 'dap-node)
   (defun jrm/dap-node-stop-all ()
     "Kill all background node processes running in inspect"
