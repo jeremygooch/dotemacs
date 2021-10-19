@@ -430,9 +430,22 @@ Lsp Mode Performance adjustments (see https://emacs-lsp.github.io/lsp-mode/page/
       ("node" "/Users/jeremygooch/.nvm/versions/node/v14.15.4/lib/node_modules/@angular/language-server" "--ngProbeLocations" "/Users/jeremygooch/.nvm/versions/node/v14.15.4/lib/node_modules" "--tsProbeLocations" "/Users/jeremygooch/.nvm/versions/node/v14.15.4/lib/node_modules" "--stdio")))
 #+END_SRC
 
+**** LSP + DAP
+
+***** DAP Chrome
 Dap is used for debugging in browser(s). More information at: https://emacs-lsp.github.io/lsp-mode/tutorials/reactjs-tutorial/
 #+begin_src emacs-lisp :tangle ~/.emacs
 (require 'dap-chrome)
+#+end_src
+
+***** DAP NodeJS
+#+begin_src emacs-lisp
+  (require 'dap-node)
+  (defun jrm/dap-node-stop-all ()
+    "Kill all background node processes running in inspect"
+    (interactive)
+    (dap-delete-all-sessions)
+    (async-shell-command "kill `ps -A | grep 'inspect-brk' | awk '{print $1}'`"))
 #+end_src
 
 **** Lisps
