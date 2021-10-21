@@ -1,16 +1,16 @@
 * TF
 ** Startup common projects
 #+begin_src emacs-lisp :tangle ~/.emacs.d/tf.el
-    (defun tf/start-express () "" (interactive)
-           (other-frame 1)
-           (shell "local-express-shell")
-           (insert "n") ;; answer stupid zsh prompt
-           (comint-send-input) ;; press enter
-           (insert "nvm use 14")
-           (comint-send-input)
-           (insert "cd ~/src/local-express/ && node main.js")
-           (comint-send-input)
-           (other-frame 1))
+  (defun tf/start-express () "" (interactive)
+         (other-frame 1)
+         (shell "local-express-shell")
+         (insert "n") ;; answer stupid zsh prompt
+         (comint-send-input) ;; press enter
+         (insert "nvm use 14")
+         (comint-send-input)
+         (insert "cd ~/src/local-express/ && node main.js")
+         (comint-send-input)
+         (other-frame 1))
   #+end_src
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/tf.el
@@ -35,6 +35,19 @@
          (insert "nvm use 14")
          (comint-send-input)
          (insert "cd ~/src/review-ui && npm run build:watch")
+         (comint-send-input)
+         (other-frame 1))
+  #+end_src
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/tf.el
+  (defun tf/start-tf-ng-workspace/library () "" (interactive)
+         (other-frame 1)
+         (shell "tf-ng-shell")
+         (insert "n") ;; answer stupid zsh prompt
+         (comint-send-input) ;; press enter
+         (insert "nvm use 14")
+         (comint-send-input)
+         (insert "cd ~/src/tf-ng-workspace && npm run dev")
          (comint-send-input)
          (other-frame 1))
   #+end_src
