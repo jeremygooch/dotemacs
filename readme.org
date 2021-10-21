@@ -161,12 +161,6 @@ Use ripgrep by default
       :flags ("--hidden -g '!e2e/'")))
 #+END_SRC
 
-Enable searching for files in .gitignore, for work specific projects
-#+begin_src emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs" "")
-  (setq rg-command-line-flags '("--no-ignore"))
-#+end_src
-
-
 *** IBuffer
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
 	(global-set-key (kbd "C-x C-b") 'ibuffer)
