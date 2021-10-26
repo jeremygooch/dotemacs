@@ -998,6 +998,26 @@ Set the node environment
   (setq org-babel-js-cmd (concat *node-dir* "node"))
 #+END_SRC
 
+**** Source Block Shortcuts
+
+#+begin_src emacs-lisp :tangle ~/.emacs
+(add-to-list
+ 'org-structure-template-alist
+ '("r" . "src restclient"))
+(add-to-list
+ 'org-structure-template-alist
+ '("js" . "src js"))
+(add-to-list
+ 'org-structure-template-alist
+ '("ts" . "src typescript"))
+(add-to-list
+ 'org-structure-template-alist
+ '("elt" . "src emacs-lisp"))
+(add-to-list
+ 'org-structure-template-alist
+ '("elt" . "src emacs-lisp :tangle ~/.emacs"))
+#+end_src
+
 **** Additional Modes
  Add some export modes for getting content out of org. Not using ~:defer~ here as I'm not sure it's helpful and adding it to ~ob-clojure~ throws a ~Wrong type argument: stringp, :defer~ error.
  #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
