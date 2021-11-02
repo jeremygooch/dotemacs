@@ -197,20 +197,6 @@ Instead of using the display's popup, prompt for gpg creds in the minibuffer
   (setq epa-pinentry-mode 'loopback)
 #+END_SRC
 
-*** Company mode
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (use-package company :diminish company-mode
-    :init (add-hook 'after-init-hook 'global-company-mode))
-#+END_SRC
-
-Company-mode with icons
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-(use-package company-box
-  :hook (company-mode . company-box-mode)
-  :diminish company-box-mode)
-(setq company-idle-delay 0.2)
-#+END_SRC
-
 ** Introspection
 *** Ivy/Counsel/Swiper
 Generic auto-complete with Ivy which 
@@ -349,26 +335,6 @@ Adjust the local mark ring pop key sequence, so after pressing `C-u C-SPC`, you 
 #+END_SRC
 
 *** Programming
-For obvious reasons it is helpful to be able to toggle formatting the buffer before saving
-#+begin_src emacs-lisp :tangle ~/.emacs
-  (defun jrm/tslint-before-save ()
-    "Use tide and tslint to fix buffer after saving"
-    (if (or (equal major-mode 'typescript-mode) (equal major-mode 'js2-mode))
-	(progn
-	  (async-shell-command (concat (vc-root-dir) "node_modules/eslint/bin/eslint.js --fix " (expand-file-name buffer-file-name))))))
-
-  (defun jrm/toggle-lint-before-save ()
-    "Toggle running the tslint command before saving a buffer"
-    (interactive)
-    (if (string-match-p (regexp-quote "tslint-before-save") (format "%s" (symbol-value 'before-save-hook)))
-	(progn
-	  (remove-hook 'before-save-hook 'jrm/tslint-before-save)
-	  (message "Removed Lint Before Save Hook"))
-      (progn
-	(add-hook 'before-save-hook 'jrm/tslint-before-save)
-	(message "Added Lint Before Save Hook"))))
-#+end_src
-
 **** LSP
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package lsp-mode
@@ -805,7 +771,7 @@ I commonly use org for db management so adding a quick way to shrink tables
 #+end_src
 
 *** Dashboard
-I like a nice big splash screen and I'm partial to the meditating GNU logo.
+I like a nice big splash screen.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package dashboard
     :config
