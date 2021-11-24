@@ -237,7 +237,7 @@ Colorizing buffer background based on file location or vc status
 
        (defun ignored-file-background ()
          (interactive)
-         (setq buffer-face-mode-face `(:background "#342828"))
+         (setq buffer-face-mode-face `(:background "thistle1"))
          (buffer-face-mode 1))
        (define-minor-mode ignored-file-mode
          "Mode for files that are ignored in VC"
@@ -680,7 +680,20 @@ Magit for version control
 ** Theme/UI
 *** General Settings
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (use-package zerodark-theme :config (load-theme 'zerodark t))
+  (use-package modus-themes
+  :ensure
+  :init
+  ;; Add all your customizations prior to loading the themes
+  (setq modus-themes-italic-constructs t
+        modus-themes-bold-constructs nil
+        modus-themes-region '(bg-only no-extend))
+
+  ;; Load the theme files before enabling a theme
+  (modus-themes-load-themes)
+  :config
+  ;; Load the theme of your choice:
+  (modus-themes-load-operandi) ;; OR (modus-themes-load-vivendi)
+  :bind ("<f5>" . modus-themes-toggle))
 #+END_SRC
 
 Remove default scrollbars
@@ -735,7 +748,7 @@ Use visual line mode for text wrapping
 **** Org Mode
 Set Org mode source block background color to dark gray so it stands out from the typical background
 #+begin_src emacs-lisp :tangle ~/.emacs
-  (custom-set-faces '(org-block ((t (:inherit shadow :background "gray12")))))
+  (custom-set-faces '(org-block ((t (:inherit shadow :background "gray83")))))
 
 #+end_src
 
@@ -776,7 +789,7 @@ I like a nice big splash screen.
   (use-package dashboard
     :config
     (dashboard-setup-startup-hook)
-    (setq dashboard-startup-banner (concat *dotemacs-dir* "assets/lambda.png"))
+    (setq dashboard-startup-banner (concat *dotemacs-dir* "assets/Lambda_light.png"))
     (setq dashboard-items '((recents  . 10)))
     (setq dashboard-banner-logo-title ""))
 #+END_SRC
@@ -784,6 +797,7 @@ I like a nice big splash screen.
 Helpful for finding the cursor when jumping around
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (global-hl-line-mode +1)
+  (set-face-background hl-line-face "LightSteelBlue1")
 #+END_SRC
 
 *** Ivy Posframe
@@ -954,9 +968,9 @@ Stylistic preferences for using the pre-v9 version of org mode (E.g. [[https://o
   (setq org-src-window-setup 'other-window)
 
   (custom-set-faces
-   '(org-block ((t (:inherit shadow :extend t :background "gray12"))))
-   '(org-block-begin-line ((t (:extend t :background "gray12" :foreground "#4a5468" :height 0.9))))
-   '(org-block-end-line ((t (:extend t :background "gray12" :foreground "#4a5468" :height 0.9)))))
+   '(org-block ((t (:inherit shadow :extend t :background "gray83"))))
+   '(org-block-begin-line ((t (:extend t :background "gray83" :foreground "#4a5468" :height 0.9))))
+   '(org-block-end-line ((t (:extend t :background "gray83" :foreground "#4a5468" :height 0.9)))))
 #+END_SRC
 
 Set the node environment
