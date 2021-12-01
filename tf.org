@@ -52,3 +52,21 @@
          (other-frame 1))
   #+end_src
 
+** Org Jira
+#+begin_src emacs-lisp :tangle ~/.emacs.d/tf.el
+(use-package org-jira)
+(setq jiralib-url "https://educopiallc.atlassian.net")
+#+end_src
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/tf.el
+  (defun tf/jira-kanban-board-by-fixversion (fixversion)
+    "Clear local tickets and call org jira by fix version the show the agenda"
+    (interactive (list (read-string "Fixversion ID: " ""
+                                    'org-jira-fixversion-id-history)))
+    (find-file "~/.org-jira/PLATFORM.org")
+    (erase-buffer)
+    (org-jira-get-issues (org-jira-get-issue-by-fixversion fixversion))
+    (org-agenda)
+    (delete-other-windows))
+#+end_src
+

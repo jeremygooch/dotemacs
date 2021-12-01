@@ -1161,14 +1161,24 @@ Setup standard todo keywords
 File locations for org agenda
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (global-set-key (kbd "C-c a") 'org-agenda)
-  (setq org-agenda-files (list "~/org/work/TeachForward/" "~/org/personal/"))
+  (setq org-agenda-files (list "~/org/work/TeachForward/" "~/org/personal/" "~/.org-jira/"))
 
   (setq org-agenda-custom-commands
-        '(("j" "Personal Week and Task List"
+        '(("p" "Personal Week and Task List"
            ((agenda "")
             (alltodo)
             (search "* DONE"))
            ((org-agenda-files '("~/org/personal"))))
+          ("j" "Jira Kanban Board"
+           ((search ":status:   Open")
+            (search ":status:   To Do")
+            (search ":status:   Selected for Development")
+            (search ":status:   In Development")
+            (search ":status:   In Review")
+            ;; (search ":status:   Ready for Test")
+            ;; (search ":status:   In Test")
+            (search ":status:   Ready for Demo"))
+           ((org-agenda-files '("~/.org-jira"))))
           ("w" "Work Week and Task List"
            ((agenda "")
             (alltodo)
@@ -1190,6 +1200,7 @@ File locations for org agenda
   (use-package grip-mode
     :ensure-system-package (grip . "pip install grip"))
 #+END_SRC
+
 ** Shells
 By default just use bash for all shells
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
