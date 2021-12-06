@@ -1190,6 +1190,13 @@ File locations for org agenda
             (search "* DONE")))))
 #+END_SRC
 
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (use-package org-jira
+    :init
+    (setq jiralib-url "https://educopiallc.atlassian.net")
+    (setq jiralib-update-issue-fields-exclude-list '(reporter)))
+#+end_src
+
 *** Org Export
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (custom-set-variables
