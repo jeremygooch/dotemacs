@@ -54,8 +54,10 @@
 
 ** Org Jira
 #+begin_src emacs-lisp :tangle ~/.emacs.d/tf.el
-(use-package org-jira)
-(setq jiralib-url "https://educopiallc.atlassian.net")
+(use-package org-jira
+    :init
+    (setq jiralib-url "https://educopiallc.atlassian.net")
+    (setq jiralib-update-issue-fields-exclude-list '(reporter)))
 #+end_src
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/tf.el
@@ -65,8 +67,10 @@
                                     'org-jira-fixversion-id-history)))
     (find-file "~/.org-jira/PLATFORM.org")
     (erase-buffer)
-    (org-jira-get-issues (org-jira-get-issue-by-fixversion fixversion))
-    (org-agenda)
-    (delete-other-windows))
+    (save-buffer)
+    ;; (org-jira-get-issues (org-jira-get-issue-by-fixversion fixversion))
+    ;; (save-buffer)
+    (call-interactively (org-jira-get-issues-by-fixversion))
+    )
 #+end_src
 
