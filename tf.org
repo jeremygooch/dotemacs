@@ -36,7 +36,7 @@
 
   (defun tf/start-tf-ng-workspace/library () ""
          (other-frame 1)
-         (shell "tf-ng-shell")
+         (shell "tf-library-shell")
          (insert "n") ;; answer stupid zsh prompt
          (comint-send-input) ;; press enter
          (insert "nvm use 14")
@@ -47,7 +47,7 @@
 
   (defun tf/start-tf-ng-workspace/elements () ""
          (other-frame 1)
-         (shell "tf-ng-shell")
+         (shell "tf-elements-shell")
          (insert "n") ;; answer stupid zsh prompt
          (comint-send-input) ;; press enter
          (insert "nvm use 14")
@@ -58,7 +58,7 @@
 
   (defun tf/start-tf-ng-workspace/pdfjs () ""
          (other-frame 1)
-         (shell "tf-ng-shell")
+         (shell "tf-pdfjs-shell")
          (insert "n") ;; answer stupid zsh prompt
          (comint-send-input) ;; press enter
          (insert "nvm use 14")
