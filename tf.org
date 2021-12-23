@@ -1,33 +1,7 @@
 * TF
 ** Startup common projects
 #+begin_src emacs-lisp :tangle ~/.emacs.d/tf.el
-  (defun tf/start-express () "" (interactive)
-         (other-frame 1)
-         (shell "local-express-shell")
-         (insert "n") ;; answer stupid zsh prompt
-         (comint-send-input) ;; press enter
-         (insert "nvm use 14")
-         (comint-send-input)
-         (insert "cd ~/src/local-express/ && node main.js")
-         (comint-send-input)
-         (other-frame 1))
-  #+end_src
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/tf.el
-  (defun tf/start-dashboard () "" (interactive)
-         (other-frame 1)
-         (shell "dashboard-shell")
-         (insert "n") ;; answer stupid zsh prompt
-         (comint-send-input) ;; press enter
-         (insert "nvm use 12")
-         (comint-send-input)
-         (insert "cd ~/src/dashboard-ui/ && npm run kube")
-         (comint-send-input)
-         (other-frame 1))
-  #+end_src
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/tf.el
-  (defun tf/start-review () "" (interactive)
+  (defun tf/start-review () ""
          (other-frame 1)
          (shell "review-shell")
          (insert "n") ;; answer stupid zsh prompt
@@ -37,10 +11,30 @@
          (insert "cd ~/src/review-ui && npm run build:watch")
          (comint-send-input)
          (other-frame 1))
-  #+end_src
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/tf.el
-  (defun tf/start-tf-ng-workspace/library () "" (interactive)
+  (defun tf/start-express () ""
+         (other-frame 1)
+         (shell "local-express-shell")
+         (insert "n") ;; answer stupid zsh prompt
+         (comint-send-input) ;; press enter
+         (insert "nvm use 14")
+         (comint-send-input)
+         (insert "cd ~/src/local-express/ && node main.js")
+         (comint-send-input)
+         (other-frame 1))
+
+  (defun tf/start-dashboard () ""
+         (other-frame 1)
+         (shell "dashboard-shell")
+         (insert "n") ;; answer stupid zsh prompt
+         (comint-send-input) ;; press enter
+         (insert "nvm use 12")
+         (comint-send-input)
+         (insert "cd ~/src/dashboard-ui/ && npm run kube")
+         (comint-send-input)
+         (other-frame 1))
+
+  (defun tf/start-tf-ng-workspace/library () ""
          (other-frame 1)
          (shell "tf-ng-shell")
          (insert "n") ;; answer stupid zsh prompt
@@ -50,14 +44,53 @@
          (insert "cd ~/src/tf-ng-workspace && npm run dev")
          (comint-send-input)
          (other-frame 1))
-  #+end_src
+
+  (defun tf/start-tf-ng-workspace/elements () ""
+         (other-frame 1)
+         (shell "tf-ng-shell")
+         (insert "n") ;; answer stupid zsh prompt
+         (comint-send-input) ;; press enter
+         (insert "nvm use 14")
+         (comint-send-input)
+         (insert "cd ~/src/tf-ng-workspace && npm run dev:elements")
+         (comint-send-input)
+         (other-frame 1))
+
+  (defun tf/start-tf-ng-workspace/pdfjs () ""
+         (other-frame 1)
+         (shell "tf-ng-shell")
+         (insert "n") ;; answer stupid zsh prompt
+         (comint-send-input) ;; press enter
+         (insert "nvm use 14")
+         (comint-send-input)
+         (insert "cd ~/src/tf-ng-workspace && npm run dev:pdfjs")
+         (comint-send-input)
+         (other-frame 1))
+
+  (defvar tf/start-projects-alist '((?0 "Local Express" tf/start-express)
+                                    (?1 "Dashboard UI" tf/start-dashboard)
+                                    (?2 "Review UI" tf/start-review)
+                                    (?3 "TFNG-Library" tf/start-tf-ng-workspace/library)
+                                    (?4 "TFNG-Elements" tf/start-tf-ng-workspace/elements)
+                                    (?5 "TFNG-PDFJs" tf/start-tf-ng-workspace/pdfjs)
+                                    (?6 "Dashboard UI" tf/start-dashboard)))
+
+  (defun xx () "" (interactive)
+         (let ((choice (read-char-choice
+                        (mapconcat (lambda (item) (format "%c %s" (car item) (cadr item)))
+                                   tf/start-projects-alist "  |  ")
+                        (mapcar #'car tf/start-projects-alist))))
+           (funcall (nth 2 (assoc choice tf/start-projects-alist)))))
+
+#+end_src
 
 ** Org Jira
 #+begin_src emacs-lisp :tangle ~/.emacs.d/tf.el
-(use-package org-jira
-    :init
-    (setq jiralib-url "https://educopiallc.atlassian.net")
-    (setq jiralib-update-issue-fields-exclude-list '(reporter)))
+  (use-package org-jira
+      :init
+      (setq jiralib-url "https://educopiallc.atlassian.net")
+      (setq jiralib-update-issue-fields-exclude-list '(reporter))
+      (setq jiralib-update-issue-fields-exclude-list '(assignee)))
 #+end_src
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/tf.el
