@@ -75,7 +75,7 @@
                                     (?5 "TFNG-PDFJs" tf/start-tf-ng-workspace/pdfjs)
                                     (?6 "Dashboard UI" tf/start-dashboard)))
 
-  (defun xx () "" (interactive)
+  (defun tf/start-project () "" (interactive)
          (let ((choice (read-char-choice
                         (mapconcat (lambda (item) (format "%c %s" (car item) (cadr item)))
                                    tf/start-projects-alist "  |  ")
