@@ -67,13 +67,25 @@
          (comint-send-input)
          (other-frame 1))
 
+  (defun tf/start-engage () ""
+         (other-frame 1)
+         (shell "engage-shell")
+         (insert "n") ;; answer stupid zsh prompt
+         (comint-send-input) ;; press enter
+         (insert "nvm use 14")
+         (comint-send-input)
+         (insert "cd ~/src/engage-ui && npm run build:watch")
+         (comint-send-input)
+         (other-frame 1))
+
   (defvar tf/start-projects-alist '((?0 "Local Express" tf/start-express)
                                     (?1 "Dashboard UI" tf/start-dashboard)
                                     (?2 "Review UI" tf/start-review)
                                     (?3 "TFNG-Library" tf/start-tf-ng-workspace/library)
                                     (?4 "TFNG-Elements" tf/start-tf-ng-workspace/elements)
                                     (?5 "TFNG-PDFJs" tf/start-tf-ng-workspace/pdfjs)
-                                    (?6 "Dashboard UI" tf/start-dashboard)))
+                                    (?6 "Dashboard UI" tf/start-dashboard)
+                                    (?7 "Engage UI" tf/start-engage)))
 
   (defun tf/start-project () "" (interactive)
          (let ((choice (read-char-choice
