@@ -95,7 +95,22 @@
            (funcall (nth 2 (assoc choice tf/start-projects-alist)))))
 
 #+end_src
+** Colorized BG By Directory
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (defun tf/set-acer-background ()
+    "Colorizes the background based on domain"
+    (let ((needle "ACER"))
+      (if (string-match-p (regexp-quote needle) (buffer-file-name))
+          (progn
+            (setq buffer-face-mode-face `(:background "#fff6ee"))
+            (buffer-face-mode 1)))))
 
+  (add-hook 'js2-mode-hook 'tf/set-acer-background)
+  (add-hook 'typescript-mode-hook 'tf/set-acer-background)
+  (add-hook 'css-mode-hook 'tf/set-acer-background)
+  (add-hook 'scss-mode-hook 'tf/set-acer-background)
+  (add-hook 'web-mode-hook 'tf/set-acer-background)
+#+end_src
 ** Org Jira
 #+begin_src emacs-lisp :tangle ~/.emacs.d/tf.el
   (use-package org-jira
