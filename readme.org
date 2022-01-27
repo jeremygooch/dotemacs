@@ -335,6 +335,13 @@ Adjust the local mark ring pop key sequence, so after pressing `C-u C-SPC`, you 
 #+END_SRC
 
 *** Programming
+Setup basic editorconfig plugin for closer integration with other tools
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (use-package editorconfig
+    :ensure t
+    :config
+    (editorconfig-mode 1))
+#+end_src
 **** LSP
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package lsp-mode
