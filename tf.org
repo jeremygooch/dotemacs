@@ -56,6 +56,18 @@
          (comint-send-input)
          (other-frame 1))
 
+
+  (defun tf/start-tf-ng-workspace/core () ""
+         (other-frame 1)
+         (shell "tf-core-shell")
+         (insert "n") ;; answer stupid zsh prompt
+         (comint-send-input) ;; press enter
+         (insert "nvm use 14")
+         (comint-send-input)
+         (insert "cd ~/src/tf-ng-workspace && npm run dev:core")
+         (comint-send-input)
+         (other-frame 1))
+
   (defun tf/start-tf-ng-workspace/pdfjs () ""
          (other-frame 1)
          (shell "tf-pdfjs-shell")
@@ -84,8 +96,9 @@
                                     (?3 "TFNG-Library" tf/start-tf-ng-workspace/library)
                                     (?4 "TFNG-Elements" tf/start-tf-ng-workspace/elements)
                                     (?5 "TFNG-PDFJs" tf/start-tf-ng-workspace/pdfjs)
-                                    (?6 "Dashboard UI" tf/start-dashboard)
-                                    (?7 "Engage UI" tf/start-engage)))
+                                    (?6 "TFNG-Core" tf/start-tf-ng-workspace/core)
+                                    (?7 "Dashboard UI" tf/start-dashboard)
+                                    (?8 "Engage UI" tf/start-engage)))
 
   (defun tf/start-project () "" (interactive)
          (let ((choice (read-char-choice
@@ -95,22 +108,7 @@
            (funcall (nth 2 (assoc choice tf/start-projects-alist)))))
 
 #+end_src
-** Colorized BG By Directory
-#+begin_src emacs-lisp :tangle ~/.emacs
-  (defun tf/set-acer-background ()
-    "Colorizes the background based on domain"
-    (let ((needle "ACER"))
-      (if (string-match-p (regexp-quote needle) (buffer-file-name))
-          (progn
-            (setq buffer-face-mode-face `(:background "#fff6ee"))
-            (buffer-face-mode 1)))))
 
-  (add-hook 'js2-mode-hook 'tf/set-acer-background)
-  (add-hook 'typescript-mode-hook 'tf/set-acer-background)
-  (add-hook 'css-mode-hook 'tf/set-acer-background)
-  (add-hook 'scss-mode-hook 'tf/set-acer-background)
-  (add-hook 'web-mode-hook 'tf/set-acer-background)
-#+end_src
 ** Org Jira
 #+begin_src emacs-lisp :tangle ~/.emacs.d/tf.el
   (use-package org-jira
@@ -133,4 +131,95 @@
     (call-interactively (org-jira-get-issues-by-fixversion))
     )
 #+end_src
+* TF/ACER
+** Startup common Projects
+#+begin_src emacs-lisp :tangle ~/.emacs.d/tf.el
+  (defun acer/prebuild-item-author-ui () ""
+         (other-frame 1)
+         (shell "acer-item-author-build-shell")
+         (insert "n") ;; answer stupid zsh prompt
+         (comint-send-input) ;; press enter
+         (insert "nvm use 14")
+         (comint-send-input)
+         (insert "cd ~/src/ACER/acer-item-author-ui && yarn build-core && yarn build-editor && yarn build-items && yarn build")
+         (comint-send-input)
+         (other-frame 1))
+
+  (defun acer/watch-item-author-core () ""
+         (other-frame 1)
+         (shell "acer-item-author-core-watch-shell")
+         (insert "n") ;; answer stupid zsh prompt
+         (comint-send-input) ;; press enter
+         (insert "nvm use 14")
+         (comint-send-input)
+         (insert "cd ~/src/ACER/acer-item-author-ui && ng build core --watch")
+         (comint-send-input)
+         (other-frame 1))
+
+  (defun acer/watch-item-author-items () ""
+         (other-frame 1)
+         (shell "acer-item-author-items-watch-shell")
+         (insert "n") ;; answer stupid zsh prompt
+         (comint-send-input) ;; press enter
+         (insert "nvm use 14")
+         (comint-send-input)
+         (insert "cd ~/src/ACER/acer-item-author-ui && ng build items --watch")
+         (comint-send-input)
+         (other-frame 1))
+
+  (defun acer/watch-item-author-editor () ""
+         (other-frame 1)
+         (shell "acer-item-author-editor-watch-shell")
+         (insert "n") ;; answer stupid zsh prompt
+         (comint-send-input) ;; press enter
+         (insert "nvm use 14")
+         (comint-send-input)
+         (insert "cd ~/src/ACER/acer-item-author-ui && ng build editor --watch")
+         (comint-send-input)
+         (other-frame 1))
+
+
+  (defun acer/start-item-author-ui () ""
+         (other-frame 1)
+         (shell "acer-item-author-watch-shell")
+         (insert "n") ;; answer stupid zsh prompt
+         (comint-send-input) ;; press enter
+         (insert "nvm use 14")
+         (comint-send-input)
+         (insert "cd ~/src/ACER/acer-item-author-ui && yarn start")
+         (comint-send-input)
+         (other-frame 1))
+
+
+  (defvar acer/start-projects-alist '((?0 "Prebuild Item Author UI" acer/prebuild-item-author-ui)
+                                      (?1 "Watch Author UI Core" acer/watch-item-author-packages)
+                                      (?2 "Watch Author UI Items" acer/watch-item-author-packages)
+                                      (?3 "Watch Author UI Editor" acer/watch-item-author-packages)
+                                      (?4 "Start Item Author UI" acer/start-item-author-ui)))
+
+  (defun acer/start-project () "" (interactive)
+         (let ((choice (read-char-choice
+                        (mapconcat (lambda (item) (format "%c %s" (car item) (cadr item)))
+                                   acer/start-projects-alist "  |  ")
+                        (mapcar #'car acer/start-projects-alist))))
+           (funcall (nth 2 (assoc choice acer/start-projects-alist)))))
+#+end_src
+
+** Colorized BG By Directory
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (defun tf/set-acer-background ()
+    "Colorizes the background based on domain"
+    (let ((needle "ACER"))
+      (if (string-match-p (regexp-quote needle) (buffer-file-name))
+          (progn
+            (setq buffer-face-mode-face `(:background "#fff6ee"))
+            (buffer-face-mode 1)))))
+
+  (add-hook 'js2-mode-hook 'tf/set-acer-background)
+  (add-hook 'typescript-mode-hook 'tf/set-acer-background)
+  (add-hook 'css-mode-hook 'tf/set-acer-background)
+  (add-hook 'scss-mode-hook 'tf/set-acer-background)
+  (add-hook 'web-mode-hook 'tf/set-acer-background)
+#+end_src
+
 
