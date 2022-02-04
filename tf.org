@@ -192,9 +192,9 @@
 
 
   (defvar acer/start-projects-alist '((?0 "Prebuild Item Author UI" acer/prebuild-item-author-ui)
-                                      (?1 "Watch Author UI Core" acer/watch-item-author-packages)
-                                      (?2 "Watch Author UI Items" acer/watch-item-author-packages)
-                                      (?3 "Watch Author UI Editor" acer/watch-item-author-packages)
+                                      (?1 "Watch Author UI Core" acer/watch-item-author-core)
+                                      (?2 "Watch Author UI Items" acer/watch-item-author-items)
+                                      (?3 "Watch Author UI Editor" acer/watch-item-author-editor)
                                       (?4 "Start Item Author UI" acer/start-item-author-ui)))
 
   (defun acer/start-project () "" (interactive)
