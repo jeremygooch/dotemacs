@@ -9,7 +9,8 @@ Some of the code blocks pertain to the OS and will be tangled automatically. The
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (defvar *home-dir*              (getenv "HOME"))
   (defvar *dotemacs-dir*          (concat *home-dir* "/src/dotemacs/"))
-  (defvar *node-dir*              (concat *home-dir* "/.nvm/versions/node/v10.8.0/bin/"))
+  (defvar *node-dir*              (concat *home-dir* "/.nvm/versions/node/v16.13.2/bin/"))
+  (defvar *deno-dir*              (concat *home-dir* "/.deno/bin/deno"))
   (defvar *org-dir*               (concat *home-dir* "/org/"))
 
   (defvar *tsserver*              (concat *home-dir* "/src/TypeScript/lib/tsserver.js"))
@@ -677,6 +678,7 @@ Magit for version control
   (setenv "PATH" (concat (getenv "PATH") (concat ":" *node-dir*)))
   (setq exec-path (append exec-path '("/usr/local/git/bin")))
   (setq exec-path (append exec-path (list *node-dir*)))
+  (setq exec-path (append exec-path (list *deno-dir*)))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
@@ -911,7 +913,7 @@ We'll need to turn off the mouse from time to time
   (use-package disable-mouse :diminish disable-mouse-mode)
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs" "")
+#+BEGIN_SRC emacs-lisp
   (global-disable-mouse-mode)
 #+END_SRC
 
