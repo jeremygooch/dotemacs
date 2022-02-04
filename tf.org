@@ -206,7 +206,7 @@
 #+end_src
 
 ** Colorized BG By Directory
-#+begin_src emacs-lisp :tangle ~/.emacs
+#+begin_src emacs-lisp :tangle ~/.emacs.d/tf.el
   (defun tf/set-acer-background ()
     "Colorizes the background based on domain"
     (let ((needle "ACER"))

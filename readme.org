@@ -17,8 +17,8 @@ Some of the code blocks pertain to the OS and will be tangled automatically. The
 
 *** Load Utilities
     #+begin_src emacs-lisp :tangle ~/.emacs
-      (load "~/.emacs.d/jrm-util.el")
-      (load "~/.emacs.d/tf.el")
+      (if (file-exists-p "~/.emacs.d/jrm-util.el") (load "~/.emacs.d/jrm-util.el"))
+      (if (file-exists-p "~/.emacs.d/tf.el") (load "~/.emacs.d/tf.el"))
     #+end_src
 * Configuration
 #+TOC: headlines 2
@@ -33,11 +33,12 @@ Setting up basic repositories and [[https://github.com/jwiegley/use-package][use
   (require 'package)
   (setq package-enable-at-startup nil)
   (setq package-archives '(
-			   ("marmalade"  . "http://marmalade-repo.org/packages/")
+			   ;; ("marmalade"  . "http://marmalade-repo.org/packages/")
 			   ("melpa-stable" . "http://stable.melpa.org/packages/")
-			   ("gnu" . "http://elpa.gnu.org/packages/")
+			   ;; ("gnu" . "http://elpa.gnu.org/packages/")
 			   ;; ("org" . "https://orgmode.org/elpa/")
-			   ("melpa" . "https://melpa.org/packages/")))
+			   ("melpa" . "https://melpa.org/packages/")
+			   ))
 #+END_SRC
 
 *** use-package Setup
@@ -687,20 +688,48 @@ Magit for version control
 ** Theme/UI
 *** General Settings
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (use-package modus-themes
-  :ensure
-  :init
-  ;; Add all your customizations prior to loading the themes
-  (setq modus-themes-italic-constructs t
-        modus-themes-bold-constructs nil
-        modus-themes-region '(bg-only no-extend))
+  (defun jrm/modus-operandi_extra-adjustments (theme)
+    "Updates additional colors and such based on the current modus theme"
+    (let ((isOperandi (string-equal theme "operandi")))
+      (if isOperandi
+          (custom-set-faces
+           '(org-block ((t (:inherit shadow :extend t :background "gray83"))))
+           '(org-block-begin-line ((t (:extend t :background "gray95" :foreground "gray59" :height 0.9))))
+           '(org-block-end-line ((t (:extend t :background "gray95" :foreground "gray59" :height 0.9)))))
+        (custom-set-faces
+         '(org-block ((t (:inherit shadow :extend t :background "gray20"))))
+         '(org-block-begin-line ((t (:extend t :background "gray11" :foreground "dim gray" :height 0.9))))
+         '(org-block-end-line ((t (:extend t :background "gray11" :foreground "dim gray" :height 0.9))))))
+      (if isOperandi
+        (setq dashboard-startup-banner (concat *dotemacs-dir* "assets/Lambda_light.png"))
+      (setq dashboard-startup-banner (concat *dotemacs-dir* "assets/Lambda_dark.png")))))
 
-  ;; Load the theme files before enabling a theme
-  (modus-themes-load-themes)
-  :config
-  ;; Load the theme of your choice:
-  (modus-themes-load-operandi) ;; OR (modus-themes-load-vivendi)
-  :bind ("<f5>" . modus-themes-toggle))
+  (defun jrm/modus-themes-toggle () ""
+         (interactive)
+         (pcase (modus-themes--current-theme)
+           ('modus-operandi (jrm/modus-operandi_extra-adjustments "operandi"))
+           ('modus-vivendi (jrm/modus-operandi_extra-adjustments "vivendi"))
+           (_ (message "No modus theme enabled"))))
+
+
+  (use-package modus-themes
+    :ensure
+    :init
+    ;; Add all your customizations prior to loading the themes
+    (setq modus-themes-italic-constructs t
+          modus-themes-bold-constructs nil
+          modus-themes-region '(bg-only no-extend))
+
+    ;; Load the theme files before enabling a theme
+    (modus-themes-load-themes)
+
+    ;; Enable personal customizations after loading a modus theme
+    (add-hook 'modus-themes-after-load-theme-hook 'jrm/modus-themes-toggle)
+
+    :config
+    ;; Load the theme of your choice:
+    (modus-themes-load-operandi) ;; OR (modus-themes-load-vivendi)
+    :bind ("<f5>" . modus-themes-toggle))
 #+END_SRC
 
 Remove default scrollbars
@@ -976,8 +1005,9 @@ Stylistic preferences for using the pre-v9 version of org mode (E.g. [[https://o
 
   (custom-set-faces
    '(org-block ((t (:inherit shadow :extend t :background "gray83"))))
-   '(org-block-begin-line ((t (:extend t :background "gray83" :foreground "#4a5468" :height 0.9))))
-   '(org-block-end-line ((t (:extend t :background "gray83" :foreground "#4a5468" :height 0.9)))))
+   '(org-block-begin-line ((t (:extend t :background "gray95" :foreground "gray59" 
+:height 0.9))))
+   '(org-block-end-line ((t (:extend t :background "gray95" :foreground "gray59" :height 0.9)))))
 #+END_SRC
 
 Set the node environment
