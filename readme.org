@@ -1033,6 +1033,9 @@ Set the node environment
    '("el" . "src emacs-lisp"))
   (add-to-list
    'org-structure-template-alist
+   '("b" . "src bash"))
+  (add-to-list
+   'org-structure-template-alist
    '("elt" . "src emacs-lisp :tangle ~/.emacs"))
 
   (add-to-list 'org-tempo-keywords-alist '("n" . "name"))
