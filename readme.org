@@ -702,8 +702,12 @@ Magit for version control
          '(org-block-begin-line ((t (:extend t :background "gray11" :foreground "dim gray" :height 0.9))))
          '(org-block-end-line ((t (:extend t :background "gray11" :foreground "dim gray" :height 0.9))))))
       (if isOperandi
-        (setq dashboard-startup-banner (concat *dotemacs-dir* "assets/Lambda_light.png"))
-      (setq dashboard-startup-banner (concat *dotemacs-dir* "assets/Lambda_dark.png")))))
+          (setq dashboard-startup-banner (concat *dotemacs-dir* "assets/Lambda_light.png"))
+        (setq dashboard-startup-banner (concat *dotemacs-dir* "assets/Lambda_dark.png")))
+
+      (if isOperandi
+          (set-face-background hl-line-face "LightSteelBlue1")
+        (set-face-background hl-line-face "#19334a"))))
 
   (defun jrm/modus-themes-toggle () ""
          (interactive)
