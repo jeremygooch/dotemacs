@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: teachforward commit message
-# key: cmt
+# key: cmtg
 # --
 
 ${1:MESSAGE (Added new tab which is "Define Scoring Guide".)}
@@ -12,7 +12,7 @@ How:
 ${3:HOW (Added new component, controllers, views and its logic.)}
 
 Jira:
-BLUE-${4:####}
+GREEN-${4:####}
 
 Tags:
 ${5:TAGS (Create Scoring Guide)}
