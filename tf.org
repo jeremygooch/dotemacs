@@ -3,91 +3,74 @@
 #+begin_src emacs-lisp :tangle ~/.emacs.d/tf.el
   (defun tf/start-review () ""
          (other-frame 1)
-         (shell "review-shell")
-         (insert "n") ;; answer stupid zsh prompt
-         (comint-send-input) ;; press enter
-         (insert "nvm use 14")
-         (comint-send-input)
-         (insert "cd ~/src/review-ui && npm run build:watch")
-         (comint-send-input)
+         (vterm "review-term")
+         (vterm-send-string "nvm use 14")
+         (vterm-send-return)
+         (vterm-send-string "cd ~/src/review-ui && npm run build:watch")
+         (vterm-send-return)
          (other-frame 1))
 
   (defun tf/start-express () ""
          (other-frame 1)
-         (shell "local-express-shell")
-         (insert "n") ;; answer stupid zsh prompt
-         (comint-send-input) ;; press enter
-         (insert "nvm use 14")
-         (comint-send-input)
-         (insert "cd ~/src/local-express/ && node main.js")
-         (comint-send-input)
+         (vterm "local-express-vterm")
+         (vterm-send-string "nvm use 14")
+         (vterm-send-return)
+         (vterm-send-string "cd ~/src/local-express/ && node main.js")
+         (vterm-send-return)
          (other-frame 1))
 
   (defun tf/start-dashboard () ""
          (other-frame 1)
-         (shell "dashboard-shell")
-         (insert "n") ;; answer stupid zsh prompt
-         (comint-send-input) ;; press enter
-         (insert "nvm use 12")
-         (comint-send-input)
-         (insert "cd ~/src/dashboard-ui/ && npm run kube")
-         (comint-send-input)
+         (vterm "dashboard-vterm")
+         (vterm-send-string "nvm use 12")
+         (vterm-send-return)
+         (vterm-send-string "cd ~/src/dashboard-ui/ && npm run kube")
+         (vterm-send-return)
          (other-frame 1))
 
   (defun tf/start-tf-ng-workspace/library () ""
          (other-frame 1)
-         (shell "tf-library-shell")
-         (insert "n") ;; answer stupid zsh prompt
-         (comint-send-input) ;; press enter
-         (insert "nvm use 14")
-         (comint-send-input)
-         (insert "cd ~/src/tf-ng-workspace && npm run dev")
-         (comint-send-input)
+         (vterm "tf-library-vterm")
+         (vterm-send-string "nvm use 14")
+         (vterm-send-return)
+         (vterm-send-string "cd ~/src/tf-ng-workspace && npm run dev")
+         (vterm-send-return)
          (other-frame 1))
 
   (defun tf/start-tf-ng-workspace/elements () ""
          (other-frame 1)
-         (shell "tf-elements-shell")
-         (insert "n") ;; answer stupid zsh prompt
-         (comint-send-input) ;; press enter
-         (insert "nvm use 14")
-         (comint-send-input)
-         (insert "cd ~/src/tf-ng-workspace && npm run dev:elements")
-         (comint-send-input)
+         (vterm "tf-elements-vterm")
+         (vterm-send-string "nvm use 14")
+         (vterm-send-return)
+         (vterm-send-string "cd ~/src/tf-ng-workspace && npm run dev:elements")
+         (vterm-send-return)
          (other-frame 1))
-
 
   (defun tf/start-tf-ng-workspace/core () ""
          (other-frame 1)
-         (shell "tf-core-shell")
-         (insert "n") ;; answer stupid zsh prompt
-         (comint-send-input) ;; press enter
-         (insert "nvm use 14")
-         (comint-send-input)
-         (insert "cd ~/src/tf-ng-workspace && npm run dev:core")
-         (comint-send-input)
+         (vterm "tf-core-vterm")
+         (vterm-send-string "nvm use 14")
+         (vterm-send-return)
+         (vterm-send-string "cd ~/src/tf-ng-workspace && npm run dev:core")
+         (vterm-send-return)
          (other-frame 1))
 
   (defun tf/start-tf-ng-workspace/pdfjs () ""
          (other-frame 1)
-         (shell "tf-pdfjs-shell")
-         (insert "n") ;; answer stupid zsh prompt
-         (comint-send-input) ;; press enter
-         (insert "nvm use 14")
-         (comint-send-input)
-         (insert "cd ~/src/tf-ng-workspace && npm run dev:pdfjs")
-         (comint-send-input)
+         (vterm "tf-pdfjs-vterm")
+         (vterm-send-string "nvm use 14")
+         (vterm-send-return)
+         (vterm-send-string "cd ~/src/tf-ng-workspace && npm run dev:pdfjs")
+         (vterm-send-return)
          (other-frame 1))
 
   (defun tf/start-engage () ""
          (other-frame 1)
-         (shell "engage-shell")
-         (insert "n") ;; answer stupid zsh prompt
-         (comint-send-input) ;; press enter
-         (insert "nvm use 14")
-         (comint-send-input)
-         (insert "cd ~/src/engage-ui && npm run build:watch")
-         (comint-send-input)
+         (vterm "engage-vterm")
+         (vterm-send-string "nvm use 14")
+         (vterm-send-return)
+         (vterm-send-string "cd ~/src/engage-ui && npm run build:watch")
+         (vterm-send-return)
          (other-frame 1))
 
   (defvar tf/start-projects-alist '((?0 "Local Express" tf/start-express)

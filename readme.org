@@ -758,8 +758,9 @@ I prefer to see trailing whitespace but not for every mode (e.g. org, elfeed, et
     (defun no-trailing-whitespace ()
       (setq show-trailing-whitespace nil))
     (add-hook 'minibuffer-setup-hook              'no-trailing-whitespace)
-    (add-hook 'dashboard-mode-hook              'no-trailing-whitespace)
+    (add-hook 'dashboard-mode-hook                'no-trailing-whitespace)
     (add-hook 'eww-mode-hook                      'no-trailing-whitespace)
+    (add-hook 'vterm-mode-hook                    'no-trailing-whitespace)
     (add-hook 'shell-mode-hook                    'no-trailing-whitespace)
     (add-hook 'mu4e:view-mode-hook                'no-trailing-whitespace)
     (add-hook 'eshell-mode-hook                   'no-trailing-whitespace)
@@ -1271,6 +1272,15 @@ Fixes emacs and osx path issues.
     (when (memq window-system '(mac ns x))
       (exec-path-from-shell-initialize)))
 #+END_SRC
+
+*** VTerm
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (use-package vterm
+    :bind (
+           :map vterm-mode-map
+                ("<f9>" . nil)
+                ("C-o" . nil)))
+#+end_src
 
 ** Consuming Content
 *** Elfeed
