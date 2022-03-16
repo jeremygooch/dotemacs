@@ -119,60 +119,49 @@
 #+begin_src emacs-lisp :tangle ~/.emacs.d/tf.el
   (defun acer/prebuild-item-author-ui () ""
          (other-frame 1)
-         (shell "acer-item-author-build-shell")
-         (insert "n") ;; answer stupid zsh prompt
-         (comint-send-input) ;; press enter
-         (insert "nvm use 14")
-         (comint-send-input)
-         (insert "cd ~/src/ACER/acer-item-author-ui && yarn build-core && yarn build-editor && yarn build-items && yarn build")
-         (comint-send-input)
+         (vterm "acer-item-author-build-vterm")
+         (vterm-send-string "nvm use 14")
+         (vterm-send-return)
+         (vterm-send-string "cd ~/src/ACER/acer-item-author-ui && yarn build-core && yarn build-editor && yarn build-items && yarn build")
+         (vterm-send-return)
          (other-frame 1))
 
   (defun acer/watch-item-author-core () ""
          (other-frame 1)
-         (shell "acer-item-author-core-watch-shell")
-         (insert "n") ;; answer stupid zsh prompt
-         (comint-send-input) ;; press enter
-         (insert "nvm use 14")
-         (comint-send-input)
-         (insert "cd ~/src/ACER/acer-item-author-ui && ng build core --watch")
-         (comint-send-input)
+         (vterm "acer-item-author-core-watch-vterm")
+         (vterm-send-string "nvm use 14")
+         (vterm-send-return)
+         (vterm-send-string "cd ~/src/ACER/acer-item-author-ui && ng build core --watch")
+         (vterm-send-return)
          (other-frame 1))
 
   (defun acer/watch-item-author-items () ""
          (other-frame 1)
-         (shell "acer-item-author-items-watch-shell")
-         (insert "n") ;; answer stupid zsh prompt
-         (comint-send-input) ;; press enter
-         (insert "nvm use 14")
-         (comint-send-input)
-         (insert "cd ~/src/ACER/acer-item-author-ui && ng build items --watch")
-         (comint-send-input)
+         (vterm "acer-item-author-items-watch-vterm")
+         (vterm-send-string "nvm use 14")
+         (vterm-send-return)
+         (vterm-send-string "cd ~/src/ACER/acer-item-author-ui && ng build items --watch")
+         (vterm-send-return)
          (other-frame 1))
 
   (defun acer/watch-item-author-editor () ""
          (other-frame 1)
-         (shell "acer-item-author-editor-watch-shell")
-         (insert "n") ;; answer stupid zsh prompt
-         (comint-send-input) ;; press enter
-         (insert "nvm use 14")
-         (comint-send-input)
-         (insert "cd ~/src/ACER/acer-item-author-ui && ng build editor --watch")
-         (comint-send-input)
+         (vterm "acer-item-author-editor-watch-vterm")
+         (vterm-send-string "nvm use 14")
+         (vterm-send-return)
+         (vterm-send-string "cd ~/src/ACER/acer-item-author-ui && ng build editor --watch")
+         (vterm-send-return)
          (other-frame 1))
 
 
   (defun acer/start-item-author-ui () ""
          (other-frame 1)
-         (shell "acer-item-author-watch-shell")
-         (insert "n") ;; answer stupid zsh prompt
-         (comint-send-input) ;; press enter
-         (insert "nvm use 14")
-         (comint-send-input)
-         (insert "cd ~/src/ACER/acer-item-author-ui && yarn start")
-         (comint-send-input)
+         (vterm "acer-item-author-watch-vterm")
+         (vterm-send-string "nvm use 14")
+         (vterm-send-return)
+         (vterm-send-string "cd ~/src/ACER/acer-item-author-ui && yarn start")
+         (vterm-send-return)
          (other-frame 1))
-
 
   (defvar acer/start-projects-alist '((?0 "Prebuild Item Author UI" acer/prebuild-item-author-ui)
                                       (?1 "Watch Author UI Core" acer/watch-item-author-core)
