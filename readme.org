@@ -709,7 +709,7 @@ Magit for version control
 
       (if isOperandi
           (set-face-background hl-line-face "LightSteelBlue1")
-        (set-face-background hl-line-face "#19334a"))))
+        (set-face-background hl-line-face "#040e17"))))
 
   (defun jrm/modus-themes-toggle () ""
          (interactive)
