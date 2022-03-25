@@ -1,65 +1,74 @@
-* My Personal Config
-** Installation
-This is my personal emacs configuration written in a literate-programming style. To generate the config tangle this file with org-babel-tangle (~C-c C-v t~).
+#+TITLE: Jeremy's Emacs Config
+:PROPERTIES:
+#+AUTHOR: Jeremy Gooch
+#+STARTUP: overview
+#+PROPERTY: header-args :results silent :tangle yes
+#+SEQ_TODO: TODO(t) | DONE(d)
+:END:
 
-Some of the code blocks pertain to the OS and will be tangled automatically. There are several blocks for Linux that pertain to running emacs as a window manager. These blocks can be found in [[X Window Manager][this section]].
+* Dependencies
+ - [[https://github.com/BurntSushi/ripgrep][ripgrep]] (rg) for better grep
+ - node for JS cli, recommend [[https://github.com/nvm-sh/nvm][nvm]] for managing versions
+ - [[https://github.com/microsoft/TypeScript][Typescript server]]
+ - [[https://github.com/akermu/emacs-libvterm][Vterm]]
+   - cmake (>= 3.11)
+   - optional: libvterm (>= 0.1)
+ - [[https://emacs-lsp.github.io/lsp-mode/page/lsp-angular/][Angular Language Server]]
+ - [[https://github.com/jwiegley/use-package][Use Package]] cloned to [[~/.emacs.d][.emacs.d]]
 
-*** Global Configs
-#+NAME: config
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (defvar *home-dir*              (getenv "HOME"))
-  (defvar *dotemacs-dir*          (concat *home-dir* "/src/dotemacs/"))
-  (defvar *node-dir*              (concat *home-dir* "/.nvm/versions/node/v16.13.2/bin/"))
-  (defvar *deno-dir*              (concat *home-dir* "/.deno/bin/deno"))
-  (defvar *org-dir*               (concat *home-dir* "/org/"))
+* Initialization
+** early-init.el
+In Emacs >= 27.1, the early-init.el file is run before the GUI is created. This can be used to take care of a few miscellaneous odds and ends.
 
-  (defvar *tsserver*              (concat *home-dir* "/src/TypeScript/lib/tsserver.js"))
-#+END_SRC
+#+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
+  ;; -*- lexical-binding: t; -*-
 
-*** Load Utilities
-    #+begin_src emacs-lisp :tangle ~/.emacs
-      (if (file-exists-p "~/.emacs.d/jrm-util.el") (load "~/.emacs.d/jrm-util.el"))
-      (if (file-exists-p "~/.emacs.d/tf.el") (load "~/.emacs.d/tf.el"))
-    #+end_src
-* Configuration
-#+TOC: headlines 2
+  ;; -------------------------------------------------------------------------------- ;;
+  ;; This early-init.el file was auto-tangled from an orgmode file.                   ;;
+  ;; -------------------------------------------------------------------------------- ;;
 
-** Initialization
-Load the config if it exists, otherwise load the sample
+  ;; Garbage Collections
+  (setq gc-cons-threshold 100000000) ;; ~100mb
+  (setq read-process-output-max 3000000) ;; ~3mb
+  (setq gc-cons-percentage 0.6)
 
-*** Package Sources
-Setting up basic repositories and [[https://github.com/jwiegley/use-package][use-package]].
-#+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
-  (package-initialize)
-  (require 'package)
+  ;; Compile Warnings
+  (setq comp-async-report-warnings-errors nil) ;; native-comp warning
+  (setq byte-compile-warnings '(not free-vars unresolved noruntime lexical make-local))
+
+  ;; Whether to make packages available when Emacs starts
   (setq package-enable-at-startup nil)
-  (setq package-archives '(
-			   ;; ("marmalade"  . "http://marmalade-repo.org/packages/")
-			   ("melpa-stable" . "http://stable.melpa.org/packages/")
-			   ("elpa" . "https://elpa.gnu.org/packages/")
-			   ;; ("gnu" . "http://elpa.gnu.org/packages/")
-			   ;; ("org" . "https://orgmode.org/elpa/")
-			   ("melpa" . "https://melpa.org/packages/")
-			   ))
-#+END_SRC
 
-*** use-package Setup
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
-    (package-install 'use-package))
+  ;; Disables bi-directional editing (i.e. writing in both Arabic and English)
+  (setq-default bidi-display-reordering 'left-to-right 
+                bidi-paragraph-direction 'left-to-right)
+  (setq bidi-inhibit-bpa t)  ; emacs 27 only - disables bidirectional parenthesis
 
-  (require 'use-package-ensure)
-  (setq use-package-always-ensure t)
-#+END_SRC
+  ;; Misc UI optimizations
+  (setq fast-but-imprecise-scrolling t)
+  (setq inhibit-compacting-font-caches t)
+  ;; Slow down the UI updates a bit
+  (setq idle-update-delay 1.0)
+#+end_src
 
-Allow use-package to install missing system packages
-#+BEGIN_SRC emacs-lisp
-(use-package use-package-ensure-system-package
-  :ensure t)
-#+END_SRC
+** Personal Information
+Header of tangled output
+#+begin_src emacs-lisp :tangle ~/.emacs
+  ;; -*- lexical-binding: t; -*-
+  ;;; 
+  ;;; Jeremy's Emacs Configuration
+  ;;;
 
-*** Personal Information
+  ;; Copyright (C) Jeremy Gooch
+  ;; Author: Jeremy Gooch <jeremy.gooch@gmail.com>
+  ;; URL: https://github.com/jeremygooch/dotemacs
+  ;; This file is not part of GNU Emacs.
+  ;; This file is free software.
+
+  ;; ------- The following code was auto-tangled from an Orgmode file. ------- ;;
+
+#+end_src
+
 For the sake of completeness, configure name and email address
 #+BEGIN_SRC emacs-lisp  :tangle ~/.emacs
   (setq user-full-name "Jeremy Gooch"
@@ -67,6 +76,89 @@ For the sake of completeness, configure name and email address
 #+END_SRC
 
 Setup a prefix for custom commands.
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (progn (define-prefix-command 'jrm-key-map))
+  (global-set-key (kbd "C-x C-j") jrm-key-map)
+#+END_SRC
+
+** Packages
+*** Set Sources
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (require 'package)
+  
+  (setq package-archives '(
+                           ("melpa-stable" . "http://stable.melpa.org/packages/")
+                           ("elpa" . "https://elpa.gnu.org/packages/")
+                           ("gnu" . "http://elpa.gnu.org/packages/")
+                           ("melpa" . "https://melpa.org/packages/")))
+  (package-initialize)
+#+end_src
+
+*** use-package Setup
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (eval-when-compile
+    (require 'use-package))
+
+  (require 'use-package-ensure)
+  (setq use-package-always-ensure t)
+  (setq use-package-verbose nil)
+
+  ;; Allow use-package to install missing system packages
+  (use-package use-package-ensure-system-package :ensure t)
+  #+END_SRC
+
+** Better Garbage Collection Strategy
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (use-package gcmh
+    :diminish gcmh-mode
+    :config
+    (setq gcmh-idle-delay 5
+          gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
+    (gcmh-mode 1))
+
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (setq gc-cons-percentage 0.1))) ;; Default value for `gc-cons-percentage'
+
+#+end_src
+
+* Global Variables
+** System specific variables
+Make sure to copy to =~/.emacs.d=
+#+begin_src emacs-lisp :tangle ~/.emacs
+(load (expand-file-name "jrm-variables.el" user-emacs-directory))
+#+end_src
+** Custom Files
+    #+begin_src emacs-lisp :tangle ~/.emacs
+      (if (file-exists-p "~/.emacs.d/jrm-util.el") (load "~/.emacs.d/jrm-util.el"))
+      (if (file-exists-p "~/.emacs.d/tf.el") (load "~/.emacs.d/tf.el"))
+    #+end_src
+
+** Path
+
+#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs" "")
+  (setq exec-path (append exec-path '("/usr/local/bin")))
+  (use-package exec-path-from-shell
+    :init
+    (exec-path-from-shell-initialize))
+
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  ;; (setq exec-path (cons (expand-file-name (concat *node-dir* "sass")) exec-path))
+  (setq exec-path (append exec-path '("/usr/local/git/bin")))
+  (setq exec-path (append exec-path (list *node-dir*)))
+  (setq exec-path (append exec-path (list *deno-dir*)))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  ;; (setq exec-path (cons (expand-file-name (concat *node-dir* "sass")) exec-path))
+  ;; (setenv "PATH" (concat (getenv "PATH") ":/usr/local/git/bin"))
+  (setenv "PATH" (concat (getenv "PATH") (concat ":" *node-dir*)))
+#+END_SRC
+
+* Opinionated Configurations
+Setup a prefix for my custom commands.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (progn (define-prefix-command 'jrm-key-map))
   (global-set-key (kbd "C-x C-j") jrm-key-map)
@@ -104,12 +196,6 @@ Use aspell for Mac (aspell can be installed with brew)
 (setq ispell-program-name "/usr/local/bin/aspell")
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs" "")
-  (setq exec-path (append exec-path '("/usr/local/bin")))
-  (use-package exec-path-from-shell
-    :init
-    (exec-path-from-shell-initialize))
-#+END_SRC
 
 Silence alarms
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
@@ -228,47 +314,48 @@ Generic auto-complete with Ivy which
      :config
      (global-set-key (kbd "C-s") 'swiper-isearch))
  #+END_SRC
+
 **** Colorized By Directory
 Colorizing buffer background based on file location or vc status
-     #+begin_src emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs" "")
-       (setq counsel-find-file-ignore-regexp "\\(aurelia_project\\|node_modules\\|dist\\|coverage-jest\\)")
-       (defun jrm/counsel-find-all-hack ()
-         "Hackaround for poorly shared plugins"
-         (interactive)
-         (counsel-file-jump "" (vc-root-dir)))
-       (global-set-key (kbd "C-M-SPC") 'jrm/counsel-find-all-hack)
+#+begin_src emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs" "")
+  (setq counsel-find-file-ignore-regexp "\\(aurelia_project\\|node_modules\\|dist\\|coverage-jest\\)")
+  (defun jrm/counsel-find-all-hack ()
+    "Hackaround for poorly shared plugins"
+    (interactive)
+    (counsel-file-jump "" (vc-root-dir)))
+  (global-set-key (kbd "C-M-SPC") 'jrm/counsel-find-all-hack)
 
-       (defun ignored-file-background ()
-         (interactive)
-         (setq buffer-face-mode-face `(:background "thistle1"))
-         (buffer-face-mode 1))
-       (define-minor-mode ignored-file-mode
-         "Mode for files that are ignored in VC"
-         :lighter " IGNORED-FILE")
-       (add-hook 'ignored-file-mode-hook 'ignored-file-background)
+  (defun ignored-file-background ()
+    (interactive)
+    (setq buffer-face-mode-face `(:background "thistle1"))
+    (buffer-face-mode 1))
+  (define-minor-mode ignored-file-mode
+    "Mode for files that are ignored in VC"
+    :lighter " IGNORED-FILE")
+  (add-hook 'ignored-file-mode-hook 'ignored-file-background)
 
-       (defun duplicate-file-background ()
-         (interactive)
-         (setq buffer-face-mode-face `(:background "#283d44"))
-         (buffer-face-mode 1))
-       (define-minor-mode duplicate-file-mode
-         "Mode for files that are in the duplicate-repo directory"
-         :lighter " DUPLICATE-REPO-FILE")
-       (add-hook 'duplicate-file-mode-hook 'duplicate-file-background)
+  (defun duplicate-file-background ()
+    (interactive)
+    (setq buffer-face-mode-face `(:background "#283d44"))
+    (buffer-face-mode 1))
+  (define-minor-mode duplicate-file-mode
+    "Mode for files that are in the duplicate-repo directory"
+    :lighter " DUPLICATE-REPO-FILE")
+  (add-hook 'duplicate-file-mode-hook 'duplicate-file-background)
 
-       (defun jrm/set-ignored-mode () ""
-              (let ((ignored (shell-command-to-string (concat "git check-ignore " (buffer-file-name))))
-                    (duplicate-repo (cl-search "duplicate-repos" (buffer-file-name))))
-                (if (not (string-empty-p ignored))
-                    (ignored-file-mode)
-                  (if duplicate-repo
-                      (duplicate-file-mode)))))
+  (defun jrm/set-ignored-mode () ""
+         (let ((ignored (shell-command-to-string (concat "git check-ignore " (buffer-file-name))))
+               (duplicate-repo (cl-search "duplicate-repos" (buffer-file-name))))
+           (if (not (string-empty-p ignored))
+               (ignored-file-mode)
+             (if duplicate-repo
+                 (duplicate-file-mode)))))
 
-       (add-hook 'js2-mode-hook 'jrm/set-ignored-mode)
-       (add-hook 'css-mode-hook 'jrm/set-ignored-mode)
-       (add-hook 'scss-mode-hook 'jrm/set-ignored-mode)
-       (add-hook 'web-mode-hook 'jrm/set-ignored-mode)
-     #+end_src
+  (add-hook 'js2-mode-hook 'jrm/set-ignored-mode)
+  (add-hook 'css-mode-hook 'jrm/set-ignored-mode)
+  (add-hook 'scss-mode-hook 'jrm/set-ignored-mode)
+  (add-hook 'web-mode-hook 'jrm/set-ignored-mode)
+#+end_src
 
 *** Which key
 Some quick help for when I get stuck in the middle of a command
@@ -306,12 +393,12 @@ Disable bidirectional editing for performance issues when opening large files.
 
 *** Yasnippet
     #+begin_src emacs-lisp :tangle ~/.emacs
-      (use-package yasnippet)
-      (use-package yasnippet-snippets
-	:init (setq yas-snippet-dirs
-	    '("~/.emacs.d/snippets"
-	      "~/src/dotemacs/snippets"))
-	:config (yas-global-mode))
+      (use-package yasnippet
+        :init (setq yas-snippet-dirs
+                    '("~/src/dotemacs/snippets"))
+        :config (yas-global-mode)
+        )
+
     #+end_src
 *** In-file Navigation
 Easier paragraph jumping
@@ -363,10 +450,13 @@ Setup basic editorconfig plugin for closer integration with other tools
     :bind (("M-p" . backward-paragraph))
     :config
     (dolist (m '(clojure-mode
-                 clojurec-mode
-                 clojurescript-mode
-                 clojurex-mode))
-      (add-to-list 'lsp-language-id-configuration `(,m . "clojure"))))
+		 clojurec-mode
+		 clojurescript-mode
+		 clojurex-mode))
+      (add-to-list 'lsp-language-id-configuration `(,m . "clojure")))
+    :config
+    (with-eval-after-load 'lsp-mode
+      (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\test\\'")))
 
 
   ;; optionally
@@ -387,17 +477,17 @@ Setup basic editorconfig plugin for closer integration with other tools
 
 Lsp Mode Performance adjustments (see https://emacs-lsp.github.io/lsp-mode/page/performance/).
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (setq gc-cons-threshold 100000000)
-  (setq read-process-output-max 3000000) ;; ~3mb
+  ;; (setq gc-cons-threshold 100000000)
+  ;; (setq read-process-output-max 3000000) ;; ~3mb
   (setq lsp-idle-delay 1)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (setq lsp-html-server-command (quote
-				 ((concat *node-dir* "html-languageserver") "--stdio")))
+                                 ((concat *node-dir* "html-languageserver") "--stdio")))
 
   (setq lsp-clients-angular-language-server-command (quote
-      ("node" "/Users/jeremygooch/.nvm/versions/node/v14.15.4/lib/node_modules/@angular/language-server" "--ngProbeLocations" "/Users/jeremygooch/.nvm/versions/node/v14.15.4/lib/node_modules" "--tsProbeLocations" "/Users/jeremygooch/.nvm/versions/node/v14.15.4/lib/node_modules" "--stdio")))
+      ("node" "/Users/jeremygooch/.nvm/versions/node/v14.16.1/lib/node_modules/@angular/language-server" "--ngProbeLocations" "/Users/jeremygooch/.nvm/versions/node/v14.16.1/lib/node_modules" "--tsProbeLocations" "/Users/jeremygooch/.nvm/versions/node/v14.16.1/lib/node_modules" "--stdio")))
 #+END_SRC
 
 LSP Utility functions
@@ -412,7 +502,7 @@ LSP Utility functions
 ***** DAP Chrome
 Dap is used for debugging in browser(s). More information at: https://emacs-lsp.github.io/lsp-mode/tutorials/reactjs-tutorial/
 #+begin_src emacs-lisp :tangle ~/.emacs
-(require 'dap-chrome)
+  ;; (require 'dap-chrome)
 #+end_src
 
 ***** DAP NodeJS
@@ -424,6 +514,7 @@ Dap is used for debugging in browser(s). More information at: https://emacs-lsp.
     (dap-delete-all-sessions)
     (async-shell-command "kill `ps -A | grep 'inspect-brk' | awk '{print $1}'`"))
 #+end_src
+
 
 **** Lisps
 Paredit for maintaining sanity while working with lisp
@@ -452,7 +543,7 @@ Make evaluating elisp buffers even quicker
 #+END_SRC
 ***** Clojure Development
 Clojure with Cider for interactive Clojure development
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package clojure-mode
     :defer
     :config
@@ -474,7 +565,7 @@ Clojure with Cider for interactive Clojure development
 
 ****** Clojure/Quil Workflow Customization
 A popup HSV color picker is helpful for quick prototyping/sketching
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (defun convert-range-360 (val)
     "Converts a value from a 0-1 range to 0-360 range. Used for calculating hue."
     (* (/ (- val 0) (- 1 0)) (+ (- 360 0) 0)))
@@ -545,7 +636,6 @@ Web Beautify for unminifying assets
 
 ***** Angular/React/TS Development
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  ;; (setq exec-path (append exec-path '(*node-dir*)))
   (custom-set-variables
    '(flycheck-typescript-tslint-executable "/home/jeremy/src/cb-consume-ui/node_modules/tslint/bin/tslint")
    '(flycheck-javascript-eslint-executable "/Users/jeremygooch/src/dashboard-ui/node_modules/eslint/bin/eslint.js"))
@@ -632,7 +722,6 @@ Defining custom indentation based on project paths and setting them to functions
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package sass-mode
     :config
-    (setq exec-path (cons (expand-file-name (concat *node-dir* "sass")) exec-path))
     (add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode)))
 
   (use-package web-mode
@@ -680,13 +769,6 @@ Various modes helpful for development
 
 **** Version Control
 Magit for version control
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (setenv "PATH" (concat (getenv "PATH") ":/usr/local/git/bin"))
-  (setenv "PATH" (concat (getenv "PATH") (concat ":" *node-dir*)))
-  (setq exec-path (append exec-path '("/usr/local/git/bin")))
-  (setq exec-path (append exec-path (list *node-dir*)))
-  (setq exec-path (append exec-path (list *deno-dir*)))
-#+END_SRC
 
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package magit
@@ -776,6 +858,7 @@ I prefer to see trailing whitespace but not for every mode (e.g. org, elfeed, et
     (add-hook 'slack-message-buffer-mode-hook     'no-trailing-whitespace)
     (add-hook 'mu4e:view-mode-hook                'no-trailing-whitespace)
     (add-hook 'calendar-mode-hook                 'no-trailing-whitespace))
+
 #+END_SRC
 
 Use visual line mode for text wrapping
@@ -784,7 +867,7 @@ Use visual line mode for text wrapping
 #+END_SRC
 *** Custom Colors
 **** Shells
-  #+begin_src emacs-lisp
+  #+begin_src emacs-lisp :tangle no
     ;; function to switch background color
     (defun buffer-background-switch ()
       (interactive)
@@ -921,7 +1004,7 @@ We'll need to turn off the mouse from time to time
   (use-package disable-mouse :diminish disable-mouse-mode)
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (global-disable-mouse-mode)
 #+END_SRC
 
@@ -1004,7 +1087,7 @@ Setup an easy way to jump to an org headline using org-goto =C-c C-j=
   (define-key dired-mode-map (kbd "C-o") 'other-window)
   (define-key rg-mode-map (kbd "C-o") 'other-window)
   (define-key grep-mode-map (kbd "C-o") 'other-window)
-  (define-key bookmark-bmenu-mode-map (kbd "C-o") 'other-window)
+  ;; (define-key bookmark-bmenu-mode-map (kbd "C-o") 'other-window)
 #+end_src
 
 *** Source Blocks
@@ -1111,7 +1194,7 @@ I like org source blocks for typescript to use different compiler settings than 
 #+end_src
 
 For org-babel's clojure backend use cider rather than the default slime
-#+BEGIN_SRC emacs-lisp  ~/.emacs
+#+BEGIN_SRC emacs-lisp :tangle no
   (setq org-babel-clojure-backend 'cider)
 #+END_SRC
 
@@ -1138,7 +1221,7 @@ Customize org capture to my liking
 
 **** Global Org Capture
 Simple command to open emacs (assumes it's already running) and launch org capture in a new frame. This can be bound to a global key sequence.
-#+BEGIN_SRC bash
+#+BEGIN_SRC bash :tangle no
 emacsclient -ne "(make-capture-frame)"
 #+END_SRC
 
@@ -1253,7 +1336,7 @@ File locations for org agenda
    '(org-export-backends '(ascii html icalendar latex md odt)))
 #+END_SRC
 *** Markdown
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package grip-mode
     :ensure-system-package (grip . "pip install grip"))
 #+END_SRC
@@ -1272,13 +1355,6 @@ Make shells interactive (i.e. M-!, or source blocks in org)
   (setq shell-command-switch "-c")
 #+END_SRC
 
-Fixes emacs and osx path issues.
-#+BEGIN_SRC emacs-lisp
-  (use-package exec-path-from-shell
-    :config
-    (when (memq window-system '(mac ns x))
-      (exec-path-from-shell-initialize)))
-#+END_SRC
 
 *** VTerm
 #+begin_src emacs-lisp :tangle ~/.emacs
@@ -1312,6 +1388,10 @@ Many thanks to [[http://pragmaticemacs.com/emacs/read-your-rss-feeds-in-emacs-wi
     (interactive)
     (bookmark-maybe-load-default-file)
     (bookmark-jump "elfeed-emacs"))
+  (defun jrm/elfeed-show-general ()
+    (interactive)
+    (bookmark-maybe-load-default-file)
+    (bookmark-jump "elfeed-general"))
 
   (defun jrm/elfeed-load-db-and-open ()
     "Wrapper to load the elfeed db from disk before opening"
@@ -1329,11 +1409,12 @@ Many thanks to [[http://pragmaticemacs.com/emacs/read-your-rss-feeds-in-emacs-wi
   (use-package elfeed
     :defer
     :bind (:map elfeed-search-mode-map
-		("A" . jrm/elfeed-show-all)
-		("E" . jrm/elfeed-show-emacs)
-		("D" . jrm/elfeed-show-development)
-		("N" . jrm/elfeed-show-news)
-		("q" . jrm/elfeed-save-db-and-bury)))
+                ("A" . jrm/elfeed-show-all)
+                ("E" . jrm/elfeed-show-emacs)
+                ("D" . jrm/elfeed-show-development)
+                ("R" . jrm/elfeed-show-general)
+                ("N" . jrm/elfeed-show-news)
+                ("q" . jrm/elfeed-save-db-and-bury)))
 
   (global-set-key (kbd "C-x e") 'jrm/elfeed-load-db-and-open)
 #+END_SRC
@@ -1368,21 +1449,21 @@ I find myself need specific font sizes for different scenarios, i.e. projecting,
 /Note: there might be a better way to handle this but things like M-+/M-- won't zoom things like line numbers, etc./
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (defvar jrm/screens-alist '((?0 "xsmall" (lambda () (set-face-attribute 'default nil :height 70) 'default))
-			      (?1 "small" (lambda () (set-face-attribute 'default nil :height 110) 'default))
-			      (?2 "medium" (lambda () (set-face-attribute 'default nil :height 120) 'proj))
-			      (?3 "large" (lambda () (set-face-attribute 'default nil :height 140) 'proj))
-			      (?4 "xtra-large" (lambda () (set-face-attribute 'default nil :height 160) 'projLg))
-			      (?5 "xxtra-large" (lambda () (set-face-attribute 'default nil :height 190) 'projLg))
-			      (?6 "xxxtra-large" (lambda () (set-face-attribute 'default nil :height 210) 'projLg)))
+                              (?1 "small" (lambda () (set-face-attribute 'default nil :height 110) 'default))
+                              (?2 "medium" (lambda () (set-face-attribute 'default nil :height 120) 'proj))
+                              (?3 "large" (lambda () (set-face-attribute 'default nil :height 140) 'proj))
+                              (?4 "xtra-large" (lambda () (set-face-attribute 'default nil :height 160) 'projLg))
+                              (?5 "xxtra-large" (lambda () (set-face-attribute 'default nil :height 190) 'projLg))
+                              (?6 "xxxtra-large" (lambda () (set-face-attribute 'default nil :height 210) 'projLg)))
     "List that associates number letters to descriptions and actions.")
   (defun jrm/adjust-font-size ()
     "Lets the user choose the the font size and takes the corresponding action.
   Returns whatever the action returns."
     (interactive)
     (let ((choice (read-char-choice
-		   (mapconcat (lambda (item) (format "%c: %s" (car item) (cadr item)))
-			      jrm/screens-alist "; ")
-		   (mapcar #'car jrm/screens-alist))))
+                   (mapconcat (lambda (item) (format "%c: %s" (car item) (cadr item)))
+                              jrm/screens-alist "; ")
+                   (mapcar #'car jrm/screens-alist))))
       (funcall (nth 2 (assoc choice jrm/screens-alist)))))
   (global-set-key (kbd "C-x C-j p")  'jrm/adjust-font-size)
 #+END_SRC
@@ -1411,19 +1492,19 @@ Lifted from (http://ergoemacs.org/emacs/emacs_copy_file_path.html)
 *** Async Shell Command 
      #+begin_src emacs-lisp :tangle ~/.emacs.d/jrm-util.el
        (defun jrm/async-callback-run-callback (process signal cb)
-	 (interactive)
-	 (when (memq (process-status process) '(exit signal))
-	   (cb)
-	   (shell-command-sentinel process signal)))
+         (interactive)
+         (when (memq (process-status process) '(exit signal))
+           (cb)
+           (shell-command-sentinel process signal)))
 
        (defun jrm/async-callback (cmd cb)
-	 (let* ((output-buffer (generate-new-buffer "*Custom Shell Command*"))
-		(proc (progn
-			(async-shell-command cmd output-buffer)
-			(get-buffer-process output-buffer))))
-	   (if (process-live-p proc)
-	       (set-process-sentinel proc cb #'jrm/async-callback-run-callback)
-	     (message "No process running."))))
+         (let* ((output-buffer (generate-new-buffer "*Custom Shell Command*"))
+                (proc (progn
+                        (async-shell-command cmd output-buffer)
+                        (get-buffer-process output-buffer))))
+           (if (process-live-p proc)
+               (set-process-sentinel proc cb #'jrm/async-callback-run-callback)
+             (message "No process running."))))
 
       #+end_src
 
@@ -1492,3 +1573,9 @@ For various reasons ripgrep does not work with all the projects I need so custom
 
 
 
+* TODOs
+** TODO Restructure config
+Need to reorganize readme into more sane structure
+** DONE Add dependencies section
+OS specific deps need to be added
+** TODO Automatically put jrm-variables in ~/.emacs.d
