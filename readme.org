@@ -12,7 +12,8 @@
  - [[https://github.com/microsoft/TypeScript][Typescript server]]
  - [[https://github.com/akermu/emacs-libvterm][Vterm]]
    - cmake (>= 3.11)
-   - optional: libvterm (>= 0.1)
+   - Linux: libtool-bin
+   - Option: libvterm (>= 0.1)
  - [[https://emacs-lsp.github.io/lsp-mode/page/lsp-angular/][Angular Language Server]]
  - [[https://github.com/jwiegley/use-package][Use Package]] cloned to [[~/.emacs.d][.emacs.d]]
 
@@ -784,28 +785,30 @@ Magit for version control
     "Updates additional colors and such based on the current modus theme"
     (let ((isOperandi (string-equal theme "operandi")))
       (if isOperandi
-          (custom-set-faces
-           '(org-block ((t (:inherit shadow :extend t :background "gray83"))))
-           '(org-block-begin-line ((t (:extend t :background "gray95" :foreground "gray59" :height 0.9))))
-           '(org-block-end-line ((t (:extend t :background "gray95" :foreground "gray59" :height 0.9)))))
-        (custom-set-faces
-         '(org-block ((t (:inherit shadow :extend t :background "gray20"))))
-         '(org-block-begin-line ((t (:extend t :background "gray11" :foreground "dim gray" :height 0.9))))
-         '(org-block-end-line ((t (:extend t :background "gray11" :foreground "dim gray" :height 0.9))))))
+	  (custom-set-faces
+	   '(org-block ((t (:inherit shadow :extend t :background "gray83"))))
+	   '(org-block-begin-line ((t (:extend t :background "gray95" :foreground "gray59" :height 0.9))))
+	   '(org-block-end-line ((t (:extend t :background "gray95" :foreground "gray59" :height 0.9)))))
+	(custom-set-faces
+	 '(org-block ((t (:inherit shadow :extend t :background "gray20"))))
+	 '(org-block-begin-line ((t (:extend t :background "gray11" :foreground "dim gray" :height 0.9))))
+	 '(org-block-end-line ((t (:extend t :background "gray11" :foreground "dim gray" :height 0.9))))))
       (if isOperandi
-          (setq dashboard-startup-banner (concat *dotemacs-dir* "assets/Lambda_light.png"))
-        (setq dashboard-startup-banner (concat *dotemacs-dir* "assets/Lambda_dark.png")))
+	  (setq dashboard-startup-banner (concat *dotemacs-dir* "assets/Lambda_light.png"))
+	(setq dashboard-startup-banner (concat *dotemacs-dir* "assets/Lambda_dark.png")))
+  ;
+  ; (if isOperandi
+  ;; 	(set-face-background hl-line-face "LightSteelBlue1")
+  ;;       (set-face-background hl-line-face "#040e17"))
 
-      (if isOperandi
-          (set-face-background hl-line-face "LightSteelBlue1")
-        (set-face-background hl-line-face "#040e17"))))
+      ))
 
   (defun jrm/modus-themes-toggle () ""
-         (interactive)
-         (pcase (modus-themes--current-theme)
-           ('modus-operandi (jrm/modus-operandi_extra-adjustments "operandi"))
-           ('modus-vivendi (jrm/modus-operandi_extra-adjustments "vivendi"))
-           (_ (message "No modus theme enabled"))))
+	 (interactive)
+	 (pcase (modus-themes--current-theme)
+	   ('modus-operandi (jrm/modus-operandi_extra-adjustments "operandi"))
+	   ('modus-vivendi (jrm/modus-operandi_extra-adjustments "vivendi"))
+	   (_ (message "No modus theme enabled"))))
 
 
   (use-package modus-themes
@@ -813,8 +816,8 @@ Magit for version control
     :init
     ;; Add all your customizations prior to loading the themes
     (setq modus-themes-italic-constructs t
-          modus-themes-bold-constructs nil
-          modus-themes-region '(bg-only no-extend))
+	  modus-themes-bold-constructs nil
+	  modus-themes-region '(bg-only no-extend))
 
     ;; Load the theme files before enabling a theme
     (modus-themes-load-themes)
