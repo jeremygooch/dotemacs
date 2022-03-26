@@ -1,0 +1,6 @@
+  (defvar *home-dir*              (getenv "HOME"))
+  (defvar *dotemacs-dir*          (concat *home-dir* "/src/dotemacs/"))
+  (defvar *deno-dir*              (concat *home-dir* "/.deno/bin/deno"))
+  (defvar *node-dir*              (concat *home-dir* "/.nvm/versions/node/v14.16.1/bin/"))
+  (defvar *org-dir*               (concat *home-dir* "/org/"))
+  (defvar *tsserver*              (concat *home-dir* "/src/TypeScript/lib/tsserver.js"))
