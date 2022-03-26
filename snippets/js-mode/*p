@@ -1,4 +1,4 @@
 # -*- mode: snippet -*-
 # name: comment parameter (/* ... */)
 # --
-* @param ${1:name}[${2:type}]: ${3:description}
+* @param ${1:name}[${2:type}]: ${3:description}$0
