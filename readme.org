@@ -1574,8 +1574,4 @@ For various reasons ripgrep does not work with all the projects I need so custom
 
 
 * TODOs
-** TODO Restructure config
-Need to reorganize readme into more sane structure
-** DONE Add dependencies section
-OS specific deps need to be added
 ** TODO Automatically put jrm-variables in ~/.emacs.d
