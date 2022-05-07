@@ -7,6 +7,7 @@
 :END:
 
 * Dependencies
+ - Update variables for local setup
  - [[https://github.com/BurntSushi/ripgrep][ripgrep]] (rg) for better grep
  - node for JS cli, recommend [[https://github.com/nvm-sh/nvm][nvm]] for managing versions
  - [[https://github.com/microsoft/TypeScript][Typescript server]]
@@ -16,6 +17,8 @@
    - Option: libvterm (>= 0.1)
  - [[https://emacs-lsp.github.io/lsp-mode/page/lsp-angular/][Angular Language Server]]
  - [[https://github.com/jwiegley/use-package][Use Package]] cloned to [[~/.emacs.d][.emacs.d]]
+ - eslint: ~npm i -g eslint~
+ - html support: ~npm install -g vscode-html-languageserver-bin~
 
 * Initialization
 ** early-init.el
@@ -148,14 +151,14 @@ Make sure to copy to =~/.emacs.d=
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   ;; (setq exec-path (cons (expand-file-name (concat *node-dir* "sass")) exec-path))
   (setq exec-path (append exec-path '("/usr/local/git/bin")))
-  (setq exec-path (append exec-path (list *node-dir*)))
-  (setq exec-path (append exec-path (list *deno-dir*)))
+  (setq exec-path (append exec-path (list (concat *node-dir* "bin/"))))
+  ;; (setq exec-path (append exec-path (list *deno-dir*)))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   ;; (setq exec-path (cons (expand-file-name (concat *node-dir* "sass")) exec-path))
   ;; (setenv "PATH" (concat (getenv "PATH") ":/usr/local/git/bin"))
-  (setenv "PATH" (concat (getenv "PATH") (concat ":" *node-dir*)))
+  (setenv "PATH" (concat (getenv "PATH") (concat ":" *node-dir* "bin/")))
 #+END_SRC
 
 * Opinionated Configurations
@@ -476,6 +479,11 @@ Setup basic editorconfig plugin for closer integration with other tools
 
   #+END_SRC
 
+***** LSP Variables
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (setq lsp-eslint-unzipped-path (concat *node-dir* "bin"))
+#+end_src
+
 Lsp Mode Performance adjustments (see https://emacs-lsp.github.io/lsp-mode/page/performance/).
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   ;; (setq gc-cons-threshold 100000000)
@@ -485,13 +493,13 @@ Lsp Mode Performance adjustments (see https://emacs-lsp.github.io/lsp-mode/page/
 
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (setq lsp-html-server-command (quote
-                                 ((concat *node-dir* "html-languageserver") "--stdio")))
+                                 ((concat *node-dir* "bin/html-languageserver") "--stdio")))
 
   (setq lsp-clients-angular-language-server-command (quote
-      ("node" "/Users/jeremygooch/.nvm/versions/node/v14.16.1/lib/node_modules/@angular/language-server" "--ngProbeLocations" "/Users/jeremygooch/.nvm/versions/node/v14.16.1/lib/node_modules" "--tsProbeLocations" "/Users/jeremygooch/.nvm/versions/node/v14.16.1/lib/node_modules" "--stdio")))
+                                                     ("node" (concat *node-dir* "lib/node_modules/@angular/language-server") "--ngProbeLocations" (concat *node-dir* "lib/node_modules") "--tsProbeLocations" (concat *node-dir* "lib/node_modules") "--stdio")))
 #+END_SRC
 
-LSP Utility functions
+***** LSP Utility functions
 #+begin_src emacs-lisp :tangle ~/.emacs
 (defun jrm/lsp-clear-blacklist () "Clears the blacklist folders for LSP Mode"
        (interactive)
@@ -638,8 +646,7 @@ Web Beautify for unminifying assets
 ***** Angular/React/TS Development
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (custom-set-variables
-   '(flycheck-typescript-tslint-executable "/home/jeremy/src/cb-consume-ui/node_modules/tslint/bin/tslint")
-   '(flycheck-javascript-eslint-executable "/Users/jeremygooch/src/dashboard-ui/node_modules/eslint/bin/eslint.js"))
+   '(flycheck-javascript-eslint-executable (concat *eslint-dir* "eslint.js")))
   (use-package flycheck :diminish flycheck-mode)
 
 #+END_SRC
@@ -1113,7 +1120,7 @@ Stylistic preferences for using the pre-v9 version of org mode (E.g. [[https://o
 
 Set the node environment
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (setq org-babel-js-cmd (concat *node-dir* "node"))
+  (setq org-babel-js-cmd (concat *node-dir* "bin/node"))
 #+END_SRC
 
 **** Source Block Shortcuts
