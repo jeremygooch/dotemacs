@@ -1377,6 +1377,22 @@ File locations for org agenda
   (use-package org-roam-ui)
 #+end_src
 
+*** Org Roam Syncing
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (defun jrm/git-auto-sync-org-roam ()
+    "Automatically stages, commits, pulls, and pushes the current branch's upstream settings. Commit message is current timestamp. Depends on Magit."
+    (interactive)
+    (if (string-match-p (regexp-quote *org-roam-dir*) (file-name-directory buffer-file-name))
+        (progn
+          (magit-stage-untracked)
+          (magit-stage-modified)
+          (magit-run-git-with-editor "commit" "-m" (format-time-string "%a %d %b %Y %H:%M:%S %Z"))
+          (magit-run-git-async "pull")
+          (magit-run-git-async "push"))))
+
+  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook 'jrm/git-auto-sync-org-roam nil t)))
+#+END_SRC
+
 ** Shells
 By default just use bash for all shells
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
