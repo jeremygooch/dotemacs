@@ -11,14 +11,14 @@
  - [[https://github.com/BurntSushi/ripgrep][ripgrep]] (rg) for better grep
  - node for JS cli, recommend [[https://github.com/nvm-sh/nvm][nvm]] for managing versions
  - [[https://github.com/microsoft/TypeScript][Typescript server]]
- - [[https://github.com/akermu/emacs-libvterm][Vterm]]
-   - cmake (>= 3.11)
-   - Linux: libtool-bin
-   - Option: libvterm (>= 0.1)
  - [[https://emacs-lsp.github.io/lsp-mode/page/lsp-angular/][Angular Language Server]]
  - [[https://github.com/jwiegley/use-package][Use Package]] cloned to [[~/.emacs.d][.emacs.d]]
  - eslint: ~npm i -g eslint~
  - html support: ~npm install -g vscode-html-languageserver-bin~
+ - [[https://fonts.google.com/specimen/Roboto][Roboto]] and [[https://fonts.google.com/specimen/Inconsolata?authuser=3&hl=fa][Inconsolata]] fonts
+
+** Non critical deps
+- Latex (for some notes)
 
 * Initialization
 ** early-init.el
@@ -897,15 +897,7 @@ Use visual line mode for text wrapping
 Set Org mode source block background color to dark gray so it stands out from the typical background
 #+begin_src emacs-lisp :tangle ~/.emacs
   (custom-set-faces '(org-block ((t (:inherit shadow :background "gray83")))))
-
 #+end_src
-
-Show the asterisks as bullets and set up indentation
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (use-package org-bullets :config (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
-  (add-hook 'org-mode-hook 'org-indent-mode)
-#+END_SRC
-
 **** Org Tables
 I commonly use org for db management so adding a quick way to shrink tables
 #+begin_src emacs-lisp :tangle ~/.emacs
@@ -1079,13 +1071,30 @@ Load some basic minor modes by default
   ;; (define-key org-mode-map (kbd "M-W") 'kill-ring-save)
 #+end_src
 *** General Styling
+Fonts and variable pitch mode for alignment issues with non-monospaced fonts.
+/Variable pitch/ will use roboto, but override elements that need fixed-pitch (i.e. org-table) with a font that is monospaced (i.e. a font that is already fixed-pitch)
 #+begin_src emacs-lisp :tangle ~/.emacs
   (add-hook 'org-mode-hook (lambda () (variable-pitch-mode t)))
+  (add-hook 'org-mode-hook (lambda () (set-face-attribute 'org-table nil :inherit 'fixed-pitch)))
+  (add-hook 'org-mode-hook (lambda () (set-face-attribute 'org-block nil :inherit 'fixed-pitch :height 0.8)))
   (custom-set-faces
-   '(variable-pitch ((t (:family "Roboto")))))
-  (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-block nil :inherit 'fixed-pitch :height 0.8)
+   '(variable-pitch ((t (:family "Roboto"))))) ;; make sure this font is installed
 #+end_src
+
+
+Show the asterisks as bullets and set up indentation
+#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+  (use-package org-bullets :config (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
+  (add-hook 'org-mode-hook 'org-indent-mode)
+#+END_SRC
+
+Show lists with a bullet rather than the =-= character.
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([-]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+#+end_src
+
 
 *** Navigation
 Setup an easy way to jump to an org headline using org-goto =C-c C-j=
@@ -1407,15 +1416,6 @@ Make shells interactive (i.e. M-!, or source blocks in org)
   (setq shell-command-switch "-c")
 #+END_SRC
 
-
-*** VTerm
-#+begin_src emacs-lisp :tangle ~/.emacs
-  (use-package vterm
-    :bind (
-           :map vterm-mode-map
-                ("<f9>" . nil)
-                ("C-o" . nil)))
-#+end_src
 
 ** Consuming Content
 *** Elfeed
