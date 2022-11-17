@@ -465,9 +465,6 @@ Setup basic editorconfig plugin for closer integration with other tools
 
   ;; optionally
   (use-package lsp-ui :commands lsp-ui-mode)
-  ;; According to https://github.com/tigersoldier/company-lsp/issues/145, company-lsp backend is no longer supported
-  ;; (use-package company-lsp :commands company-lsp)
-  ;; (push 'company-lsp company-backends)
   (use-package helm-lsp :commands helm-lsp-workspace-symbol)
   (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
   ;; optionally if you want to use debugger
@@ -786,6 +783,25 @@ Magit for version control
     (global-set-key (kbd "C-x g") 'magit-status)
     (add-hook 'magit-status-sections-hook 'magit-insert-stashes))
 #+END_SRC
+
+**** Company
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (use-package company
+    :after lsp-mode
+    :hook (prog-mode . company-mode)
+    :config
+    (setq company-minimum-prefix-length 2)
+    (setq company-idle-delay 0.2))
+
+    (global-company-mode)
+    (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
+
+  ;;(setq tab-always-indent 'complete)
+  (setq company-tooltip-align-annotations t)
+
+  (use-package company-box
+    :hook (company-mode . company-box-mode))
+#+end_src
 
 ** Theme/UI
 *** General Settings
