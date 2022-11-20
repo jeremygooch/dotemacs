@@ -200,11 +200,14 @@ Use aspell for Mac (aspell can be installed with brew)
 (setq ispell-program-name "/usr/local/bin/aspell")
 #+END_SRC
 
-
 Silence alarms
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (setq ring-bell-function 'ignore)
 #+END_SRC
+
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (save-place-mode 1)
+#+end_src
 
 *** Dired
 Some basic Dired setup
@@ -1319,6 +1322,11 @@ Use xelatex for more latex options like fontspec
 (setq org-latex-compiler "xelatex")
 #+END_SRC
 
+Show any latex previews by default
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (custom-set-variables '(org-startup-with-latex-preview t))
+#+end_src
+
 *** TODOs/Agenda
 Setup standard todo keywords
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
@@ -1592,6 +1600,14 @@ Lifted from (http://ergoemacs.org/emacs/emacs_copy_file_path.html)
              (message "No process running."))))
 
       #+end_src
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/jrm-util.el
+(defun jrm/wifi-restart-ubuntu ()
+  "Restart wifi on ubuntu & derivities using network manager."
+  (interactive)
+  (shell-command (concat "echo " (shell-quote-argument (read-passwd "Enter Password: "))
+			 " | sudo -S service network-manager restart")))
+#+end_src
 
 *** DWIM Narrow
 The following narrow was lifted from Protesilaos Stavrou blog/video: https://protesilaos.com/codelog/2021-07-24-emacs-misc-custom-commands/
