@@ -1,5 +1,5 @@
 # -*- mode: snippet -*-
-# name: Blue team commit message
+# name: TF Green team commit message
 # key: cmt
 # --
 
@@ -12,8 +12,5 @@ How:
 ${3:HOW (Added new component, controllers, views and its logic.)}
 
 Jira:
-BLUE-${4:####}
-
-Tags:
-${5:TAGS (Create Scoring Guide)}
+GREEN-${4:####}
 $0
