@@ -1465,7 +1465,9 @@ Make sure to unbind f9 for swtiching between frames
   ;; use-package does not set the variable correctly for
   ;; vterm. Resorting to custom-set-variables.
   (custom-set-variables
-   '(vterm-keymap-exceptions (push "<f9>" vterm-keymap-exceptions)))
+   '(vterm-keymap-exceptions (push "<f9>" vterm-keymap-exceptions))
+   '(vterm-keymap-exceptions (push "C-o" vterm-keymap-exceptions)))
+  (define-key vterm-mode-map (kbd "C-q") #'vterm-send-next-key)
 #+end_src
 
 ** Consuming Content
