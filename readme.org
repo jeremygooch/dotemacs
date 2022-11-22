@@ -322,48 +322,6 @@ Generic auto-complete with Ivy which
      (global-set-key (kbd "C-s") 'swiper-isearch))
  #+END_SRC
 
-**** Colorized By Directory
-Colorizing buffer background based on file location or vc status
-#+begin_src emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs" "")
-  (setq counsel-find-file-ignore-regexp "\\(aurelia_project\\|node_modules\\|dist\\|coverage-jest\\)")
-  (defun jrm/counsel-find-all-hack ()
-    "Hackaround for poorly shared plugins"
-    (interactive)
-    (counsel-file-jump "" (vc-root-dir)))
-  (global-set-key (kbd "C-M-SPC") 'jrm/counsel-find-all-hack)
-
-  (defun ignored-file-background ()
-    (interactive)
-    (setq buffer-face-mode-face `(:background "thistle1"))
-    (buffer-face-mode 1))
-  (define-minor-mode ignored-file-mode
-    "Mode for files that are ignored in VC"
-    :lighter " IGNORED-FILE")
-  (add-hook 'ignored-file-mode-hook 'ignored-file-background)
-
-  (defun duplicate-file-background ()
-    (interactive)
-    (setq buffer-face-mode-face `(:background "#283d44"))
-    (buffer-face-mode 1))
-  (define-minor-mode duplicate-file-mode
-    "Mode for files that are in the duplicate-repo directory"
-    :lighter " DUPLICATE-REPO-FILE")
-  (add-hook 'duplicate-file-mode-hook 'duplicate-file-background)
-
-  (defun jrm/set-ignored-mode () ""
-         (let ((ignored (shell-command-to-string (concat "git check-ignore " (buffer-file-name))))
-               (duplicate-repo (cl-search "duplicate-repos" (buffer-file-name))))
-           (if (not (string-empty-p ignored))
-               (ignored-file-mode)
-             (if duplicate-repo
-                 (duplicate-file-mode)))))
-
-  (add-hook 'js2-mode-hook 'jrm/set-ignored-mode)
-  (add-hook 'css-mode-hook 'jrm/set-ignored-mode)
-  (add-hook 'scss-mode-hook 'jrm/set-ignored-mode)
-  (add-hook 'web-mode-hook 'jrm/set-ignored-mode)
-#+end_src
-
 *** Which key
 Some quick help for when I get stuck in the middle of a command
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
