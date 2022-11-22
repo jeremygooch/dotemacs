@@ -341,11 +341,6 @@ Some quick help for when I get stuck in the middle of a command
    (setq create-lockfiles nil)
  #+END_SRC
 
- Disable the narrow-to-region message
- #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-   (put 'narrow-to-region 'disabled nil)
- #+END_SRC
-
 Replace region with next keystroke.
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (delete-selection-mode 1)
@@ -1586,7 +1581,6 @@ The following narrow was lifted from Protesilaos Stavrou blog/video: https://pro
   (defun prot-common-window-bounds ()
     "Determine start and end points in the window."
     (list (window-start) (window-end)))
-  
   ;;;###autoload
   (defun prot-simple-narrow-visible-window ()
     "Narrow buffer to wisible window area.
@@ -1598,16 +1592,13 @@ The following narrow was lifted from Protesilaos Stavrou blog/video: https://pro
       (if (/= buffer-area window-area)
           (narrow-to-region (car bounds) (cadr bounds))
         (user-error "Buffer fits in the window; won't narrow"))))
-  
   ;;;###autoload
   (defun prot-simple-narrow-dwim ()
     "Do-what-I-mean narrowing.
   If region is active, narrow the buffer to the region's
   boundaries.
-  
   If no region is active, narrow to the visible portion of the
   window.
-  
   If narrowing is in effect, widen the view."
     (interactive)
     (unless mark-ring                  ; needed when entering a new buffer
@@ -1625,6 +1616,12 @@ The following narrow was lifted from Protesilaos Stavrou blog/video: https://pro
       (recenter))))
   (global-set-key (kbd "C-x n n") 'prot-simple-narrow-dwim)
 #+end_src
+
+ Disable the narrow-to-region message
+ #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
+   (put 'narrow-to-region 'disabled nil)
+ #+END_SRC
+
 *** Grep customizations
 For various reasons ripgrep does not work with all the projects I need so customizing grep to my liking
 #+begin_src emacs-lisp :tangle ~/.emacs
