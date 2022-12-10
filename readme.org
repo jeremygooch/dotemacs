@@ -356,9 +356,7 @@ Disable bidirectional editing for performance issues when opening large files.
       (use-package yasnippet
         :init (setq yas-snippet-dirs
                     '("~/src/dotemacs/snippets"))
-        :config (yas-global-mode)
-        )
-
+        :config (yas-global-mode))
     #+end_src
 *** In-file Navigation
 Easier paragraph jumping
