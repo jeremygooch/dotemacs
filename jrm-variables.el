@@ -1,7 +1,7 @@
   (defvar *home-dir*              (getenv "HOME"))
   (defvar *dotemacs-dir*          (concat *home-dir* "/src/dotemacs/"))
   (defvar *deno-dir*              (concat *home-dir* "/.deno/bin/deno"))
-  (defvar *node-dir*              (concat *home-dir* "/.nvm/versions/node/v14.16.1/bin/"))
+  (defvar *node-dir*              (concat *home-dir* "/.nvm/versions/node/v14.16.1/"))
   (defvar *eslint-dir*            (concat *home-dir* "/.nvm/versions/node/v14.16.1/lib/node_modules/eslint/bin/"))
   (defvar *org-dir*               (concat *home-dir* "/org/"))
   (defvar *org-roam-dir*          (concat *home-dir* "/org-roam/"))

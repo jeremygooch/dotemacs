@@ -445,11 +445,16 @@ Lsp Mode Performance adjustments (see https://emacs-lsp.github.io/lsp-mode/page/
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (setq lsp-html-server-command (quote
-                                 ((concat *node-dir* "bin/html-languageserver") "--stdio")))
+  (setq lsp-html-server-command (quote ((concat *node-dir* "bin/html-languageserver") "--stdio")))
 
   (setq lsp-clients-angular-language-server-command (quote
-                                                     ("node" (concat *node-dir* "lib/node_modules/@angular/language-server") "--ngProbeLocations" (concat *node-dir* "lib/node_modules") "--tsProbeLocations" (concat *node-dir* "lib/node_modules") "--stdio")))
+                                                     ("node"
+                                                      "/home/jrm/.nvm/versions/node/v16.13.2/lib/node_modules/@angular/language-server"
+                                                      "--ngProbeLocations"
+                                                      "/home/jrm/.nvm/versions/node/v16.13.2/lib/node_modules"
+                                                      "--tsProbeLocations"
+                                                      "/home/jrm/.nvm/versions/node/v16.13.2/lib/node_modules"
+                                                      "--stdio")))
 #+END_SRC
 
 ***** LSP Utility functions
@@ -766,17 +771,17 @@ Magit for version control
     "Updates additional colors and such based on the current modus theme"
     (let ((isOperandi (string-equal theme "operandi")))
       (if isOperandi
-	  (custom-set-faces
-	   '(org-block ((t (:inherit shadow :extend t :background "gray83"))))
-	   '(org-block-begin-line ((t (:extend t :background "gray95" :foreground "gray59" :height 0.9))))
-	   '(org-block-end-line ((t (:extend t :background "gray95" :foreground "gray59" :height 0.9)))))
-	(custom-set-faces
-	 '(org-block ((t (:inherit shadow :extend t :background "gray20"))))
-	 '(org-block-begin-line ((t (:extend t :background "gray11" :foreground "dim gray" :height 0.9))))
-	 '(org-block-end-line ((t (:extend t :background "gray11" :foreground "dim gray" :height 0.9))))))
+          (custom-set-faces
+           '(org-block ((t (:inherit shadow :extend t :background "gray83"))))
+           '(org-block-begin-line ((t (:extend t :background "gray95" :foreground "gray59" :height 0.9))))
+           '(org-block-end-line ((t (:extend t :background "gray95" :foreground "gray59" :height 0.9)))))
+        (custom-set-faces
+         '(org-block ((t (:inherit shadow :extend t :background "gray20"))))
+         '(org-block-begin-line ((t (:extend t :background "gray11" :foreground "dim gray" :height 0.9))))
+         '(org-block-end-line ((t (:extend t :background "gray11" :foreground "dim gray" :height 0.9))))))
       (if isOperandi
-	  (setq dashboard-startup-banner (concat *dotemacs-dir* "assets/Lambda_light.png"))
-	(setq dashboard-startup-banner (concat *dotemacs-dir* "assets/Lambda_dark.png")))
+          (setq dashboard-startup-banner (concat *dotemacs-dir* "assets/Lambda_light.png"))
+        (setq dashboard-startup-banner (concat *dotemacs-dir* "assets/Lambda_dark.png")))
   ;
   ; (if isOperandi
   ;; 	(set-face-background hl-line-face "LightSteelBlue1")
@@ -785,11 +790,11 @@ Magit for version control
       ))
 
   (defun jrm/modus-themes-toggle () ""
-	 (interactive)
-	 (pcase (modus-themes--current-theme)
-	   ('modus-operandi (jrm/modus-operandi_extra-adjustments "operandi"))
-	   ('modus-vivendi (jrm/modus-operandi_extra-adjustments "vivendi"))
-	   (_ (message "No modus theme enabled"))))
+         (interactive)
+         (pcase (modus-themes--current-theme)
+           ('modus-operandi (jrm/modus-operandi_extra-adjustments "operandi"))
+           ('modus-vivendi (jrm/modus-operandi_extra-adjustments "vivendi"))
+           (_ (message "No modus theme enabled"))))
 
 
   (use-package modus-themes
@@ -1051,6 +1056,7 @@ Fonts and variable pitch mode for alignment issues with non-monospaced fonts.
   (add-hook 'org-mode-hook (lambda () (set-face-attribute 'org-block nil :inherit 'fixed-pitch :height 0.8)))
   (custom-set-faces
    '(variable-pitch ((t (:family "Roboto"))))) ;; make sure this font is installed
+  (add-hook 'org-mode-hook (lambda () (set-face-attribute 'org-date nil :inherit 'fixed-pitch)))
 #+end_src
 
 
