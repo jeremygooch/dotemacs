@@ -633,6 +633,82 @@ Add ECMA unicode glyphs that I like
   (add-hook 'typescript-mode-hook 'jrm/ecma-prettify-symbols)
 #+END_SRC
 
+Quick hack to show/hide import statements for JS/TS
+#+begin_src emacs-lisp :tangle ~/.emacs
+(defcustom jrm/imports-placeholder-content "[imports...]"
+  "Text to show in place of a folded block."
+  :tag "Ellipsis"
+  :type 'string
+  :group 'jrmhideimports)
+
+(defvar import-mark-fringe nil)
+
+(defun jrm/add-import-mark-fringe ()
+  (interactive)
+  (let ((s (make-string 1 ?x)))
+	(when import-mark-fringe (delete-overlay import-mark-fringe))
+	(setq import-mark-fringe (make-overlay (point) (1+ (point))))
+	(put-text-property 0 1 'display '(left-fringe right-triangle) s)
+	(overlay-put import-mark-fringe 'before-string s)))
+
+
+(defun jrm/remove-import-mark-fringe ()
+  (interactive)
+  (when import-mark-fringe (delete-overlay import-mark-fringe)))
+
+
+(defun jrm/imports-placeholder ()
+  "Return propertized ellipsis content."
+  (concat " "
+	  (propertize jrm/imports-placeholder-content 'face 'font-lock-comment-face)
+	  " "))
+
+(defun jrm/jsts-hide-imports ()
+  "Hide standard imports based on regex for standard JS/TS imports of multiple modules"
+  (let ((final-location (point)))
+    (funcall (lambda () "Use regex to hide the imports"
+	       (end-of-buffer)
+	       (search-backward-regexp "from[[:space:]\.].*;")
+	       (next-line)
+	       (set-mark-command nil)
+	       (jrm/add-import-mark-fringe)
+	       (beginning-of-buffer)
+
+	       (let ((new-overlay (make-overlay (region-beginning) (region-end))))
+		 (overlay-put new-overlay 'invisible t)
+		 (overlay-put new-overlay 'intangible t)
+		 (overlay-put new-overlay 'evaporate t)
+		 (overlay-put new-overlay 'before-string (jrm/imports-placeholder))
+		 (overlay-put new-overlay 'category "hide-js-imports"))
+
+	       ;; (next-line)
+	       ;; (beginning-of-buffer)
+	       (goto-char final-location)
+
+	       (pop-mark)
+	       ;; (next-line)
+
+	       (message "Imports hidden")))))
+
+(defun jrm/has-import-overlay ()
+  "Finds any matching overlays"
+  (mapcar (lambda (overlay)
+	    (and (member "hide-js-imports" (overlay-properties overlay)) overlay))
+	  (overlays-in (point-min) (point-max))))
+
+(defun jrm/jsts-show-imports ()
+  "Show module imports"
+  (mapcar 'delete-overlay (delq nil (jrm/has-import-overlay)))
+  (jrm/remove-import-mark-fringe))
+
+(defun jrm/jsts-toggle-imports ()
+  "Show/Hide standard module import code"
+  (interactive)
+  (if (delq nil (jrm/has-import-overlay))
+      (jrm/jsts-show-imports)
+    (jrm/jsts-hide-imports)))
+#+end_src
+
 ***** Indentation
 Defining custom indentation based on project paths and setting them to functions that I can call as needed. 
 #+begin_src emacs-lisp :tangle ~/.emacs
