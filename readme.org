@@ -682,6 +682,8 @@ Defining custom indentation based on project paths and setting them to functions
   ;; (add-hook 'web-mode-hook 'jrm/develop-environment)
   ;; (add-hook 'json-mode-hook 'jrm/neon-code-style)
 #+END_SRC
+***** Lint On Save
+
 **** HTML/CSS
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package sass-mode
@@ -806,14 +808,14 @@ Magit for version control
           modus-themes-region '(bg-only))
 
     ;; Load the theme files before enabling a theme
-    (modus-themes-load-themes)
+    ;; (modus-themes-load-themes)
 
     ;; Enable personal customizations after loading a modus theme
     (add-hook 'modus-themes-after-load-theme-hook 'jrm/modus-themes-toggle)
 
     :config
     ;; Load the theme of your choice:
-    (modus-themes-load-operandi) ;; OR (modus-themes-load-vivendi)
+    (load-theme 'modus-operandi :no-confirm) ;; (load-theme 'modus-vivendi)
     :bind ("<f5>" . modus-themes-toggle))
 #+END_SRC
 
@@ -1416,7 +1418,7 @@ Make shells interactive (i.e. M-!, or source blocks in org)
 
 *** Vterm
 Make sure to unbind f9 for swtiching between frames
-#+begin_src emacs-lisp :tangle (if (string-equal system-type "darwin") "~/.emacs" "")
+#+begin_src emacs-lisp
   (use-package vterm)
   ;; for some reason, using a setq or the :config or :custom keyword in
   ;; use-package does not set the variable correctly for
