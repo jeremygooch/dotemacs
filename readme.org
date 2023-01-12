@@ -819,6 +819,9 @@ Magit for version control
     :config
     (global-set-key (kbd "C-x g") 'magit-status)
     (add-hook 'magit-status-sections-hook 'magit-insert-stashes))
+
+  ;; Getting an alist-void error when running magit commands that refresh the buffer. Narrowed down to this variable so turning off for now
+  (setq magit-section-cache-visibility nil)
 #+END_SRC
 
 **** Company
