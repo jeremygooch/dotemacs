@@ -1713,6 +1713,18 @@ For various reasons ripgrep does not work with all the projects I need so custom
 (setq grep-find-ignored-directories (quote ("SCCS" "RCS" "CVS" "MCVS" ".src" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "node_modules" "vendor" "dist" "coverage")))
 #+end_src
 
+*** Sudo current buffer
+Thank you [[https://www.masteringemacs.org/][mastering emacs]]!
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (defun sudo ()
+    "Use TRAMP to `sudo' the current buffer."
+    (interactive)
+    (when buffer-file-name
+      (find-alternate-file
+       (concat "/sudo:root@localhost:"
+               buffer-file-name))))
+#+end_src
+
 ** Final Pieces
 *** Remap Key sequences
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
