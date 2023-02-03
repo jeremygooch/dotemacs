@@ -1707,6 +1707,30 @@ The following narrow was lifted from Protesilaos Stavrou blog/video: https://pro
    (put 'narrow-to-region 'disabled nil)
  #+END_SRC
 
+*** DWIM Copy & Comment
+#+begin_src emacs-lisp :tangle ~/.emacs
+  (defun jrm/kill-and-comment-dwim (arg)
+    "Takes the active region duplicates it and comments
+  out the top copy. If no region is selected, the region selected with
+  mark-paragraph is used.
+
+  With a universal prefix argument, do not paste the content but saves
+  it to the kill ring."
+    (interactive "P")
+    (if (not mark-active) (mark-paragraph))
+    (let ((start (region-beginning))
+          (end (region-end)))
+      (kill-ring-save start end)
+      (comment-region start end)
+      (if (not (bound-and-true-p arg))
+        (progn
+          (goto-char end)
+          (end-of-line)
+          (insert "\n")
+          (yank)))))
+
+  (global-set-key (kbd "M-RET") 'jrm/kill-and-comment-dwim)
+#+end_src
 *** Grep customizations
 For various reasons ripgrep does not work with all the projects I need so customizing grep to my liking
 #+begin_src emacs-lisp :tangle ~/.emacs
