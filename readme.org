@@ -1727,7 +1727,12 @@ The following narrow was lifted from Protesilaos Stavrou blog/video: https://pro
           (goto-char end)
           (end-of-line)
           (insert "\n")
-          (yank)))))
+          (yank)
+
+          ;; Delete evidence
+          (pop kill-ring)
+          (when kill-ring-yank-pointer
+            (setq kill-ring-yank-pointer kill-ring))))))
 
   (global-set-key (kbd "M-RET") 'jrm/kill-and-comment-dwim)
 #+end_src
