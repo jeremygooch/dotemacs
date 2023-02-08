@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: constructor
+# key: cstr
+# --
+
+constructor(
+    ${1:argument}
+) {
+    $0
+}

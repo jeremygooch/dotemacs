@@ -996,8 +996,8 @@ Helpful for finding the cursor when jumping around
   (set-face-background hl-line-face "LightSteelBlue1")
 #+END_SRC
 
-*** Ivy Posframe
-    #+begin_src emacs-lisp :tangle ~/.emacs
+*** Ivy Posframe (Not used)
+    #+begin_src emacs-lisp
       (use-package ivy-posframe
 	:config
 	(setq ivy-posframe-display-functions-alist
@@ -1010,11 +1010,6 @@ Helpful for finding the cursor when jumping around
     #+end_src
 
 *** Modeline
-Clean up modeline with diminish
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (use-package diminish)
-#+END_SRC
-
 Use the spaceline from spacemacs
 #+begin_src emacs-lisp :tangle ~/.emacs
 (use-package spaceline
@@ -1060,41 +1055,6 @@ Display the current time and battery indicator
 #+begin_src emacs-lisp :tangle ~/.emacs
 (global-set-key (kbd "<f9>") 'other-frame)
 #+end_src
-*** Mouse
-We'll need to turn off the mouse from time to time
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (use-package disable-mouse :diminish disable-mouse-mode)
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp :tangle no
-  (global-disable-mouse-mode)
-#+END_SRC
-
-Because linux runs exwm we shouldn't turn the mouse off completely.
-#+BEGIN_SRC emacs-lisp :tangle (if (string-equal system-type "gnu/linux") "~/.emacs" "")
-  (add-hook 'lisp-interaction-mode                'disable-mouse-mode)
-  (add-hook 'shell-mode-hook                      'disable-mouse-mode)
-  (add-hook 'org-src-mode-hook                    'disable-mouse-mode)
-  (add-hook 'org-mode-hook                        'disable-mouse-mode)
-  (add-hook 'javascript-mode-hook                 'disable-mouse-mode)
-  (add-hook 'rjsx-mode-hook                       'disable-mouse-mode)
-  (add-hook 'text-mode-hook                       'disable-mouse-mode)
-  (add-hook 'web-mode-hook                        'disable-mouse-mode)
-  (add-hook 'dired-mode-hook                      'disable-mouse-mode)
-  (add-hook 'org-mode-hoook                       'disable-mouse-mode)
-  (add-hook 'lisp-interaction-mode-hook           'disable-mouse-mode)
-  (add-hook 'emacs-lisp-mode-hook                 'disable-mouse-mode)
-  (add-hook 'special-mode-hook                    'disable-mouse-mode)
-  (add-hook 'fundamental-mode-hook                'disable-mouse-mode)
-  (add-hook 'groovy-mode-hook                     'disable-mouse-mode)
-  (add-hook 'org-agenda-mode-hook                 'disable-mouse-mode)
-  (add-hook 'eshell-mode-hook                     'disable-mouse-mode)
-  (add-hook 'slack-message-buffer-mode-hook       'disable-mouse-mode)
-  (add-hook 'typescript-mode-hook                 'disable-mouse-mode)
-  (add-hook 'clojure-mode-hook                    'disable-mouse-mode)
-  (add-hook 'repl-mode-hook                       'disable-mouse-mode)
-#+END_SRC
-
 *** Symbols
 Show symbols by default
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
@@ -1220,10 +1180,10 @@ Set the node environment
  #+end_src
 
 **** Additional Modes
- Add some export modes for getting content out of org. Not using ~:defer~ here as I'm not sure it's helpful and adding it to ~ob-clojure~ throws a ~Wrong type argument: stringp, :defer~ error.
+ Add some export modes for getting content out of org. Adding diminish to ~ob-clojure~ throws a ~Wrong type argument: stringp, :defer~ error.
  #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-   (use-package ox-twbs)
-   (use-package ob-rust)
+   (use-package ox-twbs :defer)
+   (use-package ob-rust :defer)
    (use-package ob-restclient)
    (require 'ob-clojure)
    (use-package ob-typescript :diminish typescript-mode)
