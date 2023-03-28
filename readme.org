@@ -783,6 +783,13 @@ Defining custom indentation based on project paths and setting them to functions
 
 #+END_SRC
 
+Quick utility for converting rems to px using base 16
+#+begin_src emacs-lisp :tangle ~/.emacs
+(defun jrm/rem-to-px () "" (interactive)
+       (let (n) (setq n (read-number "Enter REM value: "))
+	    (message "%spx" (* 16 n))))
+#+end_src
+
 **** PHP Development
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (use-package php-mode
