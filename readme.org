@@ -5,6 +5,8 @@
 #+PROPERTY: header-args :results silent :tangle yes
 #+SEQ_TODO: TODO(t) | DONE(d)
 :END:
+* Deprecated
+This repo has been deprecated and moved to [[https://github.com/jeremygooch/jeremacs]].
 
 * Dependencies
  - Update variables for local setup
@@ -1246,27 +1248,6 @@ For org-babel's clojure backend use cider rather than the default slime
 #+END_SRC
 
 *** Org Capture
-Customize org capture to my liking
-#+BEGIN_SRC emacs-lisp :tangle ~/.emacs
-  (global-set-key (kbd "C-c c") 'org-capture)
-  (setq org-capture-templates
-        '((" " "TODOs ==============================" entry (file "") "")
-          ("w" "Work Todo" entry (file "/Users/jeremygooch/org-roam/20221101090059-teachforward_todos.org")
-           "** TODO %? :tf:\n  %i\n  %a")
-          ("a" "Acer/Work Todo" entry (file+headline "~/org/work/TeachForward/acer.org" "Todos")
-           "** TODO %? :tf:\n  %i\n  %a")
-          ("l" "Personal Todo\n" entry (file "~/org/personal/personal.org")
-           "*** TODO %? :personal:\n  %i\n  %a")
-          (" " "PROGRAMMING SNIPPETS ===============" entry (file "") "")
-          ("j" "JS Snippet" entry (file "~/org/personal/research/development/js/Javascript-snippets.org")
-           "* \n #+BEGIN_SRC js\n%?\n#+END_SRC\n\n[Date: %<%Y-%d-%m>]" :prepend t)
-          ("t" "TS Snippet\n" entry (file "~/org/personal/research/development/js/Javascript-snippets.org")
-           "* \n #+BEGIN_SRC typescript\n%?\n#+END_SRC\n\n[Date: %<%Y-%d-%m>]" :prepend t)
-          (" " "MEETINGS ===========================" entry (file "") "")
-          ("m" "Meeting\n" entry (file+headline "~/org/work/TeachForward/teachforward.org" "Meetings")
-           "** MEETING with %? :MEETING:\n  %i\n"  :clock-in t :clock-resume t)))
-
-#+END_SRC
 
 **** Global Org Capture
 Simple command to open emacs (assumes it's already running) and launch org capture in a new frame. This can be bound to a global key sequence.
@@ -1353,7 +1334,7 @@ Setup standard todo keywords
 File locations for org agenda
 #+BEGIN_SRC emacs-lisp :tangle ~/.emacs
   (global-set-key (kbd "C-c a") 'org-agenda)
-  (setq org-agenda-files (list "~/org/work/TeachForward/" "~/org/personal/"))
+
 
   (setq org-agenda-custom-commands
         '(("p" "Personal Week and Task List"
@@ -1371,11 +1352,7 @@ File locations for org agenda
             ;; (search ":status:   In Test")
             (search ":status:   Ready for Demo"))
            ((org-agenda-files '("~/.org-jira"))))
-          ("w" "Work Week and Task List"
-           ((agenda "")
-            (alltodo)
-            (search "* DONE"))
-           ((org-agenda-files '("~/org/work/TeachForward"))))
+        
           ("A" "Personal and Work Week and Task List"
            ((agenda "")
             (alltodo)
